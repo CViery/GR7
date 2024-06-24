@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="{{url_for('static', filename= 'css/login.css')}}">
+</head>
+<body>
+  <div class="login-container">
+    <h3>LOGIN</h3>
+    <form action="/login/autenticar" method='POST'>
+      <label for="usuario">Usuário</label>
+      <input type="text" name="usario" id="usuario" required>
+      <label for="senha">Senha</label>
+      <input type="password" name="senha" id="senha" required>
+      <label for="empresa">Empresa</label>
+      <select name="empresa" id="empresa">
+        <option value="gr7">GR7</option>
+        <option value="portal">Portal</option>
+      </select>
+      <button type="submit">Entrar</button>
+    </form>
+  </div>
+</body>
+</html>

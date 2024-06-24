@@ -1,0 +1,16 @@
+
+.container_options{
+  display: flex;
+  align-items: center;
+  padding: 1em;
+  justify-content: space-around;
+}
+.dados{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 2em;
+  padding: 5em;
+  font-size: 1.2em;
+  
+}

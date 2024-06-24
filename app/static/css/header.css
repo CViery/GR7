@@ -1,0 +1,34 @@
+*{
+  padding: 0;
+  margin: 0;
+}
+.header_style{
+  width: 100vw;
+  height: 15vh;
+  background-color: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  
+}
+
+.link_style{
+  text-decoration: none;
+  color: white;
+}
+
+.nav_bar{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10em;
+}
+.nav_links{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2em;
+  font-style: none;
+}

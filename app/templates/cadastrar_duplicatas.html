@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Inicio - {{ empresa }}</title>
+{% endblock %}
+
+{% block main %}
+<main>
+  <h1>Cadastrar Duplicata</h1>
+  <form id="duplicataForm" method="POST" action="/cadastrar_duplicata" style="max-width: 1000px; margin: auto;">
+    <div class="form-group">
+      <label for="numeroDuplicata">Número da Duplicata:</label>
+      <input type="text" id="numeroDuplicata" name="numeroDuplicata" required class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="quantidadeNotas">Quantidade de Notas:</label>
+      <input type="number" id="quantidadeNotas" name="quantidadeNotas" min="1" required class="form-control">
+    </div>
+    <button type="button" onclick="gerarCamposNotas()" class="btn btn-secondary mt-2">Gerar Campos para Notas</button>
+    
+    <div id="camposNotas" class="notas-container mt-3"></div>
+    
+    <div class="form-group mt-3">
+      <label for="quantidadeParcelas">Quantidade de Parcelas:</label>
+      <input type="number" id="quantidadeParcelas" name="quantidadeParcelas" min="1" class="form-control" required>
+    </div>
+    <button type="button" onclick="gerarCamposParcelas()" class="btn btn-secondary mt-2">Gerar Campos para Parcelas</button>
+    
+    <div id="camposParcelas" class="parcelas-container mt-3"></div>
+    
+    <button type="submit" class="btn btn-success mt-3">Cadastrar Duplicata</button>
+  </form>
+</main>
+
+<script>
+  function gerarCamposNotas() {
+    const quantidadeNotas = document.getElementById('quantidadeNotas').value;
+    const camposNotas = document.getElementById('camposNotas');
+    camposNotas.innerHTML = '';
+
+    for (let i = 1; i <= quantidadeNotas; i++) {
+      const campoNota = document.createElement('div');
+      campoNota.className = 'nota-item card';
+      campoNota.innerHTML = `
+        <h3>Nota ${i}</h3>
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="numeroNota${i}">Número da Nota:</label>
+            <input type="text" id="numeroNota${i}" name="numeroNota[]${i}" required class="form-control" onchange="puxarInformacoesNota(${i})">
+          </div>
+          <div class="form-group col">
+            <label for="fornecedorNota${i}">Fornecedor:</label>
+            <input type="text" id="fornecedorNota${i}" name="fornecedorNota[]${i}" readonly class="form-control">
+          </div>
+          <div class="form-group col">
+            <label for="dataEmissaoNota${i}">Data de Emissão:</label>
+            <input type="text" id="dataEmissaoNota${i}" name="dataEmissaoNota[]${i}" readonly class="form-control">
+          </div>
+          <div class="form-group col">
+            <label for="valorNota${i}">Valor:</label>
+            <input type="text" id="valorNota${i}" name="valorNota[]]${i}" readonly class="form-control">
+          </div>
+        </div>
+      `;
+      camposNotas.appendChild(campoNota);
+    }
+  }
+
+  function puxarInformacoesNota(i) {
+    const numeroNota = document.getElementById(`numeroNota${i}`).value;
+
+    fetch(`/api/nota/${numeroNota}`)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.error) {
+          document.getElementById(`fornecedorNota${i}`).value = data.fornecedor;
+          document.getElementById(`dataEmissaoNota${i}`).value = data.data_emissao;
+          document.getElementById(`valorNota${i}`).value = data.valor;
+        } else {
+          alert(data.error);
+        }
+      })
+      .catch(error => console.error('Erro ao buscar informações da nota:', error));
+  }
+
+  function gerarCamposParcelas() {
+    const quantidadeParcelas = document.getElementById('quantidadeParcelas').value;
+    const camposParcelas = document.getElementById('camposParcelas');
+    camposParcelas.innerHTML = '';
+
+    for (let i = 1; i <= quantidadeParcelas; i++) {
+      const campoParcela = document.createElement('div');
+      campoParcela.className = 'parcela-item card';
+      campoParcela.innerHTML = `
+        <h5>Parcela ${i}</h5>
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="valorParcela${i}">Valor:</label>
+            <input type="text" id="valorParcela${i}" name="valorParcela${i}" required class="form-control">
+          </div>
+          <div class="form-group col">
+            <label for="vencimentoParcela${i}">Vencimento:</label>
+            <input type="date" id="vencimentoParcela${i}" name="vencimentoParcela${i}" required class="form-control">
+          </div>
+        </div>
+      `;
+      camposParcelas.appendChild(campoParcela);
+    }
+  }
+</script>
+
+<style>
+  .form-group {
+    margin-bottom: 15px;
+  }
+  .form-control {
+    border-radius: 5px;
+  }
+  .nota-item, .parcela-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+  }
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn {
+    border-radius: 5px;
+  }
+  .mt-2 {
+    margin-top: 10px;
+  }
+  .mt-3 {
+    margin-top: 15px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .notas-container, .parcelas-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+</style>
+{% endblock %}

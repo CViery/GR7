@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Cadastrar Nota - {{ empresa }}</title>
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/cadastrar_nota.css')}}">
+{% endblock %}
+{% block main %}
+<main>
+    <form class="cadastro-nota" action="/gastos/cadastros/notas-cadastrar-nota" method="post" >
+        <div class="form-row">
+            <div class="form-group">
+                <label for="emitido-para">Emitido Para:</label>
+                <select id="emitido-para" name="emitido-para">
+                    <option value="GR7">GR7</option>
+                    <option value="DANIEL">DANIEL</option>
+                    <option value="GILBERTO">GILBERTO</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status">
+                    <option value="PENDENTE">PENDENTE</option>
+                    <option value="PAGO">PAGO</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="boleto">Boleto:</label>
+                <select id="boleto" name="boleto">
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nota">Nota:</label>
+                <input type="text" id="nota" name="nota">
+            </div>
+
+            <div class="form-group">
+                <label for="duplicata">Duplicata:</label>
+                <input type="text" id="duplicata" name="duplicata">
+            </div>
+
+            <div class="form-group">
+                <label for="fornecedor">Fornecedor:</label>
+                <select id="fornecedor" name="fornecedor">
+                    <option value="SKY">SKY</option>
+                    <option value="COMPEL">COMPEL</option>
+                    <option value="BIS">BIS</option>
+                    <option value="ACCIOLY">ACCIOLY</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="emissao">Emissão:</label>
+                <input type="date" id="emissao" name="emissao">
+            </div>
+
+            <div class="form-group">
+                <label for="valor">Valor:</label>
+                <input type="text" id="valor" name="valor">
+            </div>
+
+            <div class="form-group">
+                <label for="despesa">Despesa:</label>
+                <select id="despesa" name="despesa">
+                    <option value="PEÇAS">PEÇAS</option>
+                    <option value="FOLHA">FOLHA</option>
+                    <option value="INTERNET">INTERNET</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <button type="submit">Cadastrar Nota</button>
+            </div>
+        </div>
+    </form>
+</main>
+
+{% endblock %}

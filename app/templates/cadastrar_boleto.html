@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Inicio - {{ empresa }}</title>
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/cadastrar_boleto.css')}}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <h1>Cadastro de Boletos</h1>
+    <form id="boletoForm" method="post" action="{{ url_for('cadastrar_boletos') }}">
+        <div class="form-group">
+            <label for="numeroNota">Número da Nota:</label>
+            <input type="text" id="numeroNota" name="num_nota" value="{{ num_nota }}" readonly>
+        </div>
+        <div class="form-group">
+            <label for="fornecedor">Fornecedor:</label>
+            <input type="text" id="fornecedor" name="fornecedor" value="{{ fornecedor }}" readonly>
+        </div>
+        <div class="form-group">
+            <label for="numParcelas">Número de Parcelas:</label>
+            <input type="number" id="numParcelas" name="numParcelas" min="1" required>
+        </div>
+        <div id="parcelasContainer"></div>
+        <div class="form-group">
+            <button type="submit">Cadastrar</button>
+        </div>
+    </form>
+</main>
+
+<script>
+document.getElementById('numParcelas').addEventListener('input', function() {
+    const parcelasContainer = document.getElementById('parcelasContainer');
+    parcelasContainer.innerHTML = '';
+
+    const numParcelas = parseInt(this.value);
+    if (!isNaN(numParcelas) && numParcelas > 0) {
+        for (let i = 1; i <= numParcelas; i++) {
+            const parcelaDiv = document.createElement('div');
+            parcelaDiv.classList.add('form-group', 'compact');
+            parcelaDiv.innerHTML = `
+                <h3>Parcela ${i}</h3>
+                <div class="form-group compact">
+                    <label for="valorParcela${i}">Valor:</label>
+                    <input type="number" id="valorParcela${i}" name="valorParcela${i}" step="0.01" required>
+                </div>
+                <div class="form-group compact">
+                    <label for="dataVencimento${i}">Data de Vencimento:</label>
+                    <input type="date" id="dataVencimento${i}" name="dataVencimento${i}" required>
+                </div>
+            `;
+            parcelasContainer.appendChild(parcelaDiv);
+        }
+    }
+});
+</script>
+{% endblock %}

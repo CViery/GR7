@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="{{url_for('static', filename= 'css/header.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename= 'css/index.css')}}">
+  
+  {%block title%}
+  {%endblock%}
+</head>
+<body>
+  <header class="header_style">
+    <nav class="nav_bar">
+      {% if empresa == 'gr7' %}
+        <p>GR7</p>
+      {% elif empresa == 'portal' %}
+        <p>Portal</p>
+      {% else %}
+        <p>Teste</p>
+      {% endif %}
+      <ul class="nav_links">
+        <li><a class="link_style" href="/home">Inicio</a></li>
+        <li><a class="link_style" href="/gastos">Gastos</a></li>
+        <li><a class="link_style" href="/faturamento">Faturamento</a></li>
+        <li><a class="link_style" href="/logout">Sair</a></li>
+      </ul>
+    </nav>
+  </header>
+  {%block main%}
+  {%endblock%}
+  <footer><h1>FOOTER</h1></footer>
+</body>
+</html>
