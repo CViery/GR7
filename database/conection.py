@@ -2,7 +2,7 @@ import sqlite3
 
 class Database:
     def __init__(self):
-        self.conn = sqlite3.connect('teste.db')
+        self.conn = sqlite3.connect('database.db')
         self.cursor = self.conn.cursor()
     
     def ver_faturamento(self, mes, ano):
@@ -29,22 +29,18 @@ class DatabaseGastos:
         self.conn = sqlite3.connect('database.db')
         self.cursor = self.conn.cursor()
     
+
+    def set_boleto(self, boleto):
+        pass
+
+    def set_notas(self, nota):
+        pass
     def verGastos(self):
         pass
 
     def gastos_por_tipo(self,tipo, mes, ano):
         try:
-            print(tipo)
-            print(mes)
-            print(ano)
-            self.cursor.execute('SELECT valor_nota FROM gastos WHERE despesas = ? AND mes = ? AND ano = ?', (tipo, mes, ano))
-            result = self.cursor.fetchall()
-            valores = []
-            for valor in result:
-                valores.append(valor[0])
-            output = sum(valores)
-            print(output)
-            return output
+            pass
         except Exception as e:
             pass
 

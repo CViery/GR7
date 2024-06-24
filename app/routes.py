@@ -1,6 +1,6 @@
 from app import app
 from flask import request, redirect, render_template, flash, session, jsonify
-from services import login, cadastrar_notas
+from services import login, cadastrar_notas, cadastrar_duplicata
 
 class Routes:
     def __init__(self):
@@ -94,9 +94,19 @@ class Routes:
                 parcelas.append({'valor': valor, 'data_vencimento': data_vencimento})
 
                 # Aqui você pode salvar os dados no banco de dados ou processá-los conforme necessário
-            print(f'Número da Nota: {numero_nota}')
+            """ print(f'Número da Nota: {numero_nota}')
             print(f'Fornecedor: {fornecedor}')
-            print(f'Parcelas: {parcelas}')
+            print(f'Parcelas: {parcelas}') """
+            for parcela in parcelas:
+                boleto = {
+                    'num_nota': numero_nota,
+                    'notas': '',
+                    'fornecedor': fornecedor,
+                    'vencimento': parcela['data_vencimento'],
+                    'valor': parcela['valor']
+                }
+                db = cadastrar_notas.Boletos()
+                db.cadastrar(boleto)
 
                 # Redireciona para uma página de confirmação ou volta para a página inicial
             return 'Boleto Salvo'
@@ -126,15 +136,20 @@ class Routes:
         notas_cadastradas = []
         parcelas_cadastradas = []
 
-        for i in range(len(request.form.getlist('numeroNota[]'))):
+        numero_notas = request.form.getlist('numeroNota[]')
+        fornecedor_notas = request.form.getlist('fornecedorNota[]')
+        data_emissao_notas = request.form.getlist('dataEmissaoNota[]')
+        valor_notas = request.form.getlist('valorNota[]')
+
+        for i in range(len(numero_notas)):
             nota = {
-                'numero': request.form.getlist('numeroNota[]')[i],
-                'fornecedor': request.form.getlist('fornecedorNota[]')[i],
-                'data_emissao': request.form.getlist('dataEmissaoNota[]')[i],
-                'valor': request.form.getlist('valorNota[]')[i]
+                'numero': numero_notas[i],
+                'fornecedor': fornecedor_notas[i],
+                'data_emissao': data_emissao_notas[i],
+                'valor': valor_notas[i]
             }
             notas_cadastradas.append(nota)
-            print(nota)
+
         quantidade_parcelas = int(request.form['quantidadeParcelas'])
 
         for i in range(1, quantidade_parcelas + 1):
@@ -149,8 +164,9 @@ class Routes:
             'notas': notas_cadastradas,
             'parcelas': parcelas_cadastradas
         }
-        print(duplicata)
-        print(notas_cadastradas)
+        db = cadastrar_duplicata.Boletos()
+        db.cadastrar_duplicatas(duplicata)
+        
         # Aqui você pode salvar a duplicata no banco de dados
         # ...
 
