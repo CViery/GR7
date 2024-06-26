@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Inicio - {{ empresa }}</title>
+<style>
+    body { font-family: Arial, sans-serif; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { padding: 10px; border: 1px solid #ddd; }
+    th { background-color: #f4f4f4; }
+    form { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    label { margin-right: 5px; }
+    select, input[type="date"], button { margin-right: 10px; }
+    .flex-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 10px; gap: 20px; }
+    .flex-container { display: flex; flex-direction: column; gap: 20px; }
+    .flex-item { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+</style>
+{% endblock %}
+
+{% block main %}
+<main>
+  <div>
+    <a href="/gastos/cadastros/notas">Cadastrar Notas</a>
+    <a href="/cadastrar_duplicata">Cadastrar Boletos</a>
+    <a href="">Conusltar Notas</a>
+    <a href="">Consultar Boletos</a> 
+  </div>
+    <div class="container">
+        <h1>Dashboard de Despesas</h1>
+
+        <form method="POST">
+            <div class="flex-row">
+                <label for="mes">Mês:</label>
+                <select id="mes" name="mes">
+                    <option value="">Selecione o mês</option>
+                    {% for mes in meses %}
+                        <option value="{{ mes[0] }}">{{ mes[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="ano">Ano:</label>
+                <select id="ano" name="ano">
+                    <option value="">Selecione o ano</option>
+                    {% for ano in years %}
+                        <option value="{{ ano }}" {% if ano == year %}selected{% endif %}>{{ ano }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Filtrar</button>
+            </div>
+        </form>
+
+        <div class="flex-container">
+            <div class="flex-item">
+                <h2>Despesas por Tipo</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for despesa in tipo_despesa %}
+                        <tr>
+                            <td>{{ despesa[0] }}</td>
+                            <td>{{ despesa[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex-item">
+                <h2>Despesas do Mês</h2>
+                <p>Total: {{ despesas_mes }}</p>
+            </div>
+
+            <div class="flex-item">
+                <h2>Boletos Vencendo Hoje</h2>
+                <form method="POST" id="filtroForm" action="/gastos">
+                    <div class="flex-row">
+                        <label for="dia">Dia:</label>
+                        <input type="date" id="dia" name="dia">
+                        <button type="submit">Filtrar</button>
+                    </div>
+                </form>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Valor</th>
+                            <th>Data de Vencimento</th>
+                            <th>Número da Nota</th>
+                            <th>Notas que Fazem Parte</th>
+                            <th>Fornecedor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="boletosBody">
+                        {% for boleto in boletos %}
+                        <tr>
+                            <td>{{ boleto['valor'] }}</td>
+                            <td>{{ boleto['vencimento'] }}</td>
+                            <td>{{ boleto['numero_nota'] }}</td>
+                            <td>{{ boleto['notas'] }}</td>
+                            <td>{{ boleto['fornecedor'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+{% endblock %}

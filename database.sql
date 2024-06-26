@@ -10,4 +10,7 @@ CREATE TABLE IF NOT EXISTS despesas (despesa);
 
 DROP TABLE notas;
 
+
+UPDATE notas SET despesa = 'Peças'; 
+
 DROP TABLE boletos;

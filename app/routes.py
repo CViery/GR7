@@ -1,6 +1,7 @@
 from app import app
 from flask import request, redirect, render_template, flash, session, jsonify
-from services import login, cadastrar_notas, cadastrar_duplicata
+from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas
+from datetime import datetime
 
 class Routes:
     def __init__(self):
@@ -181,5 +182,106 @@ class Routes:
         else:
             print('usario não está logado')
             return redirect('/')
+
+    @app.route('/gastos', methods=['GET', 'POST'])
+    def tela_gastos():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            db = dados_notas.DadosGastos()
+            meses = [
+    ('01', 'Janeiro'),
+    ('02', 'Fevereiro'),
+    ('03', 'Março'),
+    ('04', 'Abril'),
+    ('05', 'Maio'),
+    ('06', 'Junho'),
+    ('07', 'Julho'),
+    ('08', 'Agosto'),
+    ('09', 'Setembro'),
+    ('10', 'Outubro'),
+    ('11', 'Novembro'),
+    ('12', 'Dezembro')
+]
+            # Se o formulário foi enviado
+            if request.method == 'POST':
+                dados_tipos = db.despesas('06', '2024')
+                data = request.form['dia']
+                dia = data[8:]
+                mes = data[5:7]
+                print(dia)
+                print(mes)
+                ano = data[:4]
+                print(ano)
+                boletos = db.boletos_do_dia(dia,mes,ano)
+                return render_template('gastos.html',meses = meses,tipo_despesa = dados_tipos,empresa=empresa, boletos=boletos)
+            else:
+                # Caso contrário, use a data atual
+                now = datetime.now()
+                dia = now.strftime('%d')
+                mes = now.strftime('%m')
+                ano = now.strftime('%Y')
+                print(dia)
+                print(mes)
+                print(ano)
+                data = datetime.today()
+                dados_tipos = db.despesas(data.month, data.year)
+                boletos = db.boletos_do_dia(dia,mes,ano)
+                return render_template('gastos.html',meses = meses,tipo_despesa = dados_tipos,empresa=empresa, boletos=boletos)
+        else:
+            print('Usuário não está logado')
+            return redirect('/')
     
-   
+    @app.route('/atualizar', methods=['POST'])
+    def atualizar_boletos():
+        if request.method == 'POST':
+            dia = request.form['dia']
+            # Use a data atual se o campo dia não estiver definido
+            if not dia:
+                now = datetime.now()
+                dia = now.strftime('%d')
+            mes = request.form['mes']
+            ano = request.form['ano']
+            
+            # Use a lógica adequada para obter os boletos com base nos parâmetros fornecidos
+            db = dados_notas.DadosGastos()
+            boletos = db.boletos_do_dia(dia, mes, ano)
+            return jsonify({'boletos': boletos})
+        else:
+            return 'Método não permitido'
+    
+    @app.route('/cadastros')
+    def tela_cadastro():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastros.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+
+    @app.route('/cadastros/fornecedor')
+    def tela_cadastro_fornecedor():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastro_fornecedor.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+    
+    @app.route('/cadastros/despesas')
+    def tela_cadastro_despesas():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastro_despesa.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+
+    @app.route('/cadastros/despesas-cadastrar', methods=['GET', 'POST'])
+    def cadastrar_despesa():
+        if request.method == 'POST':
+            despesa = request.form['despesa']
+            db = dados_notas.DadosGastos()
+            db.cadastrar_despesa(despesa)
+            return 'Despesa cadastrada'
+        else:
+            return 'erro aqui'

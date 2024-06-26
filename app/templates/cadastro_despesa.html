@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Cadastro de Tipo de Despesas - {{ empresa }}</title>
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+  }
+
+  .form-tipo-despesa {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .btn-submit {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  .btn-submit:hover {
+    background-color: #45a049;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<main>
+  <h1>Cadastro de Tipo de Despesas</h1>
+  <form action="/cadastros/despesas-cadastrar" method="post" class="form-tipo-despesa">
+    <div class="form-group">
+      <label for="nome_tipo_despesa">Nome do Tipo de Despesa:</label>
+      <input type="text" name="despesa" id="nome_tipo_despesa" class="form-control">
+    </div>
+    <button type="submit" class="btn-submit">Cadastrar</button>
+  </form>
+</main>
+
+{% endblock %}
+
