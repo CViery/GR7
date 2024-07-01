@@ -18,16 +18,16 @@
 
 {% block main %}
 <main>
-  <div>
-    <a href="/gastos/cadastros/notas">Cadastrar Notas</a>
-    <a href="/cadastrar_duplicata">Cadastrar Boletos</a>
-    <a href="">Conusltar Notas</a>
-    <a href="">Consultar Boletos</a> 
-  </div>
+    <div>
+        <a href="/gastos/cadastros/notas">Cadastrar Notas</a>
+        <a href="/cadastrar_duplicata">Cadastrar Boletos</a>
+        <a href="/consultar_notas">Consultar Notas</a>
+        <a href="">Consultar Boletos</a> 
+    </div>
     <div class="container">
         <h1>Dashboard de Despesas</h1>
 
-        <form method="POST">
+        <form method="POST" action="/gastos" id="filtroDespesasForm">
             <div class="flex-row">
                 <label for="mes">Mês:</label>
                 <select id="mes" name="mes">
@@ -40,8 +40,8 @@
                 <label for="ano">Ano:</label>
                 <select id="ano" name="ano">
                     <option value="">Selecione o ano</option>
-                    {% for ano in years %}
-                        <option value="{{ ano }}" {% if ano == year %}selected{% endif %}>{{ ano }}</option>
+                    {% for ano in anos %}
+                        <option value="{{ ano }}">{{ ano }}</option>
                     {% endfor %}
                 </select>
                 <button type="submit">Filtrar</button>
@@ -76,7 +76,7 @@
 
             <div class="flex-item">
                 <h2>Boletos Vencendo Hoje</h2>
-                <form method="POST" id="filtroForm" action="/gastos">
+                <form method="POST" id="filtroBoletosForm" action="/gastos">
                     <div class="flex-row">
                         <label for="dia">Dia:</label>
                         <input type="date" id="dia" name="dia">
@@ -109,6 +109,4 @@
         </div>
     </div>
 </main>
-
-
 {% endblock %}

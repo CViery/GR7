@@ -89,5 +89,14 @@ class GastosDataBase:
             return result
         except Exception as e:
             print(e)
+    
+    def get_all_notas(self):
+        try:
+            query = 'SELECT * FROM notas'
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
 
 

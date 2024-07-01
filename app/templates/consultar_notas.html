@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Consultas - {{ empresa }}</title>
+<style>
+   body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+h1, h2 {
+    color: #555;
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    margin-right: 5px;
+}
+
+input[type="date"], select, button {
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 3px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.flex-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.pagination-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap; /* Garante que os itens quebrem linha quando não houver espaço */
+}
+
+.pagination-container a,
+.pagination-container span {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-container a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination-container .active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination-container .disabled {
+    pointer-events: none;
+    color: #ccc;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+<main>
+    <div class="container">
+        <h1>Consultas de Notas</h1>
+
+        <form method="POST" action="/consultar_notas">
+            <div class="flex-row">
+                <label for="data_inicio">Data Início:</label>
+                <input type="date" id="data_inicio" name="data_inicio">
+                
+                <label for="data_fim">Data Fim:</label>
+                <input type="date" id="data_fim" name="data_fim">
+
+                <label for="fornecedor">Fornecedor:</label>
+                <select id="fornecedor" name="fornecedor">
+                    <option value="">Selecione o fornecedor</option>
+                    {% for fornecedor in fornecedores %}
+                        <option value="{{ fornecedor }}">{{ fornecedor }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="despesa">Despesa:</label>
+                <select id="despesa" name="despesa">
+                    <option value="">Selecione a despesa</option>
+                    {% for despesa in despesas %}
+                        <option value="{{ despesa }}">{{ despesa }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Filtrar</button>
+            </div>
+        </form>
+
+        <div class="flex-container">
+            <div class="flex-item">
+                <h2>Notas Cadastradas</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Emitido Para</th>
+                            <th>Status</th>
+                            <th>Boleto</th>
+                            <th>Duplicata</th>
+                            <th>Fornecedor</th>
+                            <th>Número da Nota</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nota in notas %}
+                        <tr>
+                            <td>{{ nota['data_emissao'] }}</td>
+                            <td>{{ nota['emitido_para'] }}</td>
+                            <td>{{ nota['status'] }}</td>
+                            <td>{{ nota['boleto'] }}</td>
+                            <td>{{ nota['duplicata'] }}</td>
+                            <td>{{ nota['fornecedor'] }}</td>
+                            <td>{{ nota['numero_nota'] }}</td>
+                            <td>{{ nota['valor'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex-container pagination-container">
+            {{ pagination.links }}
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -2,6 +2,7 @@ from app import app
 from flask import request, redirect, render_template, flash, session, jsonify
 from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas
 from datetime import datetime
+from flask_paginate import Pagination, get_page_parameter
 
 class Routes:
     def __init__(self):
@@ -189,44 +190,62 @@ class Routes:
             empresa = session['empresa']
             db = dados_notas.DadosGastos()
             meses = [
-    ('01', 'Janeiro'),
-    ('02', 'Fevereiro'),
-    ('03', 'Março'),
-    ('04', 'Abril'),
-    ('05', 'Maio'),
-    ('06', 'Junho'),
-    ('07', 'Julho'),
-    ('08', 'Agosto'),
-    ('09', 'Setembro'),
-    ('10', 'Outubro'),
-    ('11', 'Novembro'),
-    ('12', 'Dezembro')
-]
-            # Se o formulário foi enviado
+                ('01', 'Janeiro'),
+                ('02', 'Fevereiro'),
+                ('03', 'Março'),
+                ('04', 'Abril'),
+                ('05', 'Maio'),
+                ('06', 'Junho'),
+                ('07', 'Julho'),
+                ('08', 'Agosto'),
+                ('09', 'Setembro'),
+                ('10', 'Outubro'),
+                ('11', 'Novembro'),
+                ('12', 'Dezembro')
+            ]
+            anos = ['2024', '2025', '2026', '2027', '2028', '2029', '2030']
+
             if request.method == 'POST':
-                dados_tipos = db.despesas('06', '2024')
-                data = request.form['dia']
-                dia = data[8:]
-                mes = data[5:7]
-                print(dia)
-                print(mes)
-                ano = data[:4]
-                print(ano)
-                boletos = db.boletos_do_dia(dia,mes,ano)
-                return render_template('gastos.html',meses = meses,tipo_despesa = dados_tipos,empresa=empresa, boletos=boletos)
+                if 'mes' in request.form and 'ano' in request.form:
+                    # Processar formulário de filtro de despesas
+                    mes_dados = request.form['mes']
+                    ano_dados = request.form['ano']
+                    dados_tipos = db.despesas(mes_dados, ano_dados)
+                    print(mes_dados)
+                    print(ano_dados)
+                else:
+                    # Usar data atual se não houver filtros específicos para despesas
+                    now = datetime.now()
+                    mes_dados = now.strftime('%m')
+                    ano_dados = now.strftime('%Y')
+                    dados_tipos = db.despesas(mes_dados, ano_dados)
+                    print(dados_tipos)
+
+                if 'dia' in request.form:
+                    # Processar formulário de filtro de boletos
+                    data = request.form['dia']
+                    dia = data[8:]
+                    mes = data[5:7]
+                    ano = data[:4]
+                    boletos = db.boletos_do_dia(dia, mes, ano)
+                else:
+                    # Usar data atual se não houver filtro específico para boletos
+                    now = datetime.now()
+                    dia = now.strftime('%d')
+                    mes = now.strftime('%m')
+                    ano = now.strftime('%Y')
+                    boletos = db.boletos_do_dia(dia, mes, ano)
+
+                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos)
             else:
-                # Caso contrário, use a data atual
+                # Caso seja uma requisição GET, usar a data atual
                 now = datetime.now()
                 dia = now.strftime('%d')
                 mes = now.strftime('%m')
                 ano = now.strftime('%Y')
-                print(dia)
-                print(mes)
-                print(ano)
-                data = datetime.today()
-                dados_tipos = db.despesas(data.month, data.year)
-                boletos = db.boletos_do_dia(dia,mes,ano)
-                return render_template('gastos.html',meses = meses,tipo_despesa = dados_tipos,empresa=empresa, boletos=boletos)
+                dados_tipos = db.despesas(mes, ano)
+                boletos = db.boletos_do_dia(dia, mes, ano)
+                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos)
         else:
             print('Usuário não está logado')
             return redirect('/')
@@ -285,3 +304,40 @@ class Routes:
             return 'Despesa cadastrada'
         else:
             return 'erro aqui'
+
+    @app.route('/consultar_notas', methods=['GET', 'POST'])
+    def consultas():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            db = dados_notas.DadosGastos()
+
+            # Obter listas de fornecedores e despesas para os selects
+            fornecedores = ['A', "b", 'v']
+            despesas = ['A', "b", 'v']
+
+            notas = []
+
+            if request.method == 'POST':
+                data_inicio = request.form.get('data_inicio')
+                data_fim = request.form.get('data_fim')
+                fornecedor = request.form.get('fornecedor')
+                despesa = request.form.get('despesa')
+
+                # Obter notas filtradas
+                notas = db.obter_notas_filtradas(data_inicio, data_fim, fornecedor, despesa)
+            else:
+                # Se não houver filtros, exibir todas as notas
+                notas = db.todas_as_notas()
+
+            # Configuração da paginação
+            page = request.args.get(get_page_parameter(), type=int, default=1)
+            per_page = 10
+            offset = (page - 1) * per_page
+            paginated_notas = notas[offset: offset + per_page]
+
+            pagination = Pagination(page=page, total=len(notas), per_page=per_page, css_framework='bootstrap4')
+
+            return render_template('consultar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas, notas=paginated_notas, pagination=pagination)
+        else:
+            print('Usuário não está logado')
+            return redirect('/')

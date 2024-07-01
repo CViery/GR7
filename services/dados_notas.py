@@ -36,9 +36,7 @@ class DadosGastos:
         dados_despesas = []
         for despesa in despesas:
             item  = despesa[0]
-            print(item)
             valor_despesa = self.db.get_valor_despesa(item, mes, ano)
-            print(valor_despesa)
             valores = []
             for valor in valor_despesa:
                 valores.append(valor[0])
@@ -47,5 +45,28 @@ class DadosGastos:
             dados_despesas.append((despesa[0], valor_total))
         return dados_despesas
         
+    
+    def todas_as_notas(self):
+        notas = self.db.get_all_notas()
+        output = []
+        for nota in notas:
+            print(nota)
+            data_objeto = datetime.strptime(nota[6], "%Y-%m-%d")
+            data_formatada = data_objeto.strftime("%d/%m/%Y")
+            valor_nota = nota[10]
+            valor = locale.currency(valor_nota, grouping=True)
+            nfe = {
+                'emitido_para': nota[0],
+                'status': nota[1],
+                'boleto': nota[2],
+                'numero_nota': nota[3],
+                'fornecedor': nota[5],
+                'data_emissao': data_formatada,
+                'valor': valor,
+                'duplicata':nota[4]
+            }
+            output.append(nfe)
+        return output
+
 
 
