@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Inicio - {{ empresa }}</title>
+{% endblock %}
+
+{% block main %}
+<main>
+    <form action="/submit_form" method="post">
+
+        <fieldset>
+            <legend>Dados do Veículo</legend>
+            <div class="input-group">
+                <label for="placa">Placa:</label>
+                <input type="text" id="placa" name="placa" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="modelo_veiculo">Modelo do Veículo:</label>
+                <input type="text" id="modelo_veiculo" name="modelo_veiculo" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="data_orcamento">Data de Orçamento:</label>
+                <input type="date" id="data_orcamento" name="data_orcamento" class="styled-input"
+                    onchange="calculateDias()">
+            </div>
+            <div class="input-group">
+                <label for="data_faturamento">Data de Faturamento:</label>
+                <input type="date" id="data_faturamento" name="data_faturamento" class="styled-input"
+                    onchange="calculateDias()">
+            </div>
+            <div class="input-group">
+                <label for="dias">Dias (Orçamento - Faturamento):</label>
+                <input type="text" id="dias" name="dias" class="styled-input" readonly>
+            </div>
+            <div class="input-group">
+                <label for="num_os">Número OS:</label>
+                <input type="text" id="num_os" name="num_os" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="cia">CIA:</label>
+                <select id="cia" name="cia" class="styled-input" onchange="showPneuStoreFields()">
+                    <option value="outros">Outros</option>
+                    <option value="pneu_store">Pneu Store</option>
+                </select>
+            </div>
+            <div id="pneu_store_fields" class="input-group" style="display: none;">
+    <label>Conversão Pneu Store:</label><br>
+    <input type="radio" id="pneustore_pneu" name="conversao_pneustore" value="pneustore_pneu">
+    <label for="pneustore_pneu">Pneu Store - Pneu</label><br>
+    <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="pneustore_servico">
+    <label for="pneustore_servico">Pneu Store - Serviço</label><br>
+    <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="" checked>
+    
+</div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Peças e Serviços</legend>
+            <div class="input-group">
+                <label for="pecas">Peças:</label>
+                <input type="text" id="pecas" name="pecas" class="styled-input" onchange="calculateValorTotal()">
+            </div>
+            <div class="input-group">
+                <label for="servicos">Serviços:</label>
+                <input type="text" id="servicos" name="servicos" class="styled-input" onchange="calculateValorTotal()">
+            </div>
+            <div class="input-group">
+                <label for="valor_total">Valor Total (Peças + Serviços):</label>
+                <input type="text" id="valor_total" name="valor_total" class="styled-input" readonly>
+            </div>
+            <div class="input-group">
+                <label for="revitalizacao">Revitalização:</label>
+                <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="aditivo">Aditivo:</label>
+                <input type="text" id="aditivo" name="aditivo" class="styled-input" onchange="showAditivoQuantidadeField()">
+            </div>
+            <div id="qntde_aditivo" class="input-group">
+                <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
+                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="fluido_sangria">Fluido/Sangria:</label>
+                <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="palheta">Palheta:</label>
+                <input type="text" id="palheta" name="palheta" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="limpeza_freios">Limpeza dos Freios:</label>
+                <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="detergente_parabrisa">Detergente de Para-brisa:</label>
+                <input type="text" id="detergente_parabrisa" name="detergente_parabrisa" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="filtro">Filtro:</label>
+                <input type="text" id="filtro" name="filtro" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="pneus">Pneus:</label>
+                <input type="text" id="pneus" name="pneus" class="styled-input" onchange="calculateValorMeta()">
+            </div>
+            <div class="input-group">
+                <label for="bateria">Bateria:</label>
+                <input type="text" id="bateria" name="bateria" class="styled-input" onchange="showModeloBateriaField(); calculateValorMeta()">
+            </div>
+           <div id="modelo_bateria_field" class="input-group" style="display: none;">
+    <label for="modelo_bateria">Modelo da Bateria:</label>
+    <select id="modelo_bateria" name="modelo_bateria" class="styled-input">
+        <option value="">escolha o modelo</option>
+        <option value="modelo1">Modelo 1</option>
+        <option value="modelo2">Modelo 2</option>
+    </select>
+</div>
+            <div class="input-group">
+                <label for="quantidade_oleo">Quantidade Óleo:</label>
+                <input type="text" id="quantidade_oleo" name="quantidade_oleo" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="valor_oleo">Valor do Óleo:</label>
+                <input type="text" id="valor_oleo" name="valor_oleo" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="tipo_marca_oleo">Tipo/Marca do Óleo:</label>
+                <select name="tipo_marca_oleo" id="tipo_marca_oleo" class="styled-input">
+                    <option value="">Tipo oleo</option>
+                    <option value="oleo1">Óleo 1</option>
+                    <option value="oleo2">Óleo 2</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="mecanico">Mecânico:</label>
+                <select id="mecanico" name="mecanico" class="styled-input">
+                    <option value="">Mecanicos</option>
+                    <option value="Cristian">Cristian</option>
+                    <option value="Marcos">Marcos</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="filtro_mecanico">Filtro Mecânico:</label>
+                <select id="filtro_mecanico" name="filtro_mecanico" class="styled-input">
+                    <option value="">Filtro mecanico</option>
+                    <option value="mecanico1">Fabiano</option>
+                    <option value="mecanico2">Jucimar</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="valor_meta">Valor Meta:</label>
+                <input type="text" id="valor_meta" name="valor_meta" class="styled-input" readonly>
+            </div>
+            <div class="input-group">
+                <label for="valor_dinheiro">Valor em Dinheiro:</label>
+                <input type="text" id="valor_dinheiro" name="valor_dinheiro" class="styled-input">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Outros Serviços</legend>
+            <div class="input-group">
+                <label for="freios">Freios:</label>
+                <input type="text" id="freios" name="freios" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="suspensao">Suspensão:</label>
+                <input type="text" id="suspensao" name="suspensao" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="injecao_ignicao">Injeção/Ignição:</label>
+                <input type="text" id="injecao_ignicao" name="injecao_ignicao" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="cabeote_motor_arrefecimento">Cabeçote Motor Arrefecimento:</label>
+                <input type="text" id="cabeote_motor_arrefecimento" name="cabeote_motor_arrefecimento"
+                    class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="outros">Outros:</label>
+                <input type="text" id="outros" name="outros" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="oleos">Óleos:</label>
+                <input type="text" id="oleos" name="oleos" class="styled-input">
+            </div>
+            <div class="input-group">
+                <label for="transmissao">Transmissão:</label>
+                <input type="text" id="transmissao" name="transmissao" class="styled-input">
+            </div>
+        </fieldset>
+
+        <button type="submit" class="styled-button">Enviar</button>
+
+    </form>
+</main>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f0f0f0;
+        padding: 20px;
+    }
+
+    main {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    form {
+        display: grid;
+        gap: 20px;
+    }
+
+    fieldset {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    legend {
+        font-size: 20px;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .input-group {
+        display: grid;
+        gap: 10px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    .styled-input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .styled-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    .styled-button {
+        padding: 12px 24px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+        transition: background-color 0.3s ease;
+    }
+
+    .styled-button:hover {
+        background-color: #0056b3;
+    }
+    fieldset {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: inline-block;
+    width: calc(25% - 20px); /* 25% para 4 por linha, ajuste conforme necessário */
+    margin-right: 20px;
+}
+
+.button-group {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.styled-input {
+    width: calc(100% - 20px);
+    padding: 5px;
+    margin-top: 5px;
+}
+</style>
+<script>
+    // Função para calcular o número de dias entre as datas de orçamento e faturamento
+    function calculateDias() {
+        const dataOrcamento = new Date(document.getElementById('data_orcamento').value);
+        const dataFaturamento = new Date(document.getElementById('data_faturamento').value);
+
+        if (dataOrcamento && dataFaturamento) {
+            const diffTime = Math.abs(dataFaturamento - dataOrcamento);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            document.getElementById('dias').value = diffDays;
+        }
+    }
+
+    // Função para calcular o valor total (peças + serviços)
+    function calculateValorTotal() {
+        const pecas = parseFloat(document.getElementById('pecas').value) || 0;
+        const servicos = parseFloat(document.getElementById('servicos').value) || 0;
+        const valorTotal = pecas + servicos;
+        document.getElementById('valor_total').value = valorTotal.toFixed(2);
+    }
+
+    // Função para mostrar o campo de quantidade de aditivo se necessário
+    function showAditivoQuantidadeField() {
+        const aditivo = document.getElementById('aditivo').value;
+        const qntdeAditivoField = document.getElementById('qntde_aditivo');
+        if (aditivo.trim().length > 0) {
+            qntdeAditivoField.style.display = 'block';
+        } else {
+            qntdeAditivoField.style.display = 'none';
+        }
+    }
+
+    // Função para mostrar os campos específicos da loja de pneus
+    function showPneuStoreFields() {
+        const cia = document.getElementById('cia').value;
+        const pneuStoreFields = document.getElementById('pneu_store_fields');
+        if (cia === 'pneu_store') {
+            pneuStoreFields.style.display = 'block';
+        } else {
+            pneuStoreFields.style.display = 'none';
+        }
+    }
+
+    // Função para mostrar o campo do modelo da bateria se necessário
+    function showModeloBateriaField() {
+        const bateria = document.getElementById('bateria').value;
+        const modeloBateriaField = document.getElementById('modelo_bateria_field');
+        if (bateria.trim().length > 0) {
+            modeloBateriaField.style.display = 'block';
+        } else {
+            modeloBateriaField.style.display = 'none';
+        }
+    }
+    function calculateValorMeta() {
+        const valorTotal = parseFloat(document.getElementById('valor_total').value) || 0;
+        const valorBateria = parseFloat(document.getElementById('bateria').value) || 0;
+        const valorPneus = parseFloat(document.getElementById('pneus').value) || 0;
+        
+        const valorMeta = valorTotal - valorBateria - valorPneus;
+        
+        document.getElementById('valor_meta').value = valorMeta.toFixed(2);
+    }
+</script>
+{%endblock%}

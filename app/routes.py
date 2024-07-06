@@ -1,6 +1,6 @@
 from app import app
 from flask import request, redirect, render_template, flash, session, jsonify
-from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas
+from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
 
@@ -40,7 +40,15 @@ class Routes:
         session.pop('empresa', None)
         flash('Você saiu da sessão com sucesso.')
         return redirect('/')
-
+    @app.route('/home')
+    def home():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('index.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+    
     @app.route('/gastos/cadastros/notas')
     def tela_cadastro_notas():
         if 'usuario' in session:
@@ -121,12 +129,8 @@ class Routes:
 
     @app.route('/api/nota/<numero_nota>', methods=['GET'])
     def get_nota(numero_nota):
-        notas = {
-        '12345': {'fornecedor': 'Fornecedor A', 'data_emissao': '01/06/2024', 'valor': '1000.00'},
-        '67890': {'fornecedor': 'Fornecedor B', 'data_emissao': '05/06/2024', 'valor': '1500.00'},
-        # Adicione mais notas conforme necessário
-    }
-        nota = notas.get(numero_nota)
+        db = dados_notas.DadosGastos()
+        nota = db.nota_por_numero(numero_nota)
         if nota:
             return jsonify(nota)
         else:
@@ -190,15 +194,15 @@ class Routes:
             empresa = session['empresa']
             db = dados_notas.DadosGastos()
             meses = [
-                ('01', 'Janeiro'),
-                ('02', 'Fevereiro'),
-                ('03', 'Março'),
-                ('04', 'Abril'),
-                ('05', 'Maio'),
-                ('06', 'Junho'),
-                ('07', 'Julho'),
-                ('08', 'Agosto'),
-                ('09', 'Setembro'),
+                ('1', 'Janeiro'),
+                ('2', 'Fevereiro'),
+                ('3', 'Março'),
+                ('4', 'Abril'),
+                ('5', 'Maio'),
+                ('6', 'Junho'),
+                ('7', 'Julho'),
+                ('8', 'Agosto'),
+                ('9', 'Setembro'),
                 ('10', 'Outubro'),
                 ('11', 'Novembro'),
                 ('12', 'Dezembro')
@@ -211,15 +215,15 @@ class Routes:
                     mes_dados = request.form['mes']
                     ano_dados = request.form['ano']
                     dados_tipos = db.despesas(mes_dados, ano_dados)
-                    print(mes_dados)
-                    print(ano_dados)
+                    valor_gasto = db.valor_gastos(mes_dados, ano_dados)
                 else:
                     # Usar data atual se não houver filtros específicos para despesas
                     now = datetime.now()
                     mes_dados = now.strftime('%m')
                     ano_dados = now.strftime('%Y')
                     dados_tipos = db.despesas(mes_dados, ano_dados)
-                    print(dados_tipos)
+                    valor_gasto = db.valor_gastos(mes_dados, ano_dados)
+                    
 
                 if 'dia' in request.form:
                     # Processar formulário de filtro de boletos
@@ -236,7 +240,7 @@ class Routes:
                     ano = now.strftime('%Y')
                     boletos = db.boletos_do_dia(dia, mes, ano)
 
-                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos)
+                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto)
             else:
                 # Caso seja uma requisição GET, usar a data atual
                 now = datetime.now()
@@ -312,8 +316,8 @@ class Routes:
             db = dados_notas.DadosGastos()
 
             # Obter listas de fornecedores e despesas para os selects
-            fornecedores = ['A', "b", 'v']
-            despesas = ['A', "b", 'v']
+            fornecedores = ['A', "b", 'v', "PTD COMERCIO DE PEÇAS LTDA" ]
+            despesas = ['A', "b", 'v', "Peças"]
 
             notas = []
 
@@ -324,7 +328,7 @@ class Routes:
                 despesa = request.form.get('despesa')
 
                 # Obter notas filtradas
-                notas = db.obter_notas_filtradas(data_inicio, data_fim, fornecedor, despesa)
+                notas = db.filtrar_notas(data_inicio, data_fim, fornecedor, despesa)
             else:
                 # Se não houver filtros, exibir todas as notas
                 notas = db.todas_as_notas()
@@ -341,3 +345,118 @@ class Routes:
         else:
             print('Usuário não está logado')
             return redirect('/')
+    @app.route('/consultar_boletos', methods=['GET', 'POST'])
+    def consultar_boletos():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            db = dados_notas.DadosGastos()
+
+            # Obter lista de fornecedores para o select
+            fornecedores = ['A', "b", 'v', "PTD COMERCIO DE PEÇAS LTDA" ]
+
+            boletos = []
+
+            if request.method == 'POST':
+                data_inicio = request.form.get('data_inicio')
+                data_fim = request.form.get('data_fim')
+                fornecedor = request.form.get('fornecedor')
+
+                # Obter boletos filtrados
+                boletos = db.filtrar_boletos(data_inicio, data_fim, fornecedor)
+            else:
+                # Se não houver filtros, exibir todos os boletos
+                boletos = db.todos_os_boletos()
+
+            # Configuração da paginação
+            page = request.args.get(get_page_parameter(), type=int, default=1)
+            per_page = 10
+            offset = (page - 1) * per_page
+            paginated_boletos = boletos[offset: offset + per_page]
+
+            pagination = Pagination(page=page, total=len(boletos), per_page=per_page, css_framework='bootstrap4')
+
+            return render_template('consultar_boletos.html', empresa=empresa, fornecedores=fornecedores, boletos=paginated_boletos, pagination=pagination)
+        else:
+            print('Usuário não está logado')
+            return redirect('/')
+
+    @app.route('/faturamento', methods=['GET', 'POST'])
+    def tela_faturamentos():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            db = faturamento.Faturamento()  # Certifique-se de passar a conexão com o banco de dados
+
+            meses = [
+                ('01', 'Janeiro'), ('02', 'Fevereiro'), ('03', 'Março'), ('04', 'Abril'), ('05', 'Maio'),
+                ('06', 'Junho'), ('07', 'Julho'), ('08', 'Agosto'), ('09', 'Setembro'), ('10', 'Outubro'),
+                ('11', 'Novembro'), ('12', 'Dezembro')
+            ]
+
+            anos = ['2024', '2025', '2026', '2027', '2028', '2029', '2030']
+
+            if request.method == 'POST':
+                try:
+                    mes_dados = request.form.get('mes', '')
+                    ano_dados = request.form.get('ano', '')
+
+                    # Verificar se os valores estão corretos
+                    print(f"Mes selecionado: {mes_dados}, Ano selecionado: {ano_dados}")
+
+                    if mes_dados and ano_dados:
+                        # Processar filtro de faturamentos
+                        valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
+                        valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
+                        faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
+                    else:
+                        # Usar data atual se não houver filtros específicos para faturamentos
+                        now = datetime.now()
+                        mes_dados = now.strftime('%m')
+                        ano_dados = now.strftime('%Y')
+                        valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
+                        valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
+                        faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
+                    return render_template('faturamentos.html',
+                                        anos=anos,
+                                        meses=meses,
+                                        valor_faturamento_total=valor_faturamento_total,
+                                        valor_faturamento_meta=valor_faturamento_meta,
+                                        faturamento_mecanicos = faturamento_mecanicos,
+                                        empresa=empresa)
+                except Exception as e:
+                    print(f"Ocorreu um erro ao processar o formulário: {e}")
+                    return "Ocorreu um erro ao processar o formulário", 500
+            else:
+                # Caso seja uma requisição GET, usar a data atual
+                now = datetime.now()
+                mes_dados = now.strftime('%m')
+                ano_dados = now.strftime('%Y')
+                valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
+                valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
+                faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
+                return render_template('faturamentos.html',
+                                    anos=anos,
+                                    meses=meses,
+                                    valor_faturamento_total=valor_faturamento_total,
+                                    valor_faturamento_meta= valor_faturamento_meta,
+                                    faturamento_mecanicos = faturamento_mecanicos,
+                                    empresa=empresa)
+        else:
+            print('Usuário não está logado')
+            return redirect('/')
+    
+    @app.route('/faturamentos/cadastrar', methods=['GET', 'POST'])
+    def cadastrar_faturamento():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastrar_faturamento.html', empresa=empresa)
+        else:
+            print('Usuário não está logado')
+            return redirect('/')
+    @app.route('/submit_form', methods=['POST'])
+    def submit_form():
+        db = faturamento.Faturamento()
+        
+        data = request.form.to_dict()
+        print(data)
+        db.cadastrar(data)
+        return redirect('/faturamentos/cadastrar')

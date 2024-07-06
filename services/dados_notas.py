@@ -53,7 +53,7 @@ class DadosGastos:
             print(nota)
             data_objeto = datetime.strptime(nota[6], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = nota[10]
+            valor_nota = nota[11]
             valor = locale.currency(valor_nota, grouping=True)
             nfe = {
                 'emitido_para': nota[0],
@@ -68,5 +68,89 @@ class DadosGastos:
             output.append(nfe)
         return output
 
+    def filtrar_notas(self,data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+        resultado = self.db.obter_notas_filtradas(data_inicio, data_fim,fornecedor,despesa)
+        notas =[]
+        for dados in resultado:
+            data_objeto = datetime.strptime(dados[6], "%Y-%m-%d")
+            data_formatada = data_objeto.strftime("%d/%m/%Y")
+            valor_nota = dados[11]
+            valor = locale.currency(valor_nota, grouping=True)
+            nfe = {
+                'emitido_para': dados[0],
+                'status': dados[1],
+                'boleto': dados[2],
+                'numero_nota': dados[3],
+                'fornecedor': dados[5],
+                'data_emissao': data_formatada,
+                'valor': valor,
+                'duplicata':dados[4]
+            }
+            notas.append(nfe)
+        return notas
 
 
+    def nota_por_numero(self, num_nota):
+        dados = self.db.get_nota_por_numero(num_nota)
+        if dados:
+            data_objeto = datetime.strptime(dados[6], "%Y-%m-%d")
+            data_formatada = data_objeto.strftime("%d/%m/%Y")
+            valor_nota = dados[11]
+            valor = locale.currency(valor_nota, grouping=True)
+            nfe = {
+                'fornecedor': dados[5],
+                'data_emissao': data_formatada,
+                'valor': valor
+                }
+            return nfe
+    def todos_os_boletos(self):
+        dados = self.db.get_boletos()
+        boletos = []
+        for dado in dados:
+            print(dado)
+            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_formatada = data_objeto.strftime("%d/%m/%Y")
+            valor_boleto = dado[7]
+            valor = locale.currency(valor_boleto, grouping=True)
+            boleto ={
+                'num_nota': dado[0],
+                'notas': dado[1],
+                'fornecedor': dado[2],
+                'data_vencimento': data_formatada,
+                'valor': valor
+            }
+            boletos.append(boleto)
+            print(boleto)
+        return boletos
+            
+    def filtrar_boletos(self, data_inicio=None, data_fim=None, fornecedor=None):
+        dados = self.db.obter_boletos_filtrados(data_inicio, data_fim, fornecedor)
+        boletos = []
+        for dado in dados:
+            print(dado)
+            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_formatada = data_objeto.strftime("%d/%m/%Y")
+            valor_boleto = dado[7]
+            valor = locale.currency(valor_boleto, grouping=True)
+            boleto ={
+                'num_nota': dado[0],
+                'notas': dado[1],
+                'fornecedor': dado[2],
+                'data_vencimento': data_formatada,
+                'valor': valor
+            }
+            boletos.append(boleto)
+            print(boleto)
+        return boletos
+        
+    def valor_gastos(self, mes, ano):
+        notas = self.db.get_valor_notas(mes,ano)
+        print(notas)
+        valores = []
+        for nota in notas:
+            valores.append(nota[0])
+        valor_soma = sum(valores)
+        valor_total = locale.currency(valor_soma, grouping=True)
+        return valor_total
+        
+        

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Inicio - {{ empresa }}</title>
+<style>
+    body { font-family: Arial, sans-serif; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { padding: 10px; border: 1px solid #ddd; }
+    th { background-color: #f4f4f4; }
+    form { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    label { margin-right: 5px; }
+    select, input[type="date"], button { margin-right: 10px; }
+    .flex-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 10px; gap: 20px; }
+    .flex-container { display: flex; flex-direction: column; gap: 20px; }
+    .flex-item { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .submenu { margin-bottom: 20px; }
+    .submenu a { margin-right: 10px; text-decoration: none; color: #007bff; }
+    .submenu a:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block main %}
+<main>
+    <div>
+        <a href="/gastos/cadastros/notas">Cadastrar Notas</a>
+        <a href="/gastos/cadastros/duplicatas">Cadastrar Boletos</a>
+        <a href="/consultar_notas">Consultar Notas</a>
+        <a href="/consultar_boletos">Consultar Boletos</a> 
+    </div>
+    <div class="container">
+        <h1>Dashboard de Faturamentos</h1>
+
+        <div class="submenu">
+            <a href="/faturamentos/cadastrar">Cadastrar Faturamento</a>
+            <a href="/faturamentos/consultar">Consultar Faturamento</a>
+            <a href="/faturamentos/editar">Editar Faturamento</a>
+        </div>
+
+        <form method="POST" action="/faturamento" id="filtroFaturamentosForm">
+            <div class="flex-row">
+                <label for="mes">Mês:</label>
+                <select id="mes" name="mes">
+                    <option value="">Selecione o mês</option>
+                    {% for mes in meses %}
+                        <option value="{{ mes[0] }}">{{ mes[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="ano">Ano:</label>
+                <select id="ano" name="ano">
+                    <option value="">Selecione o ano</option>
+                    {% for ano in anos %}
+                        <option value="{{ ano }}">{{ ano }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Filtrar</button>
+            </div>
+        </form>
+
+        <div class="flex-container">
+            <div class="flex-item">
+                <h2>Faturamento Total do Mês</h2>
+                <p>Total: {{ valor_faturamento_total }}</p>
+            </div>
+            <div class="flex-item">
+                <h2>Faturamento para Meta</h2>
+                <p>Total: {{ valor_faturamento_meta }}</p>
+            </div>
+
+            <div class="flex-item">
+                <h2>Faturamento por Mecânico</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mecânico</th>
+                            <th>Valor</th>
+                            <th>Qntde Filtros<th>
+                            <th>Qntde Revitalização<th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faturamento in faturamento_mecanicos %}
+                        <tr>
+                            <td>{{ faturamento[0] }}</td>
+                            <td>{{ faturamento[1] }}</td>
+                            <td>{{ faturamento[2] }}</td>
+                            <td>{{ faturamento[3] }} - {{ faturamento[4] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex-item">
+                <h2>Faturamento por Companhia</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Companhia</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faturamento in faturamento_companhia %}
+                        <tr>
+                            <td>{{ faturamento[0] }}</td>
+                            <td>{{ faturamento[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex-item">
+                <h2>Faturamento de Serviços Específicos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Serviço</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faturamento in faturamento_servicos %}
+                        <tr>
+                            <td>{{ faturamento[0] }}</td>
+                            <td>{{ faturamento[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -5,25 +5,80 @@ class Database:
         self.conn = sqlite3.connect('database.db')
         self.cursor = self.conn.cursor()
     
-    def ver_faturamento(self, mes, ano):
+
+    def cadastrar_faturamento(self, dados):
         try:
-            mes = mes
-            print(mes)
-            query = 'SELECT valor FROM faturamentos WHERE mes = ?'
-            self.cursor.execute(query,(mes,))
-            result = self.cursor.fetchall()
-            print(result)
-            valores = []
-            for valor in result:
-                print(valor[0])
-                valores.append(valor[0])
-            print(valores)
-            output = sum(valores)
-            print(output)
-            return output
+            query = 'INSERT INTO faturamento VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            self.cursor.execute(query, (dados['placa'], dados['modelo_veiculo'], dados['data_orcamento'], dados['data_faturamento'], dados['mes_faturamento'], dados['ano_faturamento'], dados['dias_servico'], dados['numero_os'], dados['companhia'],dados['conversao_ps'],dados['valor_pecas'], dados['valor_servicos'], dados['total_os'], dados['valor_revitalizacao'], dados['valor_aditivo'],dados['quantidade_litros'], dados['valor_fluido_sangria'], dados['valor_palheta'], dados['valor_limpeza_freios'], dados['valor_pastilha_parabrisa'],dados['valor_filtro'],dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'],dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['mecanico_servico'], dados['servico_filtro'], dados['valor_p_meta'], dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'],dados['valor_servicos_oleos'], dados['valor_servico_transmissao']))
+            self.conn.commit()
         except Exception as e:
             print(e)
+    def faturamento_mes(self, mes, ano):
+        try:
+            query = 'SELECT valor_os FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+    def faturamento_mes_meta(self, mes, ano):
+        try:
+            query = 'SELECT valor_meta FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+    
+    def get_qntd_filtros_mec(self, mecanico, mes,ano):
+        try:
+            query = 'SELECT filtro_mecanico FROM faturamento WHERE filtro_mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query,(mecanico,mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+            raise e
 
+    def faturamento_por_mecanico(self, mecanico, mes, ano):
+        try:
+            print(f'Mecânico: {mecanico}')
+            print(f'Mês: {mes}, Tipo: {type(mes)}')
+            print(f'Ano: {ano}')
+
+            query = '''
+            SELECT servicos 
+            FROM faturamento 
+            WHERE mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?
+            '''
+            self.cursor.execute(query, (mecanico, mes, ano))
+            result = self.cursor.fetchall()
+            
+            print(f'Resultado: {result}')
+            return result
+
+        except Exception as e:
+            print(f'Erro ao buscar faturamento por mecânico: {str(e)}')
+            raise
+    def get_mecanicos(self):
+        try:
+            query = 'SELECT nome FROM funcionarios '
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(f'Erro ao buscar mecânico: {str(e)}')
+            raise
+    
+    def get_revitalizacao_mecanico(self,mecanico, mes, ano):
+        try:
+            query = 'SELECT revitalizacao FROM faturamento WHERE mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mecanico, mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+        
 class DatabaseGastos:
     def __init__(self):
         self.conn = sqlite3.connect('database.db')
