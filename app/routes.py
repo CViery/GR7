@@ -407,6 +407,8 @@ class Routes:
                         valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
                         valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
                         faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
+                        faturamento_cias = db.faturamento_companhia(mes_dados, ano_dados)
+                        faturamento_servico = db.faturamento_servico(mes_dados, ano_dados)
                     else:
                         # Usar data atual se não houver filtros específicos para faturamentos
                         now = datetime.now()
@@ -415,12 +417,16 @@ class Routes:
                         valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
                         valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
                         faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
+                        faturamento_cias = db.faturamento_companhia(mes_dados, ano_dados)
+                        faturamento_servico = db.faturamento_servico(mes_dados, ano_dados)
                     return render_template('faturamentos.html',
                                         anos=anos,
                                         meses=meses,
                                         valor_faturamento_total=valor_faturamento_total,
                                         valor_faturamento_meta=valor_faturamento_meta,
                                         faturamento_mecanicos = faturamento_mecanicos,
+                                        faturamento_companhia = faturamento_cias,
+                                        faturamento_servico = faturamento_servico,
                                         empresa=empresa)
                 except Exception as e:
                     print(f"Ocorreu um erro ao processar o formulário: {e}")
@@ -433,12 +439,16 @@ class Routes:
                 valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
                 valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
                 faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
+                faturamento_cias = db.faturamento_companhia(mes_dados, ano_dados)
+                faturamento_servico = db.faturamento_servico(mes_dados, ano_dados)
                 return render_template('faturamentos.html',
                                     anos=anos,
                                     meses=meses,
                                     valor_faturamento_total=valor_faturamento_total,
                                     valor_faturamento_meta= valor_faturamento_meta,
                                     faturamento_mecanicos = faturamento_mecanicos,
+                                    faturamento_companhia = faturamento_cias,
+                                    faturamento_servico = faturamento_servico,
                                     empresa=empresa)
         else:
             print('Usuário não está logado')

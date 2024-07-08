@@ -74,8 +74,9 @@
                         <tr>
                             <th>Mecânico</th>
                             <th>Valor</th>
-                            <th>Qntde Filtros<th>
-                            <th>Qntde Revitalização<th>
+                            <th>Quantidade Serv</th>
+                            <th>Filtros</th>
+                            <th>Revitalização</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,7 +85,8 @@
                             <td>{{ faturamento[0] }}</td>
                             <td>{{ faturamento[1] }}</td>
                             <td>{{ faturamento[2] }}</td>
-                            <td>{{ faturamento[3] }} - {{ faturamento[4] }}</td>
+                            <td>{{ faturamento[3] }}</td>
+                            <td>{{ faturamento[4] }} -- {{ faturamento[5] }}</td> 
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -98,6 +100,7 @@
                         <tr>
                             <th>Companhia</th>
                             <th>Valor</th>
+                            <th>Quantidade</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -105,6 +108,7 @@
                         <tr>
                             <td>{{ faturamento[0] }}</td>
                             <td>{{ faturamento[1] }}</td>
+                            <td>{{ faturamento[2] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -118,13 +122,15 @@
                         <tr>
                             <th>Serviço</th>
                             <th>Valor</th>
+                            <th>quantidade</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for faturamento in faturamento_servicos %}
+                        {% for faturamento in faturamento_servico %}
                         <tr>
                             <td>{{ faturamento[0] }}</td>
                             <td>{{ faturamento[1] }}</td>
+                            <td>{{ faturamento[2] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

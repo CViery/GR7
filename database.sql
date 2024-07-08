@@ -34,3 +34,16 @@ INSERT INTO funcionarios VALUES (10, 'NATANAEL')
 DELETE FROM funcionarios WHERE id = 7;
 
 SELECT filtro_mecanico FROM faturamento WHERE filtro_mecanico = 'JUCIMAR'
+
+
+CREATE TABLE companhias (cia);
+
+
+INSERT INTO companhias VALUES ('PORTO'), ('AZUL'), ('ITAU'), ('ARVAL BRASIL'), ('ALD'), ('LETS');
+
+
+
+
+CREATE TABLE servicos (servicos);
+
+INSERT INTO servicos VALUES ('revitalizacao'), ('aditivo'), ('fluido_sangria'), ('palheta'), ('limpeza_freios'), ('detergente_parabrisa'), ('filtro'), ('pneus'), ('bateria');

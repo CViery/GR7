@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Consultas - {{ empresa }}</title>
+<style>
+   body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+h1, h2 {
+    color: #555;
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    margin-right: 5px;
+}
+
+input[type="date"], select, button {
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 3px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.flex-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.pagination-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap; /* Garante que os itens quebrem linha quando não houver espaço */
+}
+
+.pagination-container a,
+.pagination-container span {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-container a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination-container .active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination-container .disabled {
+    pointer-events: none;
+    color: #ccc;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+<main>
+    <div class="container">
+        <h1>Consultas de Faturamentos</h1>
+
+        <form method="POST" action="/consultar_faturamentos">
+            <div class="flex-row">
+                <label for="data_inicio">Data Início:</label>
+                <input type="date" id="data_inicio" name="data_inicio">
+                
+                <label for="data_fim">Data Fim:</label>
+                <input type="date" id="data_fim" name="data_fim">
+
+                <label for="fornecedor">Fornecedor:</label>
+                <select id="fornecedor" name="fornecedor">
+                    <option value="">Selecione o fornecedor</option>
+                    {% for fornecedor in fornecedores %}
+                        <option value="{{ fornecedor }}">{{ fornecedor }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="tipo_faturamento">Tipo de Faturamento:</label>
+                <select id="tipo_faturamento" name="tipo_faturamento">
+                    <option value="">Selecione o tipo de faturamento</option>
+                    {% for tipo in tipos_faturamento %}
+                        <option value="{{ tipo }}">{{ tipo }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="mecanico_servico">Mecânico:</label>
+                <select id="mecanico_servico" name="mecanico_servico">
+                    <option value="">Selecione o mecânico</option>
+                    {% for mecanico in mecanicos %}
+                        <option value="{{ mecanico }}">{{ mecanico }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Filtrar</button>
+            </div>
+        </form>
+
+        <div class="flex-container">
+            <div class="flex-item">
+                <h2>Faturamentos Registrados</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Modelo</th>
+                            <th>Data Orçamento</th>
+                            <th>Data Faturamento</th>
+                            <th>Mês</th>
+                            <th>Ano</th>
+                            <th>Dias de Serviço</th>
+                            <th>Número OS</th>
+                            <th>Companhia</th>
+                            <th>Conversão PS</th>
+                            <th>Valor Peças</th>
+                            <th>Valor Serviços</th>
+                            <th>Total OS</th>
+                            <th>Revitalização</th>
+                            <th>Aditivo</th>
+                            <th>Qtd Litros</th>
+                            <th>Fluido Sangria</th>
+                            <th>Palheta</th>
+                            <th>Limpeza Freios</th>
+                            <th>Detergente Parabrisa</th>
+                            <th>Filtro</th>
+                            <th>Pneu</th>
+                            <th>Bateria</th>
+                            <th>Modelo Bateria</th>
+                            <th>Lts Óleo</th>
+                            <th>Valor Lt Óleo</th>
+                            <th>Marca e Tipo Óleo</th>
+                            <th>Mecânico</th>
+                            <th>Filtro Mecânico</th>
+                            <th>Valor P Meta</th>
+                            <th>Valor Dinheiro</th>
+                            <th>Serviço Freios</th>
+                            <th>Serviço Suspensão</th>
+                            <th>Serviço Injeção/Ignição</th>
+                            <th>Serviço Cabeçote Motor/Arr</th>
+                            <th>Outros Serviços</th>
+                            <th>Serviços Óleos</th>
+                            <th>Serviço Transmissão</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faturamento in faturamentos %}
+                        <tr>
+                            <td>{{ faturamento['placa'] }}</td>
+                            <td>{{ faturamento['modelo_veiculo'] }}</td>
+                            <td>{{ faturamento['data_orcamento'] }}</td>
+                            <td>{{ faturamento['data_faturamento'] }}</td>
+                            <td>{{ faturamento['mes_faturamento'] }}</td>
+                            <td>{{ faturamento['ano_faturamento'] }}</td>
+                            <td>{{ faturamento['dias_servico'] }}</td>
+                            <td>{{ faturamento['numero_os'] }}</td>
+                            <td>{{ faturamento['companhia'] }}</td>
+                            <td>{{ faturamento['conversao_ps'] }}</td>
+                            <td>{{ faturamento['valor_pecas'] }}</td>
+                            <td>{{ faturamento['valor_servicos'] }}</td>
+                            <td>{{ faturamento['total_os'] }}</td>
+                            <td>{{ faturamento['valor_revitalizacao'] }}</td>
+                            <td>{{ faturamento['valor_aditivo'] }}</td>
+                            <td>{{ faturamento['quantidade_litros'] }}</td>
+                            <td>{{ faturamento['valor_fluido_sangria'] }}</td>
+                            <td>{{ faturamento['valor_palheta'] }}</td>
+                            <td>{{ faturamento['valor_limpeza_freios'] }}</td>
+                            <td>{{ faturamento['valor_pastilha_parabrisa'] }}</td>
+                            <td>{{ faturamento['valor_filtro'] }}</td>
+                            <td>{{ faturamento['valor_pneu'] }}</td>
+                            <td>{{ faturamento['valor_bateria'] }}</td>
+                            <td>{{ faturamento['modelo_bateria'] }}</td>
+                            <td>{{ faturamento['lts_oleo_motor'] }}</td>
+                            <td>{{ faturamento['valor_lt_oleo'] }}</td>
+                            <td>{{ faturamento['marca_e_tipo_oleo'] }}</td>
+                            <td>{{ faturamento['mecanico_servico'] }}</td>
+                            <td>{{ faturamento['servico_filtro'] }}</td>
+                            <td>{{ faturamento['valor_p_meta'] }}</td>
+                            <td>{{ faturamento['valor_em_dinheiro'] }}</td>
+                            <td>{{ faturamento['valor_servico_freios'] }}</td>
+                            <td>{{ faturamento['valor_servico_suspensao'] }}</td>
+                            <td>{{ faturamento['valor_servico_injecao_ignicao'] }}</td>
+                            <td>{{ faturamento['valor_servico_cabecote_motor_arr'] }}</td>
+                            <td>{{ faturamento['valor_outros_servicos'] }}</td>
+                            <td>{{ faturamento['valor_servicos_oleos'] }}</td>
+                            <td>{{ faturamento['valor_servico_transmissao'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="pagination-container">
+            {% if page > 1 %}
+                <a href="?page={{ page - 1 }}">Anterior</a>
+            {% else %}
+                <span class="disabled">Anterior</span>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == page %}
+                    <span class="active">{{ p }}</span>
+                {% else %}
+                    <a href="?page={{ p }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page < total_pages %}
+                <a href="?page={{ page + 1 }}">Próximo</a>
+            {% else %}
+                <span class="disabled">Próximo</span>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}

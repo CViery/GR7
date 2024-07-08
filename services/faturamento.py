@@ -99,13 +99,38 @@ class Faturamento:
                 qnd_revi = len(valores_revi)
                 valor_soma_revi = sum(valores_revi)
                 valor_total_revi = locale.currency(valor_soma_revi, grouping=True)
-                faturamentos.append((mecanico[0], valor_total, filtro, qnd_revi, valor_total_revi))
+                faturamentos.append((mecanico[0], valor_total, len(valores), filtro, qnd_revi, valor_total_revi))
             return faturamentos
         except Exception as e:
             raise e
 
-
-
-app = Faturamento()
-
-app.faturamento_mecanico( '06', '2024')
+    def faturamento_companhia(self, mes, ano):
+        try:
+            faturamentos = []
+            cias = self.db.get_cias()
+            for cia in cias:
+                dados = self.db.faturamento_cia(cia[0], mes, ano)
+                valores = [dado[0] for dado in dados]
+                valor_soma = sum(valores)
+                valor_total = locale.currency(valor_soma, grouping=True)
+                faturamentos.append((cia[0], valor_total, len(valores)))
+            return faturamentos
+        except Exception as e:
+            raise e
+    
+    def faturamento_servico(self, mes, ano):
+        try:
+            faturamento = []
+            servicos = self.db.buscar_serv()
+            for servico in servicos:
+                dados = self.db.faturamento_serv(servico[0], mes, ano)
+                valores = []
+                for valor in dados:
+                    if valor[0] > 0.00:
+                        valores.append(valor[0])
+                valor_soma = sum(valores)
+                valor_total = locale.currency(valor_soma, grouping=True)
+                faturamento.append((servico[0], valor_total, len(valores)))
+            return faturamento   
+        except Exception as e:
+            raise e

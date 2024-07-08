@@ -53,8 +53,6 @@ class Database:
             '''
             self.cursor.execute(query, (mecanico, mes, ano))
             result = self.cursor.fetchall()
-            
-            print(f'Resultado: {result}')
             return result
 
         except Exception as e:
@@ -78,7 +76,43 @@ class Database:
             return result
         except Exception as e:
             print(e)
-        
+    def get_cias(self):
+        try:
+            query = 'SELECT * FROM companhias'
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            raise e
+    
+    def faturamento_cia(self, cia, mes, ano):
+        try:
+            query = 'SELECT valor_os FROM faturamento WHERE cia = ? AND mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (cia, mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            raise e
+
+    def faturamento_serv(self, serv, mes, ano):
+        try:
+            query = f'SELECT {serv} FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            print(result)
+            return result
+        except Exception as e:
+            print(e) 
+
+    def buscar_serv(self):
+        try:
+            query = 'SELECT * FROM servicos'
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            print(result)
+            return result
+        except Exception as e:
+            raise e  
 class DatabaseGastos:
     def __init__(self):
         self.conn = sqlite3.connect('database.db')
