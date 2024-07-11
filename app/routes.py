@@ -470,3 +470,52 @@ class Routes:
         print(data)
         db.cadastrar(data)
         return redirect('/faturamentos/cadastrar')
+
+
+    @app.route('/faturamentos/consultar', methods=['GET', 'POST'])
+    def consultar_faturamentos():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            db = faturamento.Faturamento()  # Certifique-se de passar a conexão com o banco de dados
+
+            # Listas para preencher os selects
+            cias = ['Cia1', 'Cia2', 'Cia3']  # Exemplo, substitua com os valores reais
+            mecanicos = ['Mecânico 1', 'Mecânico 2', 'Mecânico 3']  # Exemplo, substitua com os valores reais
+
+            if request.method == 'POST':
+                data_inicio = request.form.get('data_inicio')
+                data_fim = request.form.get('data_fim')
+                companhia = request.form.get('companhia')
+                numero_os = request.form.get('numero_os')
+                placa = request.form.get('placa')
+                mecanico_servico = request.form.get('mecanico_servico')
+
+                # Implementar a lógica para buscar os faturamentos no banco de dados com base nos filtros
+                faturamentos = db.faturamentos_gerais(data_inicio, data_fim, companhia, numero_os, placa, mecanico_servico)
+            else:
+                # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
+                faturamentos = db.faturamentos_gerais()
+
+            if faturamentos is None:
+                faturamentos = []
+
+            # Lógica de paginação
+            page = request.args.get(get_page_parameter(), type=int, default=1)
+            per_page = 10
+            offset = (page - 1) * per_page
+            paginated_faturamentos = faturamentos[offset: offset + per_page]
+
+            total_pages = (len(faturamentos) + per_page - 1) // per_page
+
+            pagination = Pagination(page=page, total=len(faturamentos), per_page=per_page, css_framework='bootstrap4')
+
+            return render_template('consultar_faturamento.html', 
+                                empresa=empresa, 
+                                cias=cias, 
+                                mecanicos=mecanicos, 
+                                faturamentos=paginated_faturamentos,
+                                pagination=pagination,
+                                paginas=total_pages,
+                                pagina_atual=page)
+        else:
+            return redirect('/')

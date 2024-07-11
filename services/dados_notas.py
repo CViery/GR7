@@ -16,7 +16,7 @@ class DadosGastos:
         for dado in dados:
             valor = locale.currency(dado[7], grouping=True)
             data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
-            data = data_formatada = data_objeto.strftime("%d/%m/%Y")
+            data = data_objeto.strftime("%d/%m/%Y")
             boleto ={
                 'numero_nota' : dado[0],
                 'notas' : dado[1],

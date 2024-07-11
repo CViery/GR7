@@ -1,10 +1,11 @@
 import sqlite3
-
+import mysql
 class Database:
     def __init__(self):
         self.conn = sqlite3.connect('database.db')
+        #self.conn = mysql.connector.connect(user="tphuoqgteh", password="Q5krP$t$CAqYtfOq", host="admingr7-server.mysql.database.azure.com", port=3306, database="administracao", ssl_ca="{ca-cert filename}", ssl_disabled=False)
         self.cursor = self.conn.cursor()
-    
+        
 
     def cadastrar_faturamento(self, dados):
         try:
@@ -42,10 +43,6 @@ class Database:
 
     def faturamento_por_mecanico(self, mecanico, mes, ano):
         try:
-            print(f'Mecânico: {mecanico}')
-            print(f'Mês: {mes}, Tipo: {type(mes)}')
-            print(f'Ano: {ano}')
-
             query = '''
             SELECT servicos 
             FROM faturamento 
@@ -99,7 +96,7 @@ class Database:
             query = f'SELECT {serv} FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, (mes, ano))
             result = self.cursor.fetchall()
-            print(result)
+           
             return result
         except Exception as e:
             print(e) 
@@ -109,10 +106,19 @@ class Database:
             query = 'SELECT * FROM servicos'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
-            print(result)
             return result
         except Exception as e:
-            raise e  
+            raise e
+    
+    def faturamento_geral(self):
+        try:
+            query = 'SELECT * FROM faturamento'
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+            
 class DatabaseGastos:
     def __init__(self):
         self.conn = sqlite3.connect('database.db')

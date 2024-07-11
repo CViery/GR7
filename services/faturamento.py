@@ -134,3 +134,58 @@ class Faturamento:
             return faturamento   
         except Exception as e:
             raise e
+    
+    def faturamentos_gerais(self):
+        try:
+            faturamentos = []
+            faturamento = self.db.faturamento_geral()
+            for ordem_servico in faturamento:
+                data_objeto_orcamento = datetime.strptime(ordem_servico[2], "%Y-%m-%d")
+                data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
+                data_objeto_faturamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y") 
+                os = {
+                        'placa' : ordem_servico[0],
+                        'modelo_veiculo' : ordem_servico[1],
+                        'data_orcamento' : data_orcamento,
+                        'data_faturamento' : data_faturamento,
+                        'dias_servico' : ordem_servico[6],
+                        'numero_os' : ordem_servico[7],
+                        'companhia' : ordem_servico[8],
+                        'valor_pecas' : locale.currency(ordem_servico[10], grouping=True),
+                        'valor_servicos' : locale.currency(ordem_servico[11], grouping=True),
+                        'total_os' : locale.currency(ordem_servico[12], grouping=True),
+                        'valor_revitalizacao' : locale.currency(ordem_servico[13], grouping=True),
+                        'valor_aditivo' : locale.currency(ordem_servico[14], grouping=True),
+                        'quantidade_litros' : ordem_servico[15],
+                        'valor_fluido_sangria': locale.currency(ordem_servico[16], grouping=True),
+                        'valor_palheta' : locale.currency(ordem_servico[17], grouping=True),
+                        'valor_limpeza_freios': locale.currency(ordem_servico[18], grouping=True),
+                        'valor_pastilha_parabrisa' : locale.currency(ordem_servico[19], grouping=True),
+                        'valor_filtro': locale.currency(ordem_servico[20], grouping=True),
+                        'valor_pneu': locale.currency(ordem_servico[21], grouping=True),
+                        'valor_bateria' : locale.currency(ordem_servico[22], grouping=True),
+                        'modelo_bateria': ordem_servico[23],
+                        'lts_oleo_motor': ordem_servico[24],
+                        'valor_lt_oleo': locale.currency(ordem_servico[25], grouping=True),
+                        'marca_e_tipo_oleo': ordem_servico[26],
+                        'mecanico_servico': ordem_servico[27],
+                        'servico_filtro' : ordem_servico[28],
+                        'valor_p_meta': locale.currency(ordem_servico[29], grouping=True),
+                        'valor_em_dinheiro': locale.currency(ordem_servico[30], grouping=True),
+                        'valor_servico_freios': locale.currency(ordem_servico[31], grouping=True),
+                        'valor_servico_suspensao': locale.currency(ordem_servico[32], grouping=True),
+                        'valor_servico_injecao_ignicao': locale.currency(ordem_servico[33], grouping=True),
+                        'valor_servico_cabecote_motor_arr': locale.currency(ordem_servico[34], grouping=True),
+                        'valor_outros_servicos': locale.currency(ordem_servico[35], grouping=True),
+                        'valor_servicos_oleos': locale.currency(ordem_servico[36], grouping=True),
+                        'valor_servico_transmissao' : locale.currency(ordem_servico[37], grouping=True)
+                    }
+                faturamentos.append(os)
+            return faturamentos
+        except Exception as e:
+            print(f"Erro ao obter faturamentos: {e}")
+            return []
+
+        except Exception as e:
+            pass
