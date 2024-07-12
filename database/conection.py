@@ -1,5 +1,6 @@
 import sqlite3
 import pyodbc
+import traceback
 
 class Database:
     def __init__(self):
@@ -11,7 +12,7 @@ class Database:
     def cadastrar_faturamento(self, dados):
         try:
             query = 'INSERT INTO faturamento VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-            self.cursor.execute(query, (dados['placa'], dados['modelo_veiculo'], dados['data_orcamento'], dados['data_faturamento'], dados['mes_faturamento'], dados['ano_faturamento'], dados['dias_servico'], dados['numero_os'], dados['companhia'],dados['conversao_ps'],dados['valor_pecas'], dados['valor_servicos'], dados['total_os'], dados['valor_revitalizacao'], dados['valor_aditivo'],dados['quantidade_litros'], dados['valor_fluido_sangria'], dados['valor_palheta'], dados['valor_limpeza_freios'], dados['valor_pastilha_parabrisa'],dados['valor_filtro'],dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'],dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['mecanico_servico'], dados['servico_filtro'], dados['valor_p_meta'], dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'],dados['valor_servicos_oleos'], dados['valor_servico_transmissao']))
+            self.cursor.execute(query, (dados['placa'], dados['modelo_veiculo'], dados['data_orcamento'], dados['data_faturamento'], dados['mes_faturamento'], dados['ano_faturamento'], dados['dias_servico'], dados['numero_os'], dados['companhia'],dados['conversao_ps'],dados['valor_pecas'], dados['valor_servicos'], dados['total_os'], dados['valor_revitalizacao'], dados['valor_aditivo'],dados['quantidade_litros'], dados['valor_fluido_sangria'], dados['valor_palheta'], dados['valor_limpeza_freios'], dados['valor_pastilha_parabrisa'],dados['valor_filtro'],dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'],dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'],  dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'],dados['valor_servicos_oleos'], dados['valor_servico_transmissao']))
             self.conn.commit()
         except Exception as e:
             print(e)
@@ -20,7 +21,7 @@ class Database:
             query = 'SELECT valor_os FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, (mes, ano))
             result = self.cursor.fetchall()
-            print(result)
+
             return result
         except Exception as e:
             print(e)
@@ -33,30 +34,58 @@ class Database:
         except Exception as e:
             print(e)
     
-    def get_qntd_filtros_mec(self, mecanico, mes,ano):
+    def get_qntd_filtros_mec(self, mecanico, mes, ano):
         try:
+            # Garantir que os parâmetros são strings
+            mecanico = str(mecanico)
+            mes = str(mes)
+            ano = str(ano)
+            
+            # Debugging
+
+            
             query = 'SELECT filtro_mecanico FROM faturamento WHERE filtro_mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?'
-            self.cursor.execute(query,(mecanico,mes, ano))
+            self.cursor.execute(query, (mecanico, mes, ano))
             result = self.cursor.fetchall()
+        
+            # Verificação dos resultados
+            if not result:
+                print("Nenhum resultado encontrado.")
+            
             return result
         except Exception as e:
-            print(e)
+            print(f"Erro ao executar a consulta: {e}")
+            traceback.print_exc()  # Imprime a pilha de chamadas para depuração
             raise e
 
     def faturamento_por_mecanico(self, mecanico, mes, ano):
         try:
+            # Convertendo para strings se não estiverem
+            mecanico = str(mecanico)
+            mes = str(mes)
+            ano = str(ano)
+            
+            # Montando a query SQL
             query = '''
             SELECT servicos 
             FROM faturamento 
             WHERE mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?
             '''
+            
+            # Imprimindo a query para debug
+           
+            
+            # Executando a query
             self.cursor.execute(query, (mecanico, mes, ano))
             result = self.cursor.fetchall()
+            
             return result
 
         except Exception as e:
+            # Imprimindo o erro para debug
             print(f'Erro ao buscar faturamento por mecânico: {str(e)}')
-            raise
+            raise e
+        
     def get_mecanicos(self):
         try:
             query = 'SELECT nome FROM funcionarios '
@@ -72,6 +101,7 @@ class Database:
             query = 'SELECT revitalizacao FROM faturamento WHERE mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, (mecanico, mes, ano))
             result = self.cursor.fetchall()
+            
             return result
         except Exception as e:
             print(e)

@@ -47,3 +47,6 @@ INSERT INTO companhias VALUES ('PORTO'), ('AZUL'), ('ITAU'), ('ARVAL BRASIL'), (
 CREATE TABLE servicos (servicos);
 
 INSERT INTO servicos VALUES ('revitalizacao'), ('aditivo'), ('fluido_sangria'), ('palheta'), ('limpeza_freios'), ('detergente_parabrisa'), ('filtro'), ('pneus'), ('bateria');
+
+
+CREATE TABLE funcionarios (id int, nome VARCHAR(50))

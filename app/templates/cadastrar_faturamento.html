@@ -38,8 +38,9 @@
             <div class="input-group">
                 <label for="cia">CIA:</label>
                 <select id="cia" name="cia" class="styled-input" onchange="showPneuStoreFields()">
-                    <option value="outros">Outros</option>
-                    <option value="pneu_store">Pneu Store</option>
+                    {%for cia in cias%}
+                        <option value="{{cia}}">{{cia}}</option>
+                    {%endfor%}
                 </select>
             </div>
             <div id="pneu_store_fields" class="input-group" style="display: none;">
@@ -135,16 +136,18 @@
                 <label for="mecanico">Mecânico:</label>
                 <select id="mecanico" name="mecanico" class="styled-input">
                     <option value="">Mecanicos</option>
-                    <option value="Cristian">Cristian</option>
-                    <option value="Marcos">Marcos</option>
+                    {%for mecanico in mecanicos%}
+                        <option value="{{mecanico}}">{{mecanico}}</option>
+                    {%endfor%}
                 </select>
             </div>
             <div class="input-group">
                 <label for="filtro_mecanico">Filtro Mecânico:</label>
                 <select id="filtro_mecanico" name="filtro_mecanico" class="styled-input">
-                    <option value="">Filtro mecanico</option>
-                    <option value="mecanico1">Fabiano</option>
-                    <option value="mecanico2">Jucimar</option>
+                    <option value="">Mecanicos</option>
+                    {%for mecanico in mecanicos%}
+                        <option value="{{mecanico}}">{{mecanico}}</option>
+                    {%endfor%}
                 </select>
             </div>
             <div class="input-group">

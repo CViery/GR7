@@ -11,7 +11,7 @@ class GastosDataBase:
             query = 'INSERT INTO notas VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'
             self.cursor.execute(query, (nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], nota['duplicata'], nota['fornecedor'], nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'], nota['despesa'], nota['valor']))
             result = 'Nota Cadastrada'
-            print(result)
+           
             self.db.conn.commit()
         except Exception as e:
             print(e)
@@ -22,13 +22,13 @@ class GastosDataBase:
             self.cursor.execute(query, (boleto['num_nota'], boleto['notas'], boleto['fornecedor'], boleto['vencimento'], boleto['dia_vencimento'], boleto['mes_vencimento'], boleto['ano_vencimento'], boleto['valor']))
             result = 'Boleto Cadastrado'
             self.db.conn.commit()
-            print(result)
+            
         except Exception as e:
             print(e)
     
     def get_all_gastos(self):
         try:
-            query = 'SELECT * FROM gastos'
+            query = 'SELECT * FROM notas'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -38,7 +38,7 @@ class GastosDataBase:
     
     def get_gatos_por_tipo(self, tipo, mes, ano):
         try:
-            query = 'SELECT valor WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ? FROM gastos'
+            query = 'SELECT valor WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ? FROM notas'
             self.cursor.execute(query, (tipo, mes, ano))
             result = self.cursor.fetchall()
             return result
@@ -73,10 +73,9 @@ class GastosDataBase:
 
     def get_despesas(self):
         try:
-            query = 'SELECT * FROM despesas' 
+            query = 'SELECT * FROM despesa' 
             self.cursor.execute(query)
             result = self.cursor.fetchall()
-            print(result)
             return result
         except Exception as e:
             print(e)
@@ -119,6 +118,7 @@ class GastosDataBase:
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
+        print(resultados)
         return resultados
 
     def get_nota_por_numero(self,num_nota):
@@ -165,7 +165,6 @@ class GastosDataBase:
             query = 'SELECT valor FROM notas WHERE mes_emissao = ? AND ano_emissao = ?'
             self.cursor.execute(query, (mes, ano))
             result = self.cursor.fetchall()
-            print(result)
             return result
         except Exception as e:
             print(e)

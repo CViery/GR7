@@ -194,15 +194,15 @@ class Routes:
             empresa = session['empresa']
             db = dados_notas.DadosGastos()
             meses = [
-                ('1', 'Janeiro'),
-                ('2', 'Fevereiro'),
-                ('3', 'Março'),
-                ('4', 'Abril'),
-                ('5', 'Maio'),
-                ('6', 'Junho'),
-                ('7', 'Julho'),
-                ('8', 'Agosto'),
-                ('9', 'Setembro'),
+                ('01', 'Janeiro'),
+                ('02', 'Fevereiro'),
+                ('03', 'Março'),
+                ('04', 'Abril'),
+                ('05', 'Maio'),
+                ('06', 'Junho'),
+                ('07', 'Julho'),
+                ('08', 'Agosto'),
+                ('09', 'Setembro'),
                 ('10', 'Outubro'),
                 ('11', 'Novembro'),
                 ('12', 'Dezembro')
@@ -213,16 +213,22 @@ class Routes:
                 if 'mes' in request.form and 'ano' in request.form:
                     # Processar formulário de filtro de despesas
                     mes_dados = request.form['mes']
+                    print(mes_dados)
                     ano_dados = request.form['ano']
+                    print(ano_dados)
                     dados_tipos = db.despesas(mes_dados, ano_dados)
                     valor_gasto = db.valor_gastos(mes_dados, ano_dados)
+                    
                 else:
                     # Usar data atual se não houver filtros específicos para despesas
                     now = datetime.now()
                     mes_dados = now.strftime('%m')
+                    print(mes_dados)
+                    print(ano_dados)
                     ano_dados = now.strftime('%Y')
                     dados_tipos = db.despesas(mes_dados, ano_dados)
                     valor_gasto = db.valor_gastos(mes_dados, ano_dados)
+                    print(valor_gasto)
                     
 
                 if 'dia' in request.form:
@@ -249,7 +255,8 @@ class Routes:
                 ano = now.strftime('%Y')
                 dados_tipos = db.despesas(mes, ano)
                 boletos = db.boletos_do_dia(dia, mes, ano)
-                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos)
+                valor_gasto = db.valor_gastos(mes, ano)
+                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto)
         else:
             print('Usuário não está logado')
             return redirect('/')
@@ -458,7 +465,12 @@ class Routes:
     def cadastrar_faturamento():
         if 'usuario' in session:
             empresa = session['empresa']
-            return render_template('cadastrar_faturamento.html', empresa=empresa)
+            db = faturamento.Faturamento()
+            cias = db.companhias()
+            print(cias) # Exemplo, substitua com os valores reais
+            mecanicos = db.funcionarios()
+            print(mecanicos) 
+            return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos)
         else:
             print('Usuário não está logado')
             return redirect('/')
@@ -479,8 +491,10 @@ class Routes:
             db = faturamento.Faturamento()  # Certifique-se de passar a conexão com o banco de dados
 
             # Listas para preencher os selects
-            cias = ['Cia1', 'Cia2', 'Cia3']  # Exemplo, substitua com os valores reais
-            mecanicos = ['Mecânico 1', 'Mecânico 2', 'Mecânico 3']  # Exemplo, substitua com os valores reais
+            cias = db.companhias()
+            print(cias) # Exemplo, substitua com os valores reais
+            mecanicos = db.funcionarios()
+            print(mecanicos)  # Exemplo, substitua com os valores reais
 
             if request.method == 'POST':
                 data_inicio = request.form.get('data_inicio')
@@ -495,6 +509,7 @@ class Routes:
             else:
                 # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
                 faturamentos = db.faturamentos_gerais()
+                print(faturamentos)
 
             if faturamentos is None:
                 faturamentos = []

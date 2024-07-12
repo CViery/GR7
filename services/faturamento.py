@@ -19,8 +19,8 @@ class Faturamento:
                 'data_faturamento' : dados['data_faturamento'],
                 'mes_faturamento' : mes,
                 'ano_faturamento': ano,
-                'dias_servico' : dados['dias'],
-                'numero_os' : dados['num_os'],
+                'dias_servico' : int(dados['dias']),
+                'numero_os' : int(dados['num_os']),
                 'companhia' : dados['cia'],
                 'conversao_ps': dados['conversao_pneustore'],
                 'valor_pecas' : float(dados['pecas']),
@@ -89,10 +89,11 @@ class Faturamento:
                 valor_soma = sum(valores)
                 valor_total = locale.currency(valor_soma, grouping=True)
                 dados_filtro = self.db.get_qntd_filtros_mec(mecanico[0], mes, ano)
-                qntd_filtro = [qntd[0] for filtro in dados_filtro]
+                qntd_filtro = [qntd[0] for qntd in dados_filtro]
                 filtro = len(qntd_filtro)
                 dados_revitalizacao = self.db.get_revitalizacao_mecanico(mecanico[0], mes, ano)
                 valores_revi = []
+    
                 for valor in dados_revitalizacao:
                     if valor[0] > 0.00:
                         valores_revi.append(valor[0])
@@ -100,6 +101,7 @@ class Faturamento:
                 valor_soma_revi = sum(valores_revi)
                 valor_total_revi = locale.currency(valor_soma_revi, grouping=True)
                 faturamentos.append((mecanico[0], valor_total, len(valores), filtro, qnd_revi, valor_total_revi))
+            print(faturamentos)
             return faturamentos
         except Exception as e:
             raise e
@@ -169,9 +171,9 @@ class Faturamento:
                         'lts_oleo_motor': ordem_servico[24],
                         'valor_lt_oleo': locale.currency(ordem_servico[25], grouping=True),
                         'marca_e_tipo_oleo': ordem_servico[26],
-                        'mecanico_servico': ordem_servico[27],
-                        'servico_filtro' : ordem_servico[28],
-                        'valor_p_meta': locale.currency(ordem_servico[29], grouping=True),
+                        'mecanico_servico': ordem_servico[29],
+                        'servico_filtro' : ordem_servico[30],
+                        'valor_p_meta': locale.currency(ordem_servico[27], grouping=True),
                         'valor_em_dinheiro': locale.currency(ordem_servico[30], grouping=True),
                         'valor_servico_freios': locale.currency(ordem_servico[31], grouping=True),
                         'valor_servico_suspensao': locale.currency(ordem_servico[32], grouping=True),
@@ -189,3 +191,27 @@ class Faturamento:
 
         except Exception as e:
             pass
+
+    def companhias(self):
+        try:
+            cias = []
+            dados = self.db.get_cias()
+            for cia in dados:
+                cias.append(cia[0])
+            
+            return cias
+
+        except Exception as e:
+            print(e)
+    
+    def funcionarios(self):
+        try:
+            mecanicos = []
+            dados = self.db.get_mecanicos()
+            for mecanico in dados:
+                mecanicos.append(mecanico[0])
+            
+            return mecanicos
+
+        except Exception as e:
+            print(e)
