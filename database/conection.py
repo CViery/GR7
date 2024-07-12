@@ -1,9 +1,10 @@
 import sqlite3
-import mysql
+import pyodbc
+
 class Database:
     def __init__(self):
-        self.conn = sqlite3.connect('database.db')
-        #self.conn = mysql.connector.connect(user="tphuoqgteh", password="Q5krP$t$CAqYtfOq", host="admingr7-server.mysql.database.azure.com", port=3306, database="administracao", ssl_ca="{ca-cert filename}", ssl_disabled=False)
+        conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7server.database.windows.net,1433;Database=admingr7;Uid=cristian;Pwd=viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+        self.conn = pyodbc.connect(conn_str)
         self.cursor = self.conn.cursor()
         
 
@@ -19,6 +20,7 @@ class Database:
             query = 'SELECT valor_os FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, (mes, ano))
             result = self.cursor.fetchall()
+            print(result)
             return result
         except Exception as e:
             print(e)
