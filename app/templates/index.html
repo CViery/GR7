@@ -5,10 +5,20 @@
 
 {% block main %}
 <main>
-  <h1> Tela inicial<h1>
-  <a href="/gastos/cadastros/notas">notas</a>
-  
-  <a href="/gastos/cadastros/duplicatas">duplicata</a>
+  <h5> Olá {{user}} sejá bem vindo ao Portal da {{empresa}},{{data}} agora em São Paulo - SP está {{temperatura[0]}} - {{temperatura[1]}} <h5>
+    <div>
+      <h3>Faturamento</h3>
+      <div>
+        <ul>
+          <li>Faturamento Geral: {{faturamento}}</li>
+          <li>Faturamento Meta: {{faturamento_meta}}</li>
+          <li>Faturamento Peças: {{faturamento_pecas}}</li>
+          <li>Faturamento Serviços: {{faturamento_servicos}}</li>
+          <li>Primeira Meta: {{primeira_meta}}</li>
+          <!-- <li>Segunda Meta: {{segunda_meta}}</li> -->
+        </ul>
+      </div>
+    </div>
 </main>
 
 {% endblock %}

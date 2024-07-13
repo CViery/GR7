@@ -1,6 +1,6 @@
 from app import app
 from flask import request, redirect, render_template, flash, session, jsonify
-from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento
+from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
 
@@ -25,7 +25,18 @@ class Routes:
             if auten:
                 session['usuario'] = usuario
                 session['empresa'] = empresa
-                return render_template('index.html', empresa=empresa)
+                utils = utills.Utills()
+                db = faturamento.Faturamento()
+                temperatura = utils.temperatura()
+                now = datetime.now()
+                mes_dados = now.strftime('%m')
+                ano_dados = now.strftime('%Y')
+                valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
+                valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
+                valor_faturamento_pecas = utils.faturamento_pecas(mes_dados, ano_dados)
+                valor_faturamento_servico = utils.faturamento_servicos(mes_dados,ano_dados)
+                valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
+                return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta)
             else:
                 flash('Usuário ou senha incorretos.')
                 return redirect('/')
@@ -44,7 +55,19 @@ class Routes:
     def home():
         if 'usuario' in session:
             empresa = session['empresa']
-            return render_template('index.html', empresa=empresa)
+            usuario = session['usuario']
+            utils = utills.Utills()
+            db = faturamento.Faturamento()
+            temperatura = utils.temperatura()
+            now = datetime.now()
+            mes_dados = now.strftime('%m')
+            ano_dados = now.strftime('%Y')
+            valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
+            valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
+            valor_faturamento_pecas = utils.faturamento_pecas(mes_dados, ano_dados)
+            valor_faturamento_servico = utils.faturamento_servicos(mes_dados,ano_dados)
+            valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
+            return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta)
         else:
             print('usario não está logado')
             return redirect('/')

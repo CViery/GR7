@@ -150,7 +150,24 @@ class Database:
             return result
         except Exception as e:
             print(e)
-            
+    def faturamento_pecas(self,mes, ano):
+        try:
+            query = 'SELECT pecas FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+    
+    def faturamento_servicos(self,mes, ano):
+        try:
+            query = 'SELECT servicos FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+
 class DatabaseGastos:
     def __init__(self):
         self.conn = sqlite3.connect('database.db')
