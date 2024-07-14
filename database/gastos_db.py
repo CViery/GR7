@@ -8,10 +8,9 @@ class GastosDataBase:
 
     def set_nota(self, nota):
         try:
-            query = 'INSERT INTO notas VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'
-            self.cursor.execute(query, (nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], nota['duplicata'], nota['fornecedor'], nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'], nota['despesa'], nota['valor']))
+            query = 'INSERT INTO notas VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            self.cursor.execute(query, (nota['pago_por'],nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], nota['duplicata'], nota['fornecedor'], nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'],nota['vencimentos'] , nota['valor'], nota['despesa'], ))
             result = 'Nota Cadastrada'
-           
             self.db.conn.commit()
         except Exception as e:
             print(e)
@@ -38,7 +37,7 @@ class GastosDataBase:
     
     def get_gatos_por_tipo(self, tipo, mes, ano):
         try:
-            query = 'SELECT valor WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ? FROM notas'
+            query = 'SELECT valor FROM notas WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ? '
             self.cursor.execute(query, (tipo, mes, ano))
             result = self.cursor.fetchall()
             return result
@@ -113,12 +112,11 @@ class GastosDataBase:
             query += " AND fornecedor = ?"
             params.append(fornecedor)
         if despesa:
-            query += " AND despesa = ?"
+            query += " AND num_nota  = ?"
             params.append(despesa)
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
-        print(resultados)
         return resultados
 
     def get_nota_por_numero(self,num_nota):
@@ -164,6 +162,15 @@ class GastosDataBase:
         try:
             query = 'SELECT valor FROM notas WHERE mes_emissao = ? AND ano_emissao = ?'
             self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+    
+    def get_fornecedores(self):
+        try:
+            query = 'SELECT * FROM fornecedores '
+            self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
         except Exception as e:

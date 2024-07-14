@@ -7,8 +7,10 @@
   <link rel="stylesheet" href="{{url_for('static', filename= 'css/login.css')}}">
 </head>
 <body>
+
   <div class="login-container">
     <h3>LOGIN</h3>
+    {% set mensagens = get_flashed_messages() %}
     <form action="/autenticar" method='POST'>
       <label for="usuario">Usuário</label>
       <input type="text" name="usuario" id="usuario" required>
@@ -21,6 +23,13 @@
       </select>
       <button type="submit">Entrar</button>
     </form>
+    {%if mensagens%}
+      <div>
+        {%for msg in mensagens%}
+          {{msg}}
+        {%endfor%}
+      </div>
+    {%endif%}
   </div>
 </body>
 </html>

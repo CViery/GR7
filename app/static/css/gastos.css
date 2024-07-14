@@ -1,34 +1,126 @@
-.cadastro-nota {
-  max-width: 400px;
-  margin: 0 auto;
+main{ 
+  font-family: Arial, sans-serif;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 10px;
+  height: 100vh;
 }
-
-.form-row {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-input,
-select {
-  width: 100%;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-button {
+.container{ 
+  max-width: 1000px; 
+  margin: 0 auto; 
+  padding: 20px;
+ }
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-bottom: 20px;
+ }
+th, td { 
   padding: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: #fff;
+  border: 1px solid #ddd;
+}
+th { 
+  background-color: #f4f4f4;
+}
+form { 
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px; 
+  /* margin-bottom: 20px;  */
+}
+label { 
+  margin-right: 3px; 
+  color: white;
+}
+.container_form{
+  display: flex;
+  gap: 1em;
+}
+select, input[type="date"], button { 
+  margin-right: 5px;
+  border-radius: 10px;
+  text-align: center;
+  height: 1.5em;
+}
+.flex-row { 
+  display: flex; 
+  flex-wrap: wrap; 
+  align-items: center; 
+  margin-bottom: 10px; 
+  gap: 20px;
+ }
+ .button-filtro-mes{
+  width: 10em;
+  height: 1.5em;
+  background-color: white;
+  color: black;
+  border: 2px solid transparent;
+  border-radius: 10px;  /* Bordas arredondadas */
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
   cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, border 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+ .button-filtro-mes:hover{
+  background-color: #f0f0f0;  /* Cor de fundo ao passar o mouse */
+  transform: scale(1.05);  /* Efeito de crescimento ao passar o mouse */
+  border: 2px solid #007BFF;  /* Borda azul ao passar o mouse */
+ }
+.flex-container { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 20px; 
+}
+.flex-item { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 10px; 
+  align-items: center;
+}
+.container-boletos{
+  margin-top: 2em;
+}
+.submenu{
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  gap: 10px;
+}
+.option {
+  width: 250px;  /* Largura dos botões */
+  height: 50px;  /* Altura dos botões */
+  background-color: white;
+  color: black;
+  border: 2px solid transparent;
+  border-radius: 10px;  /* Bordas arredondadas */
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, border 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-button:hover {
-  background-color: #0056b3;
+.option:hover {
+  background-color: #f0f0f0;  /* Cor de fundo ao passar o mouse */
+  transform: scale(1.05);  /* Efeito de crescimento ao passar o mouse */
+  border: 2px solid #007BFF;  /* Borda azul ao passar o mouse */
+}
+
+.option:active {
+  background-color: #e0e0e0;  /* Cor de fundo ao clicar */
+  transform: scale(1);  /* Retornar ao tamanho original ao clicar */
+  border: 2px solid #0056b3;  /* Borda azul mais escura ao clicar */
+}
+
+.gastos{
+  color: white;
+}
+.dados_boletos{
+  background-color: white;
 }

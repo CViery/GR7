@@ -96,13 +96,14 @@ class DadosGastos:
 
     def nota_por_numero(self, num_nota):
         dados = self.db.get_nota_por_numero(num_nota)
+        print(dados)
         if dados:
-            data_objeto = datetime.strptime(dados[6], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = dados[11]
+            valor_nota = dados[12]
             valor = locale.currency(valor_nota, grouping=True)
             nfe = {
-                'fornecedor': dados[5],
+                'fornecedor': dados[6],
                 'data_emissao': data_formatada,
                 'valor': valor
                 }

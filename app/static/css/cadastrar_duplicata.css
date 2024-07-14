@@ -1,0 +1,84 @@
+main{
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    color: white;
+}
+
+.form-group {
+    display: flex;
+    gap: 1em;
+  }
+  .form-control {
+    border-radius: 5px;
+  }
+  .nota-item, .parcela-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+  }
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: black;
+    margin-top: 1em;
+
+  }
+  .container1{
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin-bottom: 1em;
+    margin-top: 1em;
+  }
+  .nota{
+    color: black;
+  }
+  .btn {
+    width: 20em;
+    height: 30px;
+    background-color: white;
+    color: black;
+    border: 2px solid transparent;
+    border-radius: 10px;  /* Bordas arredondadas */
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, border 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  .btn:hover{
+    background-color: #f0f0f0;  /* Cor de fundo ao passar o mouse */
+  transform: scale(1.05);  /* Efeito de crescimento ao passar o mouse */
+  border: 2px solid #007BFF;  /* Borda azul ao passar o mouse */
+  }
+  .mt-2 {
+    
+  }
+  .mt-3 {
+    
+  }
+  .card {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .notas-container, .parcelas-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin-bottom: 1em;
+    align-items: center;
+    justify-content: center;
+  }
+  label{
+    font-size: 1.5em;
+  }

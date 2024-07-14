@@ -3,6 +3,7 @@ from flask import request, redirect, render_template, flash, session, jsonify
 from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
+from database import gastos_db
 
 class Routes:
     def __init__(self):
@@ -36,7 +37,12 @@ class Routes:
                 valor_faturamento_pecas = utils.faturamento_pecas(mes_dados, ano_dados)
                 valor_faturamento_servico = utils.faturamento_servicos(mes_dados,ano_dados)
                 valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
-                return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta)
+                valor_segunda_meta = utils.segunda_meta(mes_dados, ano_dados)
+                valor_gastos = utils.gastos(mes_dados, ano_dados)
+                porcentagem_faturamento = utils.porcentagem_faturamento(mes_dados, ano_dados)
+                gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
+                porcentagem_pecas = utils.porcentagem_gastos_pecas(mes_dados, ano_dados)
+                return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
             else:
                 flash('Usuário ou senha incorretos.')
                 return redirect('/')
@@ -67,24 +73,34 @@ class Routes:
             valor_faturamento_pecas = utils.faturamento_pecas(mes_dados, ano_dados)
             valor_faturamento_servico = utils.faturamento_servicos(mes_dados,ano_dados)
             valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
-            return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta)
+            valor_segunda_meta = utils.segunda_meta(mes_dados, ano_dados)
+            valor_gastos = utils.gastos(mes_dados, ano_dados)
+            porcentagem_faturamento = utils.porcentagem_faturamento(mes_dados, ano_dados)
+            gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
+            porcentagem_pecas = utils.porcentagem_gastos_pecas(mes_dados, ano_dados)
+            return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
         else:
-            print('usario não está logado')
+            flash('usario não está logado')
             return redirect('/')
     
     @app.route('/gastos/cadastros/notas')
     def tela_cadastro_notas():
         if 'usuario' in session:
             empresa = session['empresa']
-            return render_template('cadastrar_notas.html', empresa=empresa)
+            db = utills.Utills()
+
+            fornecedores = db.fornecedores()
+            despesas = db.despesas()
+            return render_template('cadastrar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas)
         else:
-            print('usario não está logado')
+            flash('usario não está logado')
             return redirect('/')
     
     @app.route('/gastos/cadastros/notas-cadastrar-nota', methods=['POST'])
     def cadastrar_nota():
         enviar = cadastrar_notas.Notas()
         dados = {
+            'empresa': session['empresa'],
             'emitido_para' : request.form['emitido-para'],
             'status' : request.form['status'],
             'boleto' : request.form['boleto'],
@@ -99,7 +115,8 @@ class Routes:
         if dados['boleto'] == 'Sim':
             return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
         else:
-            return render_template('index.html', empresa=session['empresa'], show_alert=True)
+            flash('Nota cadastrada')
+            return render_template('cadastrar_notas.html', empresa=session['empresa'], show_alert=True)
         
     # Aqui você pode processar os dados como desejar
     # Por exemplo, você pode salvá-los em um banco de dados
@@ -126,10 +143,6 @@ class Routes:
                 data_vencimento = request.form[f'dataVencimento{i}']
                 parcelas.append({'valor': valor, 'data_vencimento': data_vencimento})
 
-                # Aqui você pode salvar os dados no banco de dados ou processá-los conforme necessário
-            """ print(f'Número da Nota: {numero_nota}')
-            print(f'Fornecedor: {fornecedor}')
-            print(f'Parcelas: {parcelas}') """
             for parcela in parcelas:
                 boleto = {
                     'num_nota': numero_nota,
@@ -141,8 +154,8 @@ class Routes:
                 db = cadastrar_notas.Boletos()
                 db.cadastrar(boleto)
 
-                # Redireciona para uma página de confirmação ou volta para a página inicial
-            return 'Boleto Salvo'
+                flash('Boleto Cadastrado')
+                return redirect('/gastos/cadastros/notas')
         except Exception as e:
             print(f'Erro: {e}')
             return "Erro no processamento dos dados", 400
@@ -247,7 +260,6 @@ class Routes:
                     now = datetime.now()
                     mes_dados = now.strftime('%m')
                     print(mes_dados)
-                    print(ano_dados)
                     ano_dados = now.strftime('%Y')
                     dados_tipos = db.despesas(mes_dados, ano_dados)
                     valor_gasto = db.valor_gastos(mes_dados, ano_dados)
@@ -344,10 +356,11 @@ class Routes:
         if 'usuario' in session:
             empresa = session['empresa']
             db = dados_notas.DadosGastos()
+            db_utils = utills.Utills()
 
+            fornecedores = db_utils.fornecedores()
+            despesas = db_utils.despesas()
             # Obter listas de fornecedores e despesas para os selects
-            fornecedores = ['A', "b", 'v', "PTD COMERCIO DE PEÇAS LTDA" ]
-            despesas = ['A', "b", 'v', "Peças"]
 
             notas = []
 
@@ -380,9 +393,8 @@ class Routes:
         if 'usuario' in session:
             empresa = session['empresa']
             db = dados_notas.DadosGastos()
-
-            # Obter lista de fornecedores para o select
-            fornecedores = ['A', "b", 'v', "PTD COMERCIO DE PEÇAS LTDA" ]
+            db_utils = utills.Utills()
+            fornecedores = db_utils.fornecedores()
 
             boletos = []
 
@@ -557,3 +569,50 @@ class Routes:
                                 pagina_atual=page)
         else:
             return redirect('/')
+
+    @app.route('/cadastros/companhias')
+    def tela_cadastro_companhia():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastrar_companhias.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+    
+    @app.route('/cadastros/baterias')
+    def tela_cadastro_bateria():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastrar_bateria.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+        
+    @app.route('/cadastros/oleos')
+    def tela_cadastro_oleo():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastrar_oleo.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+    
+    @app.route('/cadastros/funcionarios')
+    def tela_cadastro_funcionarios():
+        if 'usuario' in session:
+            empresa = session['empresa']
+            return render_template('cadastrar_funcionarios.html', empresa=empresa)
+        else:
+            print('usario não está logado')
+            return redirect('/')
+    
+    
+    @app.route('/cadastros/oleo-cadastrar', methods=['GET', 'POST'])
+    def cadastrar_despesa():
+        if request.method == 'POST':
+            despesa = request.form['oleo']
+            db = dados_notas.DadosGastos()
+            db.cadastrar_despesa(despesa)
+            return redirect('/cadastros/oleos')
+        else:
+            return 'erro aqui'

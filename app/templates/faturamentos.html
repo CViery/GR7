@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}
 <title>Inicio - {{ empresa }}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <style>
     body { font-family: Arial, sans-serif; }
+    main{background-color: black; color: white;}
     .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
     th, td { padding: 10px; border: 1px solid #ddd; }
@@ -16,26 +18,60 @@
     .submenu { margin-bottom: 20px; }
     .submenu a { margin-right: 10px; text-decoration: none; color: #007bff; }
     .submenu a:hover { text-decoration: underline; }
+    .container_dados{display: flex; gap: 1em;}
+    .option{
+  width: 10em;
+  height: 1.5em;
+  background-color: white;
+  color: black;
+  border: 2px solid transparent;
+  border-radius: 10px;  /* Bordas arredondadas */
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, border 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+ .option:hover{
+  background-color: #f0f0f0;  /* Cor de fundo ao passar o mouse */
+  transform: scale(1.05);  /* Efeito de crescimento ao passar o mouse */
+  border: 2px solid #007BFF;  /* Borda azul ao passar o mouse */
+ }
+ select{
+    border-radius: 15px;
+ }
+ .button_for{
+    width: 10em;
+  height: 1.5em;
+  background-color: white;
+  color: black;
+  border: 2px solid transparent;
+  border-radius: 10px;  /* Bordas arredondadas */
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, border 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+ .button_for:hover{
+    background-color: #f0f0f0;  /* Cor de fundo ao passar o mouse */
+  transform: scale(1.05);  /* Efeito de crescimento ao passar o mouse */
+  border: 2px solid #007BFF;  /* Borda azul ao passar o mouse */
+ }
 </style>
 {% endblock %}
 
 {% block main %}
 <main>
-    <div>
-        <a href="/gastos/cadastros/notas">Cadastrar Notas</a>
-        <a href="/gastos/cadastros/duplicatas">Cadastrar Boletos</a>
-        <a href="/consultar_notas">Consultar Notas</a>
-        <a href="/consultar_boletos">Consultar Boletos</a> 
-    </div>
     <div class="container">
-        <h1>Dashboard de Faturamentos</h1>
-
+        <h1>Faturamentos</h1>
         <div class="submenu">
-            <a href="/faturamentos/cadastrar">Cadastrar Faturamento</a>
-            <a href="/faturamentos/consultar">Consultar Faturamento</a>
-            <a href="/faturamentos/editar">Editar Faturamento</a>
+            <a href="/faturamentos/cadastrar"><button class="option">Cadastrar Faturamento</button></a>
+            <a href="/faturamentos/consultar"><button class="option">Consultar Faturamento</button></a>
+            <a href="/faturamentos/editar"><button class="option">Editar Faturamento</button></a>
         </div>
-
         <form method="POST" action="/faturamento" id="filtroFaturamentosForm">
             <div class="flex-row">
                 <label for="mes">Mês:</label>
@@ -53,11 +89,10 @@
                         <option value="{{ ano }}">{{ ano }}</option>
                     {% endfor %}
                 </select>
-                <button type="submit">Filtrar</button>
+                <button class="button_for" type="submit">Filtrar</button>
             </div>
         </form>
-
-        <div class="flex-container">
+        <div class="container_dados">
             <div class="flex-item">
                 <h2>Faturamento Total do Mês</h2>
                 <p>Total: {{ valor_faturamento_total }}</p>
@@ -66,77 +101,102 @@
                 <h2>Faturamento para Meta</h2>
                 <p>Total: {{ valor_faturamento_meta }}</p>
             </div>
-
-            <div class="flex-item">
-                <h2>Faturamento por Mecânico</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Mecânico</th>
-                            <th>Valor</th>
-                            <th>Quantidade Serv</th>
-                            <th>Filtros</th>
-                            <th>Revitalização</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for faturamento in faturamento_mecanicos %}
-                        <tr>
-                            <td>{{ faturamento[0] }}</td>
-                            <td>{{ faturamento[1] }}</td>
-                            <td>{{ faturamento[2] }}</td>
-                            <td>{{ faturamento[3] }}</td>
-                            <td>{{ faturamento[4] }} -- {{ faturamento[5] }}</td> 
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="flex-item">
-                <h2>Faturamento por Companhia</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Companhia</th>
-                            <th>Valor</th>
-                            <th>Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for faturamento in faturamento_companhia %}
-                        <tr>
-                            <td>{{ faturamento[0] }}</td>
-                            <td>{{ faturamento[1] }}</td>
-                            <td>{{ faturamento[2] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="flex-item">
-                <h2>Faturamento de Serviços Específicos</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Serviço</th>
-                            <th>Valor</th>
-                            <th>quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for faturamento in faturamento_servico %}
-                        <tr>
-                            <td>{{ faturamento[0] }}</td>
-                            <td>{{ faturamento[1] }}</td>
-                            <td>{{ faturamento[2] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
+        <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Faturamento por Mecânico
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mecânico</th>
+                                <th>Valor</th>
+                                <th>Quantidade Serv</th>
+                                <th>Filtros</th>
+                                <th>Revitalização</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for faturamento in faturamento_mecanicos %}
+                            <tr>
+                                <td>{{ faturamento[0] }}</td>
+                                <td>{{ faturamento[1] }}</td>
+                                <td>{{ faturamento[2] }}</td>
+                                <td>{{ faturamento[3] }}</td>
+                                <td>{{ faturamento[4] }} -- {{ faturamento[5] }}</td> 
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Faturamento por Companhia
+                </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Companhia</th>
+                                <th>Valor</th>
+                                <th>Quantidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for faturamento in faturamento_companhia %}
+                            <tr>
+                                <td>{{ faturamento[0] }}</td>
+                                <td>{{ faturamento[1] }}</td>
+                                <td>{{ faturamento[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Faturamento de Serviços Específicos
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Serviço</th>
+                                <th>Valor</th>
+                                <th>quantidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for faturamento in faturamento_servico %}
+                            <tr>
+                                <td>{{ faturamento[0] }}</td>
+                                <td>{{ faturamento[1] }}</td>
+                                <td>{{ faturamento[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+            </div>
+          </div>
     </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
 {% endblock %}

@@ -5,6 +5,14 @@
 {% endblock %}
 {% block main %}
 <main>
+    {% set mensagens = get_flashed_messages() %}
+    {%if mensagens%}
+      <div>
+        {%for msg in mensagens%}
+          {{msg}}
+        {%endfor%}
+      </div>
+    {%endif%}
     <form class="cadastro-nota" action="/gastos/cadastros/notas-cadastrar-nota" method="post" >
         <div class="form-row">
             <div class="form-group">
@@ -13,6 +21,7 @@
                     <option value="GR7">GR7</option>
                     <option value="DANIEL">DANIEL</option>
                     <option value="GILBERTO">GILBERTO</option>
+                    <option value="OUTROS">OUTROS</option>
                 </select>
             </div>
 
@@ -47,10 +56,9 @@
             <div class="form-group">
                 <label for="fornecedor">Fornecedor:</label>
                 <select id="fornecedor" name="fornecedor">
-                    <option value="SKY">SKY</option>
-                    <option value="COMPEL">COMPEL</option>
-                    <option value="BIS">BIS</option>
-                    <option value="ACCIOLY">ACCIOLY</option>
+                    {%for fornecedor in fornecedores%}
+                    <option value="{{fornecedor}}">{{fornecedor}}</option>
+                    {%endfor%}
                 </select>
             </div>
         </div>
@@ -69,9 +77,9 @@
             <div class="form-group">
                 <label for="despesa">Despesa:</label>
                 <select id="despesa" name="despesa">
-                    <option value="PEÇAS">PEÇAS</option>
-                    <option value="FOLHA">FOLHA</option>
-                    <option value="INTERNET">INTERNET</option>
+                    {%for despesa in despesas%}
+                    <option value="{{despesa}}">{{despesa}}</option>
+                    {%endfor%}
                 </select>
             </div>
         </div>

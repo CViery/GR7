@@ -1,0 +1,93 @@
+<div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            Faturamento por Mecânico
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mecânico</th>
+                        <th>Valor</th>
+                        <th>Quantidade Serv</th>
+                        <th>Filtros</th>
+                        <th>Revitalização</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for faturamento in faturamento_mecanicos %}
+                    <tr>
+                        <td>{{ faturamento[0] }}</td>
+                        <td>{{ faturamento[1] }}</td>
+                        <td>{{ faturamento[2] }}</td>
+                        <td>{{ faturamento[3] }}</td>
+                        <td>{{ faturamento[4] }} -- {{ faturamento[5] }}</td> 
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            Faturamento por Companhia
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Companhia</th>
+                        <th>Valor</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for faturamento in faturamento_companhia %}
+                    <tr>
+                        <td>{{ faturamento[0] }}</td>
+                        <td>{{ faturamento[1] }}</td>
+                        <td>{{ faturamento[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            Faturamento de Serviços Específicos
+        </button>
+      </h2>
+      <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Serviço</th>
+                        <th>Valor</th>
+                        <th>quantidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for faturamento in faturamento_servico %}
+                    <tr>
+                        <td>{{ faturamento[0] }}</td>
+                        <td>{{ faturamento[1] }}</td>
+                        <td>{{ faturamento[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+  </div>

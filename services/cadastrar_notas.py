@@ -15,6 +15,7 @@ class Notas:
             valor_aut = valor_str.replace(',', '.')
             valor = float(valor_aut)
             nota = {
+                'pago_por': dados['empresa'],
                 'emitido_para' : dados['emitido_para'],
                 'status' : dados['status'],
                 'boleto' : dados['boleto'],
@@ -25,8 +26,10 @@ class Notas:
                 'dia_emissao': dia,
                 'mes_emissao': mes,
                 'ano_emissao': ano,
+                'vencimentos': '',
+                'valor' : valor,
                 'despesa' : dados['despesa'],
-                'valor' : valor
+                
             }
             self.db.set_nota(nota)
         except Exception as e:

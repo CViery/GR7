@@ -26,7 +26,6 @@ class Boletos:
                 datas.append(data_formatada)
             parcelas = json.dumps(datas)
             self.db.atualizar_notas(num_nota,numero_duplicata,parcelas)
-            # fazer updatde usando o numero da nota para ads o num da duplicata, e os vencimentos para aql nota
         vencimentos = duplicata['parcelas']
         
         for vencimento in vencimentos:
@@ -37,9 +36,10 @@ class Boletos:
             valor_str = vencimento['valor']
             valor_aut = valor_str.replace(',', '.')
             valor = float(valor_aut)
+            nfe = json.dumps(numeros_notas)
             boleto = {
                 'num_nota': numero_duplicata,
-                'notas': numeros_notas,
+                'notas': nfe,
                 'fornecedor': fornecedor,
                 'vencimento':data,
                 'dia_vencimento':dia,
@@ -47,7 +47,8 @@ class Boletos:
                 'ano_vencimento':ano,
                 'valor': valor
             }
-            #enviar o boleto para o cadastro no banco 
+            print(boleto)
+            self.db.set_boleto(boleto)
 
         
 

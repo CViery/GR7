@@ -5,8 +5,8 @@
 .header_style{
   width: 100vw;
   height: 15vh;
-  background-color: black;
-  color: white;
+  background-color: white;
+  color: black;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -15,7 +15,7 @@
 
 .link_style{
   text-decoration: none;
-  color: white;
+  color: black;
 }
 
 .nav_bar{
