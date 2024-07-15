@@ -1,6 +1,5 @@
 import requests
 from database import conection, gastos_db
-import locale
 from services import faturamento, dados_notas
 
 class Utills:
@@ -8,24 +7,7 @@ class Utills:
         self.db = conection.Database()
         self.db_gastos = gastos_db.GastosDataBase()
         self.db_dados_notas = dados_notas.DadosGastos()
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
         self.faturamento_db = faturamento.Faturamento()
-    def temperatura(self):
-        try:
-            API_KEY = "de354584bda26fb5d6ed074b532ccef9"
-            cidade = "são paulo"
-            link = f"https://api.openweathermap.org/data/2.5/weather?q={cidade}&appid={API_KEY}&lang=pt_br"
-
-            requisicao = requests.get(link)
-            requisicao_dic = requisicao.json()
-            descricao = requisicao_dic['weather'][0]['description']
-            temperatura = requisicao_dic['main']['temp'] - 273.15
-            temp = int(temperatura)
-            resposta = (descricao, f"{temp} ºC")
-            return resposta
-            
-        except Exception as e:
-            print(e)
 
     def faturamento_pecas(self,mes,ano):
         try:
@@ -33,7 +15,7 @@ class Utills:
             dados = self.db.faturamento_pecas(mes,ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = locale.currency(valor_soma, grouping=True)
+            valor_total = f'R$ {valor_soma}'
             return valor_total
         except Exception as e:
             print(e)
@@ -44,7 +26,7 @@ class Utills:
             dados = self.db.faturamento_servicos(mes,ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = locale.currency(valor_soma, grouping=True)
+            valor_total = f'R$ {valor_soma}'
             return valor_total
         except Exception as e:
             print(e)
@@ -59,7 +41,7 @@ class Utills:
             if falta <= 0:
                 valor_total = 'Primeira meta Atingida'
             else:
-                valor_total = locale.currency(falta, grouping=True)
+                valor_total = f'R$ {falta}'
             return valor_total
         except Exception as e:
             print(e)
@@ -74,7 +56,7 @@ class Utills:
             if falta <= 0:
                 valor_total = 'Segunda meta Atingida'
             else:
-                valor_total = locale.currency(falta, grouping=True)
+                valor_total = f'R$ {falta}'
             return valor_total
         except Exception as e:
             print(e)
@@ -143,5 +125,5 @@ class Utills:
         dados_pecas = self.db_gastos.get_gatos_por_tipo('PEÇAS', mes, ano)
         valores_gastos = [dado[0] for dado in dados_pecas]
         gasto = sum(valores_gastos)
-        valor_total = locale.currency(gasto, grouping=True)
+        valor_total = f'R$ {gasto}'
         return valor_total

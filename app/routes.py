@@ -11,7 +11,7 @@ class Routes:
 
     @app.route('/')
     def show_login():
-        return render_template('index.html')
+        return render_template('login.html')
 
     @app.route('/autenticar', methods=['POST'])
     def autenticar():
@@ -21,7 +21,7 @@ class Routes:
             empresa = request.form['empresa']
             print(usuario, senha, empresa)
             db = login.Login()
-            auten = True
+            auten = db.login(usuario.upper(), senha)
             print(auten)
             if auten:
                 session['usuario'] = usuario
