@@ -26,22 +26,8 @@ class Routes:
             if auten:
                 session['usuario'] = usuario
                 session['empresa'] = empresa
-                utils = utills.Utills()
-                db = faturamento.Faturamento()
-                now = datetime.now()
-                mes_dados = now.strftime('%m')
-                ano_dados = now.strftime('%Y')
-                valor_faturamento_total = db.faturamento_total_mes(mes_dados, ano_dados)
-                valor_faturamento_meta = db.faturamento_meta_mes(mes_dados, ano_dados)
-                valor_faturamento_pecas = utils.faturamento_pecas(mes_dados, ano_dados)
-                valor_faturamento_servico = utils.faturamento_servicos(mes_dados,ano_dados)
-                valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
-                valor_segunda_meta = utils.segunda_meta(mes_dados, ano_dados)
-                valor_gastos = utils.gastos(mes_dados, ano_dados)
-                porcentagem_faturamento = utils.porcentagem_faturamento(mes_dados, ano_dados)
-                gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
-                porcentagem_pecas = utils.porcentagem_gastos_pecas(mes_dados, ano_dados)
-                return render_template('index.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
+                
+                return redirect('/home')
             else:
                 flash('Usuário ou senha incorretos.')
                 return redirect('/')
