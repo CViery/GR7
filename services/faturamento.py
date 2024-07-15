@@ -1,11 +1,11 @@
 from database import conection
-import locale
+
 from datetime import datetime
 
 class Faturamento:
     def __init__(self):
         self.db = conection.Database()
-        locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+        
 
     def cadastrar(self, dados):
         try:
@@ -63,7 +63,7 @@ class Faturamento:
             valores = [dado[0] for dado in dados]
 
             valor_soma = sum(valores)
-            valor_total = locale.currency(valor_soma, grouping=True)
+            valor_total = f'R$ {valor_soma}'
             return valor_total
         except Exception as e:
             print(f"Erro ao calcular faturamento total do mês: {e}")
@@ -74,7 +74,7 @@ class Faturamento:
             dados = self.db.faturamento_mes_meta(mes, ano)
             valores = [dado[0] for dado in dados]
             valor_soma = sum(valores)
-            valor_total = locale.currency(valor_soma, grouping=True)
+            valor_total = f'R$ {valor_soma}'
             return valor_total
         except Exception as e:
             print(f"Erro ao calcular faturamento total da meta do mês: {e}")
@@ -87,7 +87,7 @@ class Faturamento:
                 dados = self.db.faturamento_por_mecanico(mecanico[0], mes, ano)
                 valores = [dado[0] for dado in dados]
                 valor_soma = sum(valores)
-                valor_total = locale.currency(valor_soma, grouping=True)
+                valor_total = f'R$ {valor_soma}'
                 dados_filtro = self.db.get_qntd_filtros_mec(mecanico[0], mes, ano)
                 qntd_filtro = [qntd[0] for qntd in dados_filtro]
                 filtro = len(qntd_filtro)
@@ -99,7 +99,7 @@ class Faturamento:
                         valores_revi.append(valor[0])
                 qnd_revi = len(valores_revi)
                 valor_soma_revi = sum(valores_revi)
-                valor_total_revi = locale.currency(valor_soma_revi, grouping=True)
+                valor_total_revi = f'R$ {valor_soma_revi}'
                 faturamentos.append((mecanico[0], valor_total, len(valores), filtro, qnd_revi, valor_total_revi))
             print(faturamentos)
             return faturamentos
@@ -114,7 +114,7 @@ class Faturamento:
                 dados = self.db.faturamento_cia(cia[0], mes, ano)
                 valores = [dado[0] for dado in dados]
                 valor_soma = sum(valores)
-                valor_total = locale.currency(valor_soma, grouping=True)
+                valor_total = f'R$ {valor_soma}'
                 faturamentos.append((cia[0], valor_total, len(valores)))
             return faturamentos
         except Exception as e:
@@ -131,7 +131,7 @@ class Faturamento:
                     if valor[0] > 0.00:
                         valores.append(valor[0])
                 valor_soma = sum(valores)
-                valor_total = locale.currency(valor_soma, grouping=True)
+                valor_total = f'R$ {valor_soma}'
                 faturamento.append((servico[0], valor_total, len(valores)))
             return faturamento   
         except Exception as e:
@@ -154,34 +154,34 @@ class Faturamento:
                         'dias_servico' : ordem_servico[6],
                         'numero_os' : ordem_servico[7],
                         'companhia' : ordem_servico[8],
-                        'valor_pecas' : locale.currency(ordem_servico[10], grouping=True),
-                        'valor_servicos' : locale.currency(ordem_servico[11], grouping=True),
-                        'total_os' : locale.currency(ordem_servico[12], grouping=True),
-                        'valor_revitalizacao' : locale.currency(ordem_servico[13], grouping=True),
-                        'valor_aditivo' : locale.currency(ordem_servico[14], grouping=True),
+                        'valor_pecas' : f'R$ {ordem_servico[10]}',
+                        'valor_servicos' : f"R$ {ordem_servico[11]}",
+                        'total_os' : f'R$ {ordem_servico[12]}',
+                        'valor_revitalizacao' : f'R$ {ordem_servico[13]}',
+                        'valor_aditivo' : f'R$ {ordem_servico[14]}',
                         'quantidade_litros' : ordem_servico[15],
-                        'valor_fluido_sangria': locale.currency(ordem_servico[16], grouping=True),
-                        'valor_palheta' : locale.currency(ordem_servico[17], grouping=True),
-                        'valor_limpeza_freios': locale.currency(ordem_servico[18], grouping=True),
-                        'valor_pastilha_parabrisa' : locale.currency(ordem_servico[19], grouping=True),
-                        'valor_filtro': locale.currency(ordem_servico[20], grouping=True),
-                        'valor_pneu': locale.currency(ordem_servico[21], grouping=True),
-                        'valor_bateria' : locale.currency(ordem_servico[22], grouping=True),
+                        'valor_fluido_sangria': f'R$ {ordem_servico[16]}',
+                        'valor_palheta' : f'R$ {ordem_servico[17]}',
+                        'valor_limpeza_freios':f'R$ {ordem_servico[18]}',
+                        'valor_pastilha_parabrisa' :f'R$ {ordem_servico[19]}',
+                        'valor_filtro': f'R$ {ordem_servico[20]}',
+                        'valor_pneu': f'R$ {ordem_servico[21]}',
+                        'valor_bateria' : f'R$ {ordem_servico[22]}',
                         'modelo_bateria': ordem_servico[23],
                         'lts_oleo_motor': ordem_servico[24],
-                        'valor_lt_oleo': locale.currency(ordem_servico[25], grouping=True),
+                        'valor_lt_oleo': f'R$ {ordem_servico[25]}',
                         'marca_e_tipo_oleo': ordem_servico[26],
                         'mecanico_servico': ordem_servico[29],
                         'servico_filtro' : ordem_servico[30],
-                        'valor_p_meta': locale.currency(ordem_servico[27], grouping=True),
-                        'valor_em_dinheiro': locale.currency(ordem_servico[30], grouping=True),
-                        'valor_servico_freios': locale.currency(ordem_servico[31], grouping=True),
-                        'valor_servico_suspensao': locale.currency(ordem_servico[32], grouping=True),
-                        'valor_servico_injecao_ignicao': locale.currency(ordem_servico[33], grouping=True),
-                        'valor_servico_cabecote_motor_arr': locale.currency(ordem_servico[34], grouping=True),
-                        'valor_outros_servicos': locale.currency(ordem_servico[35], grouping=True),
-                        'valor_servicos_oleos': locale.currency(ordem_servico[36], grouping=True),
-                        'valor_servico_transmissao' : locale.currency(ordem_servico[37], grouping=True)
+                        'valor_p_meta': f'R$ {ordem_servico[27]}',
+                        'valor_em_dinheiro': f'R$ {ordem_servico[30]}',
+                        'valor_servico_freios': f'R$ {ordem_servico[31]}',
+                        'valor_servico_suspensao': f'R$ {ordem_servico[32]}',
+                        'valor_servico_injecao_ignicao': f'R$ {ordem_servico[33]}',
+                        'valor_servico_cabecote_motor_arr': f'R$ {ordem_servico[34]}',
+                        'valor_outros_servicos': f'R$ {ordem_servico[35]}',
+                        'valor_servicos_oleos': f'R$ {ordem_servico[36]}',
+                        'valor_servico_transmissao' : f'R$ {ordem_servico[37]}'
                     }
                 faturamentos.append(os)
             return faturamentos

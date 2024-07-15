@@ -1,12 +1,11 @@
 from database import gastos_db
-import locale
 from datetime import datetime
 
 class DadosGastos:
 
     def __init__(self):
         self.db = gastos_db.GastosDataBase()
-        locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+        
 
     
     def boletos_do_dia(self, dia, mes, ano):
@@ -14,7 +13,7 @@ class DadosGastos:
         valores = []
         boletos = []
         for dado in dados:
-            valor = locale.currency(dado[7], grouping=True)
+            valor = f'R$ {dado[7]}'
             data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
             data = data_objeto.strftime("%d/%m/%Y")
             boleto ={
@@ -41,7 +40,7 @@ class DadosGastos:
             for valor in valor_despesa:
                 valores.append(valor[0])
             valor_soma = sum(valores)
-            valor_total = locale.currency(valor_soma, grouping=True)
+            valor_total = f'R$ {valor_soma}'
             dados_despesas.append((despesa[0], valor_total))
         return dados_despesas
         
@@ -54,7 +53,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_nota = nota[12]
-            valor = locale.currency(valor_nota, grouping=True)
+            valor = f'R$ {valor_nota}'
             nfe = {
                 'pago_por': nota[0],
                 'emitido_para': nota[1],
@@ -77,7 +76,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_nota = dados[12]
-            valor = locale.currency(valor_nota, grouping=True)
+            valor = f'R$ {valor_nota}'
             nfe = {
                 'pago_por': dados[0],
                 'emitido_para': dados[1],
@@ -101,7 +100,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_nota = dados[12]
-            valor = locale.currency(valor_nota, grouping=True)
+            valor = f'R$ {valor_nota}'
             nfe = {
                 'fornecedor': dados[6],
                 'data_emissao': data_formatada,
@@ -116,7 +115,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_boleto = dado[7]
-            valor = locale.currency(valor_boleto, grouping=True)
+            valor = f'R$ {valor_boleto}'
             boleto ={
                 'num_nota': dado[0],
                 'notas': dado[1],
@@ -136,7 +135,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_boleto = dado[7]
-            valor = locale.currency(valor_boleto, grouping=True)
+            valor = f'R$ {valor_boleto}'
             boleto ={
                 'num_nota': dado[0],
                 'notas': dado[1],
@@ -154,7 +153,7 @@ class DadosGastos:
         for nota in notas:
             valores.append(nota[0])
         valor_soma = sum(valores)
-        valor_total = locale.currency(valor_soma, grouping=True)
+        valor_total = f'R$ {valor_soma}'
         print(valor_total)
         return valor_total
         
