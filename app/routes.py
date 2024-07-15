@@ -42,7 +42,7 @@ class Routes:
                 porcentagem_faturamento = utils.porcentagem_faturamento(mes_dados, ano_dados)
                 gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
                 porcentagem_pecas = utils.porcentagem_gastos_pecas(mes_dados, ano_dados)
-                return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
+                return render_template('index.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
             else:
                 flash('Usuário ou senha incorretos.')
                 return redirect('/')
@@ -78,7 +78,7 @@ class Routes:
             porcentagem_faturamento = utils.porcentagem_faturamento(mes_dados, ano_dados)
             gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
             porcentagem_pecas = utils.porcentagem_gastos_pecas(mes_dados, ano_dados)
-            return render_template('index.html', empresa=empresa, user=usuario,temperatura=temperatura, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
+            return render_template('index.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
         else:
             flash('usario não está logado')
             return redirect('/')
