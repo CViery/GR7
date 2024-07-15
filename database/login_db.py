@@ -4,7 +4,7 @@ class Login:
     
     def get_user(self, user):
         try:
-            users = [('CRISTIAN', '1234', 'ADMIN'), ('GILBERTO', '1234', 'ADMIN')]
+            users = [('CRISTIAN', 'viery2312', 'ADMIN'), ('GILBERTO', '1234', 'ADMIN')]
             for person in users:
                 if person[0] == user:
                     return person
