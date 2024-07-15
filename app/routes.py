@@ -608,7 +608,7 @@ class Routes:
     
     
     @app.route('/cadastros/oleo-cadastrar', methods=['GET', 'POST'])
-    def cadastrar_despesa():
+    def cadastrar_desp():
         if request.method == 'POST':
             despesa = request.form['oleo']
             db = dados_notas.DadosGastos()
