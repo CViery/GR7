@@ -48,7 +48,7 @@ class Routes:
                 return redirect('/')
         except Exception as e:
             print(f"Erro durante autenticação: {e}")
-            flash('Ocorreu um erro. Tente novamente.')
+            flash(f'Ocorreu um erro. Tente novamente.{e}')
             return redirect('/')
 
     @app.route('/logout')
