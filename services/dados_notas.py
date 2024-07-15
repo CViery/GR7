@@ -13,7 +13,7 @@ class DadosGastos:
         valores = []
         boletos = []
         for dado in dados:
-            valor = f'R$ {dado[7]:,.2f}'
+            valor = f'R$ {dado[7]:.2f}'
             data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
             data = data_objeto.strftime("%d/%m/%Y")
             boleto ={
@@ -40,7 +40,7 @@ class DadosGastos:
             for valor in valor_despesa:
                 valores.append(valor[0])
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:,.2f}'
+            valor_total = f'R$ {valor_soma:.2f}'
             dados_despesas.append((despesa[0], valor_total))
         return dados_despesas
         
@@ -53,7 +53,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_nota = nota[12]
-            valor = f'R$ {valor_nota:,.2f}'
+            valor = f'R$ {valor_nota:.2f}'
             nfe = {
                 'pago_por': nota[0],
                 'emitido_para': nota[1],
@@ -76,7 +76,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_nota = dados[12]
-            valor = f'R$ {valor_nota:,.2f}'
+            valor = f'R$ {valor_nota:.2f}'
             nfe = {
                 'pago_por': dados[0],
                 'emitido_para': dados[1],
@@ -100,7 +100,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_nota = dados[12]
-            valor = f'R$ {valor_nota:,.2f}'
+            valor = f'R$ {valor_nota:.2f}'
             nfe = {
                 'fornecedor': dados[6],
                 'data_emissao': data_formatada,
@@ -115,7 +115,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_boleto = dado[7]
-            valor = f'R$ {valor_boleto:,.2f}'
+            valor = f'R$ {valor_boleto:.2f}'
             boleto ={
                 'num_nota': dado[0],
                 'notas': dado[1],
@@ -135,7 +135,7 @@ class DadosGastos:
             data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_boleto = dado[7]
-            valor = f'R$ {valor_boleto:,.2f}'
+            valor = f'R$ {valor_boleto:.2f}'
             boleto ={
                 'num_nota': dado[0],
                 'notas': dado[1],
@@ -153,7 +153,7 @@ class DadosGastos:
         for nota in notas:
             valores.append(nota[0])
         valor_soma = sum(valores)
-        valor_total = f'R$ {valor_soma:,.2f}'
+        valor_total = f'R$ {valor_soma:.2f}'
         print(valor_total)
         return valor_total
         

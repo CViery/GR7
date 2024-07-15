@@ -15,7 +15,7 @@ class Utills:
             dados = self.db.faturamento_pecas(mes,ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:,.2f}'
+            valor_total = f'R$ {valor_soma:.2f}'
             return valor_total
         except Exception as e:
             print(e)
@@ -26,7 +26,7 @@ class Utills:
             dados = self.db.faturamento_servicos(mes,ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:,.2f}'
+            valor_total = f'R$ {valor_soma:.2f}'
             return valor_total
         except Exception as e:
             print(e)
@@ -41,7 +41,7 @@ class Utills:
             if falta <= 0:
                 valor_total = 'Primeira meta Atingida'
             else:
-                valor_total = f'R$ {falta:,.2f}'
+                valor_total = f'R$ {falta:.2f}'
             return valor_total
         except Exception as e:
             print(e)
@@ -56,7 +56,7 @@ class Utills:
             if falta <= 0:
                 valor_total = 'Segunda meta Atingida'
             else:
-                valor_total = f'R$ {falta:,.2f}'
+                valor_total = f'R$ {falta:.2f}'
             return valor_total
         except Exception as e:
             print(e)
@@ -125,5 +125,5 @@ class Utills:
         dados_pecas = self.db_gastos.get_gatos_por_tipo('PEÇAS', mes, ano)
         valores_gastos = [dado[0] for dado in dados_pecas]
         gasto = sum(valores_gastos)
-        valor_total = f'R$ {gasto:,.2f}'
+        valor_total = f'R$ {gasto:.2f}'
         return valor_total

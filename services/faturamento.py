@@ -63,7 +63,7 @@ class Faturamento:
             valores = [dado[0] for dado in dados]
 
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:,.2f}'
+            valor_total = f'R$ {valor_soma:.2f}'
             return valor_total
         except Exception as e:
             print(f"Erro ao calcular faturamento total do mês: {e}")
@@ -74,7 +74,7 @@ class Faturamento:
             dados = self.db.faturamento_mes_meta(mes, ano)
             valores = [dado[0] for dado in dados]
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:,.2f}'
+            valor_total = f'R$ {valor_soma:.2f}'
             return valor_total
         except Exception as e:
             print(f"Erro ao calcular faturamento total da meta do mês: {e}")
@@ -87,7 +87,7 @@ class Faturamento:
                 dados = self.db.faturamento_por_mecanico(mecanico[0], mes, ano)
                 valores = [dado[0] for dado in dados]
                 valor_soma = sum(valores)
-                valor_total = f'R$ {valor_soma:,.2f}'
+                valor_total = f'R$ {valor_soma:.2f}'
                 dados_filtro = self.db.get_qntd_filtros_mec(mecanico[0], mes, ano)
                 qntd_filtro = [qntd[0] for qntd in dados_filtro]
                 filtro = len(qntd_filtro)
@@ -99,7 +99,7 @@ class Faturamento:
                         valores_revi.append(valor[0])
                 qnd_revi = len(valores_revi)
                 valor_soma_revi = sum(valores_revi)
-                valor_total_revi = f'R$ {valor_soma_revi:,.2f}'
+                valor_total_revi = f'R$ {valor_soma_revi:.2f}'
                 faturamentos.append((mecanico[0], valor_total, len(valores), filtro, qnd_revi, valor_total_revi))
             print(faturamentos)
             return faturamentos
@@ -114,7 +114,7 @@ class Faturamento:
                 dados = self.db.faturamento_cia(cia[0], mes, ano)
                 valores = [dado[0] for dado in dados]
                 valor_soma = sum(valores)
-                valor_total = f'R$ {valor_soma:,.2f}'
+                valor_total = f'R$ {valor_soma:.2f}'
                 faturamentos.append((cia[0], valor_total, len(valores)))
             return faturamentos
         except Exception as e:
@@ -131,7 +131,7 @@ class Faturamento:
                     if valor[0] > 0.00:
                         valores.append(valor[0])
                 valor_soma = sum(valores)
-                valor_total = f'R$ {valor_soma:,.2f}'
+                valor_total = f'R$ {valor_soma:.2f}'
                 faturamento.append((servico[0], valor_total, len(valores)))
             return faturamento   
         except Exception as e:
@@ -154,34 +154,34 @@ class Faturamento:
                         'dias_servico' : ordem_servico[6],
                         'numero_os' : ordem_servico[7],
                         'companhia' : ordem_servico[8],
-                        'valor_pecas' : f'R$ {ordem_servico[10]:,.2f}',
-                        'valor_servicos' : f"R$ {ordem_servico[11]:,.2f}",
-                        'total_os' : f'R$ {ordem_servico[12]:,.2f}',
-                        'valor_revitalizacao' : f'R$ {ordem_servico[13]:,.2f}',
-                        'valor_aditivo' : f'R$ {ordem_servico[14]:,.2f}',
+                        'valor_pecas' : f'R$ {ordem_servico[10]:.2f}',
+                        'valor_servicos' : f"R$ {ordem_servico[11]:.2f}",
+                        'total_os' : f'R$ {ordem_servico[12]:.2f}',
+                        'valor_revitalizacao' : f'R$ {ordem_servico[13]:.2f}',
+                        'valor_aditivo' : f'R$ {ordem_servico[14]:.2f}',
                         'quantidade_litros' : ordem_servico[15],
-                        'valor_fluido_sangria': f'R$ {ordem_servico[16]:,.2f}',
-                        'valor_palheta' : f'R$ {ordem_servico[17]:,.2f}',
-                        'valor_limpeza_freios':f'R$ {ordem_servico[18]:,.2f}',
-                        'valor_pastilha_parabrisa' :f'R$ {ordem_servico[19]:,.2f}',
-                        'valor_filtro': f'R$ {ordem_servico[20]:,.2f}',
-                        'valor_pneu': f'R$ {ordem_servico[21]:,.2f}',
-                        'valor_bateria' : f'R$ {ordem_servico[22]:,.2f}',
+                        'valor_fluido_sangria': f'R$ {ordem_servico[16]:.2f}',
+                        'valor_palheta' : f'R$ {ordem_servico[17]:.2f}',
+                        'valor_limpeza_freios':f'R$ {ordem_servico[18]:.2f}',
+                        'valor_pastilha_parabrisa' :f'R$ {ordem_servico[19]:.2f}',
+                        'valor_filtro': f'R$ {ordem_servico[20]:.2f}',
+                        'valor_pneu': f'R$ {ordem_servico[21]:.2f}',
+                        'valor_bateria' : f'R$ {ordem_servico[22]:.2f}',
                         'modelo_bateria': ordem_servico[23],
                         'lts_oleo_motor': ordem_servico[24],
-                        'valor_lt_oleo': f'R$ {ordem_servico[25]:,.2f}',
+                        'valor_lt_oleo': f'R$ {ordem_servico[25]:.2f}',
                         'marca_e_tipo_oleo': ordem_servico[26],
                         'mecanico_servico': ordem_servico[29],
                         'servico_filtro' : ordem_servico[30],
-                        'valor_p_meta': f'R$ {ordem_servico[27]:,.2f}',
-                        'valor_em_dinheiro': f'R$ {ordem_servico[30]:,.2f}',
-                        'valor_servico_freios': f'R$ {ordem_servico[31]:,.2f}',
-                        'valor_servico_suspensao': f'R$ {ordem_servico[32]:,.2f}',
-                        'valor_servico_injecao_ignicao': f'R$ {ordem_servico[33]:,.2f}',
-                        'valor_servico_cabecote_motor_arr': f'R$ {ordem_servico[34]:,.2f}',
-                        'valor_outros_servicos': f'R$ {ordem_servico[35]:,.2f}',
-                        'valor_servicos_oleos': f'R$ {ordem_servico[36]:,.2f}',
-                        'valor_servico_transmissao' : f'R$ {ordem_servico[37]:,.2f}'
+                        'valor_p_meta': f'R$ {ordem_servico[27]:.2f}',
+                        'valor_em_dinheiro': f'R$ {ordem_servico[30]:.2f}',
+                        'valor_servico_freios': f'R$ {ordem_servico[31]:.2f}',
+                        'valor_servico_suspensao': f'R$ {ordem_servico[32]:.2f}',
+                        'valor_servico_injecao_ignicao': f'R$ {ordem_servico[33]:.2f}',
+                        'valor_servico_cabecote_motor_arr': f'R$ {ordem_servico[34]:.2f}',
+                        'valor_outros_servicos': f'R$ {ordem_servico[35]:.2f}',
+                        'valor_servicos_oleos': f'R$ {ordem_servico[36]:.2f}',
+                        'valor_servico_transmissao' : f'R$ {ordem_servico[37]:.2f}'
                     }
                 faturamentos.append(os)
             return faturamentos
