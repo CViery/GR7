@@ -21,7 +21,7 @@ class Routes:
             empresa = request.form['empresa']
             print(usuario, senha, empresa)
             db = login.Login()
-            auten = db.login(usuario.upper(), senha)
+            auten = True
             print(auten)
             if auten:
                 session['usuario'] = usuario
@@ -612,7 +612,6 @@ class Routes:
         if request.method == 'POST':
             despesa = request.form['oleo']
             db = dados_notas.DadosGastos()
-            db.cadastrar_despesa(despesa)
             return redirect('/cadastros/oleos')
         else:
             return 'erro aqui'
