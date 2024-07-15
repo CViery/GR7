@@ -28,7 +28,6 @@ class Routes:
                 session['empresa'] = empresa
                 utils = utills.Utills()
                 db = faturamento.Faturamento()
-                temperatura = utils.temperatura()
                 now = datetime.now()
                 mes_dados = now.strftime('%m')
                 ano_dados = now.strftime('%Y')
@@ -64,7 +63,7 @@ class Routes:
             usuario = session['usuario']
             utils = utills.Utills()
             db = faturamento.Faturamento()
-            temperatura = utils.temperatura()
+            
             now = datetime.now()
             mes_dados = now.strftime('%m')
             ano_dados = now.strftime('%Y')
