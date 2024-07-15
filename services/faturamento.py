@@ -5,7 +5,7 @@ from datetime import datetime
 class Faturamento:
     def __init__(self):
         self.db = conection.Database()
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
     def cadastrar(self, dados):
         try:

@@ -6,7 +6,7 @@ class DadosGastos:
 
     def __init__(self):
         self.db = gastos_db.GastosDataBase()
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
     
     def boletos_do_dia(self, dia, mes, ano):
