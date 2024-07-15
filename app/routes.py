@@ -11,7 +11,7 @@ class Routes:
 
     @app.route('/')
     def show_login():
-        return render_template('login.html')
+        return render_template('index.html')
 
     @app.route('/autenticar', methods=['POST'])
     def autenticar():
