@@ -101,11 +101,7 @@ class Routes:
             return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
         else:
             flash('Nota cadastrada')
-            return render_template('cadastrar_notas.html', empresa=session['empresa'], show_alert=True)
-        
-    # Aqui você pode processar os dados como desejar
-    # Por exemplo, você pode salvá-los em um banco de dados
-        return 'Nota cadastrada com sucesso!'
+            return redirect('/gastos/cadastros/notas')
     
     @app.route('/gastos/cadatro/duplicata')
     def duplicata():
@@ -258,6 +254,7 @@ class Routes:
                     mes = data[5:7]
                     ano = data[:4]
                     boletos = db.boletos_do_dia(dia, mes, ano)
+                    valor_a_pagar = db.valor_a_pagar(dia,mes,ano)
                 else:
                     # Usar data atual se não houver filtro específico para boletos
                     now = datetime.now()
@@ -265,8 +262,9 @@ class Routes:
                     mes = now.strftime('%m')
                     ano = now.strftime('%Y')
                     boletos = db.boletos_do_dia(dia, mes, ano)
+                    valor_a_pagar = db.valor_a_pagar(dia,mes,ano)
 
-                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto)
+                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar)
             else:
                 # Caso seja uma requisição GET, usar a data atual
                 now = datetime.now()
@@ -276,7 +274,8 @@ class Routes:
                 dados_tipos = db.despesas(mes, ano)
                 boletos = db.boletos_do_dia(dia, mes, ano)
                 valor_gasto = db.valor_gastos(mes, ano)
-                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto)
+                valor_a_pagar = db.valor_a_pagar(dia,mes,ano)
+                return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar)
         else:
             print('Usuário não está logado')
             return redirect('/')
@@ -345,34 +344,38 @@ class Routes:
 
             fornecedores = db_utils.fornecedores()
             despesas = db_utils.despesas()
-            # Obter listas de fornecedores e despesas para os selects
-
             notas = []
+
+            data_inicio = request.args.get('data_inicio')
+            data_fim = request.args.get('data_fim')
+            fornecedor = request.args.get('fornecedor')
+            despesa = request.args.get('despesa')
 
             if request.method == 'POST':
                 data_inicio = request.form.get('data_inicio')
                 data_fim = request.form.get('data_fim')
                 fornecedor = request.form.get('fornecedor')
                 despesa = request.form.get('despesa')
-
-                # Obter notas filtradas
+                notas = db.filtrar_notas(data_inicio, data_fim, fornecedor, despesa)
+            elif data_inicio or data_fim or fornecedor or despesa:
                 notas = db.filtrar_notas(data_inicio, data_fim, fornecedor, despesa)
             else:
-                # Se não houver filtros, exibir todas as notas
                 notas = db.todas_as_notas()
 
             # Configuração da paginação
-            page = request.args.get(get_page_parameter(), type=int, default=1)
-            per_page = 10
-            offset = (page - 1) * per_page
-            paginated_notas = notas[offset: offset + per_page]
+           #page = request.args.get(get_page_parameter(), type=int, default=1)
+            #per_page = 10
+            #offset = (page - 1) * per_page
+            #paginated_notas = notas[offset: offset + per_page]
 
-            pagination = Pagination(page=page, total=len(notas), per_page=per_page, css_framework='bootstrap4')
+            #pagination = Pagination(page=page, total=len(notas), per_page=per_page, css_framework='bootstrap4')
 
-            return render_template('consultar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas, notas=paginated_notas, pagination=pagination)
+            return render_template('consultar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas,notas=notas,
+                                data_inicio=data_inicio, data_fim=data_fim, fornecedor=fornecedor, despesa=despesa)
         else:
             print('Usuário não está logado')
             return redirect('/')
+        
     @app.route('/consultar_boletos', methods=['GET', 'POST'])
     def consultar_boletos():
         if 'usuario' in session:
