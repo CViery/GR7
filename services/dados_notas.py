@@ -23,9 +23,20 @@ class DadosGastos:
                 'vencimento' : data,
                 'valor' : valor
             }
-            valores.append(boleto['valor'])
+            
+            valores.append(dado[7])
             boletos.append(boleto)
         return boletos
+
+    def valor_a_pagar(self, dia, mes, ano):
+        dados = self.db.get_boleto_by_day(dia, mes, ano)
+        valores = []
+        for dado in dados:
+            valores.append(dado[7])
+        a_pagar = sum(valores)
+        valor_a_pagar = f'R$ {a_pagar:.2f}'
+        return valor_a_pagar
+
     def cadastrar_despesa(self,despesa):
         cadastrar = self.db.set_despesas(despesa)
         print('cadastrado')

@@ -127,3 +127,10 @@ class Utills:
         gasto = sum(valores_gastos)
         valor_total = f'R$ {gasto:.2f}'
         return valor_total
+    
+    def valor_dinheiro(self,mes, ano):
+        dados_dinheiro = self.db.faturamento_dinheiro( mes, ano)
+        valores_dinheiro = [dado[0] for dado in dados_dinheiro]
+        gasto = sum(valores_dinheiro)
+        valor_total = f'R$ {gasto:.2f}'
+        return valor_total
