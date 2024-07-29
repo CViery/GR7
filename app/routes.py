@@ -414,7 +414,9 @@ class Routes:
     def tela_faturamentos():
         if 'usuario' in session:
             empresa = session['empresa']
-            db = faturamento.Faturamento()  # Certifique-se de passar a conexão com o banco de dados
+            db = faturamento.Faturamento() 
+            services = utills.Utills()
+             # Certifique-se de passar a conexão com o banco de dados
 
             meses = [
                 ('01', 'Janeiro'), ('02', 'Fevereiro'), ('03', 'Março'), ('04', 'Abril'), ('05', 'Maio'),
@@ -439,6 +441,7 @@ class Routes:
                         faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
                         faturamento_cias = db.faturamento_companhia(mes_dados, ano_dados)
                         faturamento_servico = db.faturamento_servico(mes_dados, ano_dados)
+                        valor_em_dinheiro = services.valor_dinheiro(mes_dados, ano_dados)
                     else:
                         # Usar data atual se não houver filtros específicos para faturamentos
                         now = datetime.now()
@@ -449,6 +452,7 @@ class Routes:
                         faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
                         faturamento_cias = db.faturamento_companhia(mes_dados, ano_dados)
                         faturamento_servico = db.faturamento_servico(mes_dados, ano_dados)
+                        valor_em_dinheiro = services.valor_dinheiro(mes_dados, ano_dados)
                     return render_template('faturamentos.html',
                                         anos=anos,
                                         meses=meses,
@@ -457,6 +461,7 @@ class Routes:
                                         faturamento_mecanicos = faturamento_mecanicos,
                                         faturamento_companhia = faturamento_cias,
                                         faturamento_servico = faturamento_servico,
+                                        valor_em_dinheiro = valor_em_dinheiro,
                                         empresa=empresa)
                 except Exception as e:
                     print(f"Ocorreu um erro ao processar o formulário: {e}")
@@ -471,6 +476,7 @@ class Routes:
                 faturamento_mecanicos = db.faturamento_mecanico(mes_dados, ano_dados)
                 faturamento_cias = db.faturamento_companhia(mes_dados, ano_dados)
                 faturamento_servico = db.faturamento_servico(mes_dados, ano_dados)
+                valor_em_dinheiro = services.valor_dinheiro(mes_dados, ano_dados)
                 return render_template('faturamentos.html',
                                     anos=anos,
                                     meses=meses,
@@ -479,6 +485,7 @@ class Routes:
                                     faturamento_mecanicos = faturamento_mecanicos,
                                     faturamento_companhia = faturamento_cias,
                                     faturamento_servico = faturamento_servico,
+                                    valor_em_dinheiro = valor_em_dinheiro,
                                     empresa=empresa)
         else:
             print('Usuário não está logado')

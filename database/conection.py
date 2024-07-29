@@ -167,6 +167,15 @@ class Database:
             return result
         except Exception as e:
             print(e)
+        
+    def faturamento_dinheiro(self,mes,ano):
+        try:
+            query = 'SELECT valor_dinheiro WHERE faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, mes, ano)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
 
 class DatabaseGastos:
     def __init__(self):
