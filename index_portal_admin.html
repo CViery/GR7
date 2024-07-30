@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>Inicio - {{ empresa }}</title>
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/home.css')}}">
+{% endblock %}
+
+{% block main %}
+<main>
+  <h5> Olá {{user}}, sejá bem-vindo ao Portal da {{empresa}}!
+    <div class="container">
+      <div class="box-infos">
+        <h3>Faturamento</h3>
+        <div>
+          <ul class="dados-container">
+            <li class="dados-home">Faturamento Geral: {{faturamento}}</li>
+            <li class="dados-home">Faturamento Meta: {{faturamento_meta}}</li>
+            <li class="dados-home">Faturamento Peças: {{faturamento_pecas}}</li>
+            <li class="dados-home">Faturamento Serviços: {{faturamento_servicos}}</li>
+            <li class="dados-home">Primeira Meta: {{primeira_meta}}</li>
+            <li class="dados-home">Segunda Meta: {{segunda_meta}}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box-infos">
+        <h3>Despesas</h3>
+        <div>
+          <ul class="dados-container">
+            <li class="dados-home">Valor Gasto: {{valor_gastos}}</li>
+            <li class="dados-home">% sobre o faturamento: {{porcentagem_faturamento}}</li>
+            <li class="dados-home">Gasto em Peças: {{gastos_pecas}}</li>
+            <li class="dados-home">% pecas sobre a venda: {{porcentagem_pecas}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+</main>
+
+{% endblock %}
