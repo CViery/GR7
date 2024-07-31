@@ -1,5 +1,5 @@
 from database import login_db
-
+from flask import session
 
 class Login:
     def __init__(self):
@@ -14,9 +14,13 @@ class Login:
                     'password': users[1],
                     'permission': users[2]
                     }
-                print(dados)
                 if user == dados['user'] and password == dados['password']:
-                    return True
+                    if dados['permission'] == 'ADMIN':
+                        session['permission'] = dados['permission']
+                        return 'ADMIN'
+                    elif dados['permission'] == 'NORMAL':
+                        session['permission'] = dados['permission']
+                        return 'NORMAL'
             else:
                 print('usuario não encontrado')
                 return False

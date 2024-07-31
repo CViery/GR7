@@ -7,21 +7,20 @@
 <main>
     {% set mensagens = get_flashed_messages() %}
     {%if mensagens%}
-      <div>
+    <div>
         {%for msg in mensagens%}
-          {{msg}}
+        {{msg}}
         {%endfor%}
-      </div>
+    </div>
     {%endif%}
-    <form class="cadastro-nota" action="/gastos/cadastros/notas-cadastrar-nota" method="post" >
+    <form class="cadastro-nota" action="/gastos/cadastros/notas-cadastrar-nota" method="post">
         <div class="form-row">
             <div class="form-group">
                 <label for="emitido-para">Emitido Para:</label>
                 <select id="emitido-para" name="emitido-para">
-                    <option value="GR7">GR7</option>
-                    <option value="DANIEL">DANIEL</option>
-                    <option value="GILBERTO">GILBERTO</option>
-                    <option value="OUTROS">OUTROS</option>
+                    {%for pessoa in emitido_para%}
+                    <option value="{{pessoa}}">{{pessoa}}</option>
+                    {%endfor%}
                 </select>
             </div>
 
