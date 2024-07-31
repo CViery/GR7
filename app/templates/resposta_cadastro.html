@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>ERRO - {{ empresa }}</title>
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/resposta_permissao.css')}}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <div>
+        <h3>Cadastro efetuado com sucesso</h3>
+        <a href="{{rota}}"><button>Voltar</button></a>
+    </div>
+
+</main>
+
+{% endblock %}

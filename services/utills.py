@@ -2,6 +2,7 @@ import requests
 from database import conection, gastos_db
 from services import faturamento, dados_notas
 
+
 class Utills:
     def __init__(self):
         self.db = conection.Database()
@@ -9,21 +10,21 @@ class Utills:
         self.db_dados_notas = dados_notas.DadosGastos()
         self.faturamento_db = faturamento.Faturamento()
 
-    def faturamento_pecas(self,mes,ano):
+    def faturamento_pecas(self, mes, ano):
         try:
-            
-            dados = self.db.faturamento_pecas(mes,ano)
+
+            dados = self.db.faturamento_pecas(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
             valor_total = f'R$ {valor_soma:.2f}'
             return valor_total
         except Exception as e:
             print(e)
-    
-    def faturamento_servicos(self,mes,ano):
+
+    def faturamento_servicos(self, mes, ano):
         try:
-            
-            dados = self.db.faturamento_servicos(mes,ano)
+
+            dados = self.db.faturamento_servicos(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
             valor_total = f'R$ {valor_soma:.2f}'
@@ -60,6 +61,7 @@ class Utills:
             return valor_total
         except Exception as e:
             print(e)
+
     def despesas(self):
         try:
             despesas = []
@@ -69,7 +71,7 @@ class Utills:
             return despesas
         except Exception as e:
             print(e)
-    
+
     def fornecedores(self):
         try:
             fornecedores = []
@@ -79,7 +81,7 @@ class Utills:
             return fornecedores
         except Exception as e:
             print(e)
-    
+
     def gastos(self, mes, ano):
         valor = self.db_dados_notas.valor_gastos(mes, ano)
         return valor
@@ -95,7 +97,6 @@ class Utills:
 
         valores_fat = [dado[0] for dado in dados_faturamento]
         faturamento = sum(valores_fat)
-
 
         # Verifique se o faturamento é zero para evitar divisão por zero
         if faturamento == 0:
@@ -127,36 +128,47 @@ class Utills:
         gasto = sum(valores_gastos)
         valor_total = f'R$ {gasto:.2f}'
         return valor_total
-    
-    def valor_dinheiro(self,mes, ano):
-        dados_dinheiro = self.db.faturamento_dinheiro( mes, ano)
+
+    def valor_dinheiro(self, mes, ano):
+        dados_dinheiro = self.db.faturamento_dinheiro(mes, ano)
         valores_dinheiro = [dado[0] for dado in dados_dinheiro]
         gasto = sum(valores_dinheiro)
         valor_total = f'R$ {gasto:.2f}'
         return valor_total
+
+    def emitido_para(self):
+        dados = self.db_gastos.get_recebedor()
+        lista = [dado[0] for dado in dados]
+        return lista
+
+    def cadastrar_fornecedor(self, dados):
+        CNPJ = dados['cnpj']
+        razao = dados['nome_empresa']
+        self.db_gastos.set_fornecedor(CNPJ, razao)
+
 
 class Utills_portal():
     def __init__(self):
-        self.db = conection.Database()
+        self.db = conection.DatabasePortal()
         self.db_gastos = gastos_db.GastosDataBasePortal()
-        self.db_dados_notas = dados_notas.DadosGastos()
-        self.faturamento_db = faturamento.Faturamento()
+        self.db_dados_notas = dados_notas.DadosGastosPortal()
+        self.faturamento_db = faturamento.FaturamentoPortal()
 
-    def faturamento_pecas(self,mes,ano):
+    def faturamento_pecas(self, mes, ano):
         try:
-            
-            dados = self.db.faturamento_pecas(mes,ano)
+
+            dados = self.db.faturamento_pecas(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
             valor_total = f'R$ {valor_soma:.2f}'
             return valor_total
         except Exception as e:
             print(e)
-    
-    def faturamento_servicos(self,mes,ano):
+
+    def faturamento_servicos(self, mes, ano):
         try:
-            
-            dados = self.db.faturamento_servicos(mes,ano)
+
+            dados = self.db.faturamento_servicos(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
             valor_total = f'R$ {valor_soma:.2f}'
@@ -193,6 +205,7 @@ class Utills_portal():
             return valor_total
         except Exception as e:
             print(e)
+
     def despesas(self):
         try:
             despesas = []
@@ -202,7 +215,7 @@ class Utills_portal():
             return despesas
         except Exception as e:
             print(e)
-    
+
     def fornecedores(self):
         try:
             fornecedores = []
@@ -212,7 +225,7 @@ class Utills_portal():
             return fornecedores
         except Exception as e:
             print(e)
-    
+
     def gastos(self, mes, ano):
         valor = self.db_dados_notas.valor_gastos(mes, ano)
         return valor
@@ -229,11 +242,10 @@ class Utills_portal():
         valores_fat = [dado[0] for dado in dados_faturamento]
         faturamento = sum(valores_fat)
 
-
         # Verifique se o faturamento é zero para evitar divisão por zero
         if faturamento == 0:
-            print("Faturamento é zero, não é possível calcular a porcentagem.")
-            return "Faturamento é zero, não é possível calcular a porcentagem."
+            msg = f'{0} %'
+            return msg
 
         # Calcule a porcentagem
         calculo = (gasto / faturamento) * 100
@@ -247,6 +259,9 @@ class Utills_portal():
         dados_faturamento = self.db.faturamento_pecas(mes, ano)
         valores_faturamento = [dado[0] for dado in dados_faturamento]
         faturamento = sum(valores_faturamento)
+        if faturamento == 0:
+            msg = f'{0} %'
+            return msg
 
         calculo = (gasto / faturamento) * 100
         dados = f'{calculo:.2f} %'
@@ -260,10 +275,15 @@ class Utills_portal():
         gasto = sum(valores_gastos)
         valor_total = f'R$ {gasto:.2f}'
         return valor_total
-    
-    def valor_dinheiro(self,mes, ano):
-        dados_dinheiro = self.db.faturamento_dinheiro( mes, ano)
+
+    def valor_dinheiro(self, mes, ano):
+        dados_dinheiro = self.db.faturamento_dinheiro(mes, ano)
         valores_dinheiro = [dado[0] for dado in dados_dinheiro]
         gasto = sum(valores_dinheiro)
         valor_total = f'R$ {gasto:.2f}'
         return valor_total
+
+    def emitido_para(self):
+        dados = self.db_gastos.get_recebedor()
+        lista = [dado[0] for dado in dados]
+        return lista

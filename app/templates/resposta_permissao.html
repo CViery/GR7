@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+<title>ERRO - {{ empresa }}</title>
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/resposta_permissao.css')}}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <div>
+        <h3>Desculpe! Você não tem acesso a essa pagina</h3>
+        <p>Volte para a Tela inicial</p>
+        <a href="/home"><button>Voltar</button></a>
+    </div>
+
+</main>
+
+{% endblock %}

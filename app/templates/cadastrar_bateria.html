@@ -54,14 +54,13 @@
 {% block main %}
 <main>
   <h1>Cadastro de modelo Bateria</h1>
-  <form action="/cadastros/bateria-cadastrar" method="post" class="form-tipo-despesa">
+  <form action="/bateria-cadastrar" method="post" class="form-tipo-despesa">
     <div class="form-group">
       <label for="nome_tipo_despesa">Modelo Bataria</label>
-      <input type="text" name="despesa" id="nome_tipo_despesa" class="form-control">
+      <input type="text" name="bateria" id="nome_tipo_despesa" class="form-control">
     </div>
     <button type="submit" class="btn-submit">Cadastrar</button>
   </form>
 </main>
 
 {% endblock %}
-
