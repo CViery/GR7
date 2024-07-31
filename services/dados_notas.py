@@ -357,7 +357,7 @@ class DadosGastosPortal():
         self.db.set_oleo(tipo)
 
     def cadastrar_companhia(self, dados):
-        despesa = dados['depesa']
+        despesa = dados['despesa']
         self.db.cadastrar_companhia(despesa)
 
     def cadastrar_funcionario(self, dados):

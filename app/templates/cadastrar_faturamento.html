@@ -39,19 +39,19 @@
                 <label for="cia">CIA:</label>
                 <select id="cia" name="cia" class="styled-input" onchange="showPneuStoreFields()">
                     {%for cia in cias%}
-                        <option value="{{cia}}">{{cia}}</option>
+                    <option value="{{cia}}">{{cia}}</option>
                     {%endfor%}
                 </select>
             </div>
             <div id="pneu_store_fields" class="input-group" style="display: none;">
-    <label>Conversão Pneu Store:</label><br>
-    <input type="radio" id="pneustore_pneu" name="conversao_pneustore" value="pneustore_pneu">
-    <label for="pneustore_pneu">Pneu Store - Pneu</label><br>
-    <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="pneustore_servico">
-    <label for="pneustore_servico">Pneu Store - Serviço</label><br>
-    <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="" checked>
-    
-</div>
+                <label>Conversão Pneu Store:</label><br>
+                <input type="radio" id="pneustore_pneu" name="conversao_pneustore" value="pneustore_pneu">
+                <label for="pneustore_pneu">Pneu Store - Pneu</label><br>
+                <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="pneustore_servico">
+                <label for="pneustore_servico">Pneu Store - Serviço</label><br>
+                <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="" checked>
+
+            </div>
         </fieldset>
 
         <fieldset>
@@ -74,7 +74,8 @@
             </div>
             <div class="input-group">
                 <label for="aditivo">Aditivo:</label>
-                <input type="text" id="aditivo" name="aditivo" class="styled-input" onchange="showAditivoQuantidadeField()">
+                <input type="text" id="aditivo" name="aditivo" class="styled-input"
+                    onchange="showAditivoQuantidadeField()">
             </div>
             <div id="qntde_aditivo" class="input-group">
                 <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
@@ -106,28 +107,29 @@
             </div>
             <div class="input-group">
                 <label for="bateria">Bateria:</label>
-                <input type="text" id="bateria" name="bateria" class="styled-input" onchange="showModeloBateriaField(); calculateValorMeta()">
+                <input type="text" id="bateria" name="bateria" class="styled-input"
+                    onchange="showModeloBateriaField(); calculateValorMeta()">
             </div>
-           <div id="modelo_bateria_field" class="input-group" style="display: none;">
-    <label for="modelo_bateria">Modelo da Bateria:</label>
-    <select id="modelo_bateria" name="modelo_bateria" class="styled-input">
-        <option value="">escolha o modelo</option>
-        <option value="H50JD">H50JD</option>
-        <option value="HNP50GD">HNP50GD</option>
-        <option value="H60DD">H60DD</option>
-        <option value="H60HD">H60HD</option>
-        <option value="M40SD">M40SD</option>
-        <option value="M48FD">M48FD</option>
-        <option value="M50ED">M50ED</option>
-        <option value="M50JD">M50JD</option>
-        <option value="M60AD">M60AD</option>
-        <option value="M60GD">M60GD</option>
-        <option value="MA60AD">MA60AD</option>
-        <option value="MF60AD">MF60AD</option>
-        <option value="MF72LD">MF72LD</option>
-        <option value="M80RD">M80RD</option>
-    </select>
-</div>
+            <div id="modelo_bateria_field" class="input-group" style="display: none;">
+                <label for="modelo_bateria">Modelo da Bateria:</label>
+                <select id="modelo_bateria" name="modelo_bateria" class="styled-input">
+                    <option value="">escolha o modelo</option>
+                    <option value="H50JD">H50JD</option>
+                    <option value="HNP50GD">HNP50GD</option>
+                    <option value="H60DD">H60DD</option>
+                    <option value="H60HD">H60HD</option>
+                    <option value="M40SD">M40SD</option>
+                    <option value="M48FD">M48FD</option>
+                    <option value="M50ED">M50ED</option>
+                    <option value="M50JD">M50JD</option>
+                    <option value="M60AD">M60AD</option>
+                    <option value="M60GD">M60GD</option>
+                    <option value="MA60AD">MA60AD</option>
+                    <option value="MF60AD">MF60AD</option>
+                    <option value="MF72LD">MF72LD</option>
+                    <option value="M80RD">M80RD</option>
+                </select>
+            </div>
             <div class="input-group">
                 <label for="quantidade_oleo">Quantidade Óleo:</label>
                 <input type="text" id="quantidade_oleo" name="quantidade_oleo" class="styled-input">
@@ -166,7 +168,7 @@
                 <select id="mecanico" name="mecanico" class="styled-input">
                     <option value="">Mecanicos</option>
                     {%for mecanico in mecanicos%}
-                        <option value="{{mecanico}}">{{mecanico}}</option>
+                    <option value="{{mecanico}}">{{mecanico}}</option>
                     {%endfor%}
                 </select>
             </div>
@@ -175,7 +177,7 @@
                 <select id="filtro_mecanico" name="filtro_mecanico" class="styled-input">
                     <option value="">Mecanicos</option>
                     {%for mecanico in mecanicos%}
-                        <option value="{{mecanico}}">{{mecanico}}</option>
+                    <option value="{{mecanico}}">{{mecanico}}</option>
                     {%endfor%}
                 </select>
             </div>
@@ -297,26 +299,28 @@
     .styled-button:hover {
         background-color: #0056b3;
     }
+
     fieldset {
-    margin-bottom: 20px;
-}
+        margin-bottom: 20px;
+    }
 
-.input-group {
-    display: inline-block;
-    width: calc(25% - 20px); /* 25% para 4 por linha, ajuste conforme necessário */
-    margin-right: 20px;
-}
+    .input-group {
+        display: inline-block;
+        width: calc(25% - 20px);
+        /* 25% para 4 por linha, ajuste conforme necessário */
+        margin-right: 20px;
+    }
 
-.button-group {
-    text-align: center;
-    margin-top: 20px;
-}
+    .button-group {
+        text-align: center;
+        margin-top: 20px;
+    }
 
-.styled-input {
-    width: calc(100% - 20px);
-    padding: 5px;
-    margin-top: 5px;
-}
+    .styled-input {
+        width: calc(100% - 20px);
+        padding: 5px;
+        margin-top: 5px;
+    }
 </style>
 <script>
     // Função para calcular o número de dias entre as datas de orçamento e faturamento
@@ -333,9 +337,18 @@
 
     // Função para calcular o valor total (peças + serviços)
     function calculateValorTotal() {
-        const pecas = parseFloat(document.getElementById('pecas').value) || 0;
-        const servicos = parseFloat(document.getElementById('servicos').value) || 0;
+        // Obter os valores dos campos de entrada e substituir as vírgulas por pontos
+        const pecasValue = document.getElementById('pecas').value.replace(',', '.');
+        const servicosValue = document.getElementById('servicos').value.replace(',', '.');
+
+        // Converter os valores para números
+        const pecas = parseFloat(pecasValue) || 0;
+        const servicos = parseFloat(servicosValue) || 0;
+
+        // Calcular o valor total
         const valorTotal = pecas + servicos;
+
+        // Atualizar o campo de valor total com o resultado formatado
         document.getElementById('valor_total').value = valorTotal.toFixed(2);
     }
 
@@ -375,9 +388,9 @@
         const valorTotal = parseFloat(document.getElementById('valor_total').value) || 0;
         const valorBateria = parseFloat(document.getElementById('bateria').value) || 0;
         const valorPneus = parseFloat(document.getElementById('pneus').value) || 0;
-        
+
         const valorMeta = valorTotal - valorBateria - valorPneus;
-        
+
         document.getElementById('valor_meta').value = valorMeta.toFixed(2);
     }
 </script>
