@@ -790,6 +790,7 @@ class Routes:
                     anos = ['2024', '2025', '2026',
                             '2027', '2028', '2029', '2030']
 
+
                     if request.method == 'POST':
                         try:
                             mes_dados = request.form.get('mes', '')
@@ -841,6 +842,7 @@ class Routes:
                             print(
                                 f"Ocorreu um erro ao processar o formulário: {e}")
                             return "Ocorreu um erro ao processar o formulário", 500
+
                     else:
                         # Caso seja uma requisição GET, usar a data atual
                         now = datetime.now()
@@ -1051,6 +1053,7 @@ class Routes:
                                                faturamento_servico=faturamento_servico,
                                                empresa=empresa)
 
+                   
         else:
             print('Usuário não está logado')
             return redirect('/')
