@@ -35,7 +35,7 @@ class Routes:
                     if session['permission_empresa'] == 0 or session['permission_empresa'] == 2:
                         return redirect('/home')
                     else:
-                        flash('Desculpe seu acesso não permite acessar.')
+                        flash('Desculpe empresa invalida.')
                         return redirect('/')
             elif auten == 'NORMAL':
                 session['usuario'] = usuario
@@ -44,13 +44,13 @@ class Routes:
                     if session['permission_empresa'] == 0 or session['permission_empresa'] == 1:
                         return redirect('/home')
                     else:
-                        flash('Desculpe seu acesso não permite acessar.')
+                        flash('Desculpe empresa invalida.')
                         return redirect('/')
                 elif empresa == 'portal':
                     if session['permission_empresa'] == 0 or session['permission_empresa'] == 2:
                         return redirect('/home')
                     else:
-                        flash('Desculpe seu acesso não permite acessar.')
+                        flash('Desculpe empresa invalida.')
                         return redirect('/')
                 return 'Usuario Normal'
             else:
