@@ -97,6 +97,61 @@ class Faturamento:
         except Exception as e:
             print(e)
 
+    def filtrar_os(self, data_inicio=None, data_fim=None, cia=None, num_os=None, placa=None, mecanico=None):
+        try:
+            faturamento = self.db.obter_ordens_filtradas(
+                data_inicio, data_fim, placa, mecanico, num_os, cia)
+            faturamentos = []
+            for ordem_servico in faturamento:
+                data_objeto_orcamento = datetime.strptime(
+                    ordem_servico[2], "%Y-%m-%d")
+                data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
+                data_objeto_faturamento = datetime.strptime(
+                    ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                os = {
+                    'placa': ordem_servico[0],
+                    'modelo_veiculo': ordem_servico[1],
+                    'data_orcamento': data_orcamento,
+                    'data_faturamento': data_faturamento,
+                    'dias_servico': ordem_servico[6],
+                    'numero_os': ordem_servico[7],
+                    'companhia': ordem_servico[8],
+                    'valor_pecas': f'R$ {ordem_servico[10]:.2f}',
+                    'valor_servicos': f"R$ {ordem_servico[11]:.2f}",
+                    'total_os': f'R$ {ordem_servico[12]:.2f}',
+                    'valor_revitalizacao': f'R$ {ordem_servico[13]:.2f}',
+                    'valor_aditivo': f'R$ {ordem_servico[14]:.2f}',
+                    'quantidade_litros': ordem_servico[15],
+                    'valor_fluido_sangria': f'R$ {ordem_servico[16]:.2f}',
+                    'valor_palheta': f'R$ {ordem_servico[17]:.2f}',
+                    'valor_limpeza_freios': f'R$ {ordem_servico[18]:.2f}',
+                    'valor_pastilha_parabrisa': f'R$ {ordem_servico[19]:.2f}',
+                    'valor_filtro': f'R$ {ordem_servico[20]:.2f}',
+                    'valor_pneu': f'R$ {ordem_servico[21]:.2f}',
+                    'valor_bateria': f'R$ {ordem_servico[22]:.2f}',
+                    'modelo_bateria': ordem_servico[23],
+                    'lts_oleo_motor': ordem_servico[24],
+                    'valor_lt_oleo': f'R$ {ordem_servico[25]:.2f}',
+                    'marca_e_tipo_oleo': ordem_servico[26],
+                    'mecanico_servico': ordem_servico[29],
+                    'servico_filtro': ordem_servico[30],
+                    'valor_p_meta': f'R$ {ordem_servico[27]:.2f}',
+                    'valor_em_dinheiro': f'R$ {ordem_servico[30]:.2f}',
+                    'valor_servico_freios': f'R$ {ordem_servico[31]:.2f}',
+                    'valor_servico_suspensao': f'R$ {ordem_servico[32]:.2f}',
+                    'valor_servico_injecao_ignicao': f'R$ {ordem_servico[33]:.2f}',
+                    'valor_servico_cabecote_motor_arr': f'R$ {ordem_servico[34]:.2f}',
+                    'valor_outros_servicos': f'R$ {ordem_servico[35]:.2f}',
+                    'valor_servicos_oleos': f'R$ {ordem_servico[36]:.2f}',
+                    'valor_servico_transmissao': f'R$ {ordem_servico[37]:.2f}'
+                }
+                faturamentos.append(os)
+            return faturamentos
+        except Exception as e:
+            print(f"Erro ao obter faturamentos: {e}")
+            return []
+
     def faturamento_total_mes(self, mes, ano):
         try:
             dados = self.db.faturamento_mes(mes, ano)
@@ -259,6 +314,16 @@ class Faturamento:
 
             return mecanicos
 
+        except Exception as e:
+            print(e)
+
+    def faturamento_dinheiro(self, mes, ano):
+        try:
+            dados = self.db.faturamento_dinheiro(mes, ano)
+            valores = [dado[0] for dado in dados]
+            soma = sum(valores)
+            result = f'R$ {soma:.2f}'
+            return result
         except Exception as e:
             print(e)
 
@@ -498,6 +563,61 @@ class FaturamentoPortal():
         except Exception as e:
             pass
 
+    def filtrar_os(self, data_inicio=None, data_fim=None, cia=None, num_os=None, placa=None, mecanico=None):
+        try:
+            faturamento = self.db.obter_ordens_filtradas(
+                data_inicio, data_fim, placa, mecanico, num_os, cia)
+            faturamentos = []
+            for ordem_servico in faturamento:
+                data_objeto_orcamento = datetime.strptime(
+                    ordem_servico[2], "%Y-%m-%d")
+                data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
+                data_objeto_faturamento = datetime.strptime(
+                    ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                os = {
+                    'placa': ordem_servico[0],
+                    'modelo_veiculo': ordem_servico[1],
+                    'data_orcamento': data_orcamento,
+                    'data_faturamento': data_faturamento,
+                    'dias_servico': ordem_servico[6],
+                    'numero_os': ordem_servico[7],
+                    'companhia': ordem_servico[8],
+                    'valor_pecas': f'R$ {ordem_servico[10]:.2f}',
+                    'valor_servicos': f"R$ {ordem_servico[11]:.2f}",
+                    'total_os': f'R$ {ordem_servico[12]:.2f}',
+                    'valor_revitalizacao': f'R$ {ordem_servico[13]:.2f}',
+                    'valor_aditivo': f'R$ {ordem_servico[14]:.2f}',
+                    'quantidade_litros': ordem_servico[15],
+                    'valor_fluido_sangria': f'R$ {ordem_servico[16]:.2f}',
+                    'valor_palheta': f'R$ {ordem_servico[17]:.2f}',
+                    'valor_limpeza_freios': f'R$ {ordem_servico[18]:.2f}',
+                    'valor_pastilha_parabrisa': f'R$ {ordem_servico[19]:.2f}',
+                    'valor_filtro': f'R$ {ordem_servico[20]:.2f}',
+                    'valor_pneu': f'R$ {ordem_servico[21]:.2f}',
+                    'valor_bateria': f'R$ {ordem_servico[22]:.2f}',
+                    'modelo_bateria': ordem_servico[23],
+                    'lts_oleo_motor': ordem_servico[24],
+                    'valor_lt_oleo': f'R$ {ordem_servico[25]:.2f}',
+                    'marca_e_tipo_oleo': ordem_servico[26],
+                    'mecanico_servico': ordem_servico[29],
+                    'servico_filtro': ordem_servico[30],
+                    'valor_p_meta': f'R$ {ordem_servico[27]:.2f}',
+                    'valor_em_dinheiro': f'R$ {ordem_servico[30]:.2f}',
+                    'valor_servico_freios': f'R$ {ordem_servico[31]:.2f}',
+                    'valor_servico_suspensao': f'R$ {ordem_servico[32]:.2f}',
+                    'valor_servico_injecao_ignicao': f'R$ {ordem_servico[33]:.2f}',
+                    'valor_servico_cabecote_motor_arr': f'R$ {ordem_servico[34]:.2f}',
+                    'valor_outros_servicos': f'R$ {ordem_servico[35]:.2f}',
+                    'valor_servicos_oleos': f'R$ {ordem_servico[36]:.2f}',
+                    'valor_servico_transmissao': f'R$ {ordem_servico[37]:.2f}'
+                }
+                faturamentos.append(os)
+            return faturamentos
+        except Exception as e:
+            print(f"Erro ao obter faturamentos: {e}")
+            return []
+
     def companhias(self):
         try:
             cias = []
@@ -519,5 +639,15 @@ class FaturamentoPortal():
 
             return mecanicos
 
+        except Exception as e:
+            print(e)
+
+    def faturamento_dinheiro(self, mes, ano):
+        try:
+            dados = self.db.faturamento_dinheiro(mes, ano)
+            valores = [dado[0] for dado in dados]
+            soma = sum(valores)
+            result = f'R$ {soma:.2f}'
+            return result
         except Exception as e:
             print(e)

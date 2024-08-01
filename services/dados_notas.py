@@ -79,6 +79,13 @@ class DadosGastos:
             output.append(nfe)
         return output
 
+    def valor_nota(self):
+        notas = self.db.get_all_notas()
+        output = [nota[12] for nota in notas]
+        soma = sum(output)
+        result = f'R$ {soma:.2f}'
+        return result
+
     def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa)
@@ -102,6 +109,14 @@ class DadosGastos:
             }
             notas.append(nfe)
         return notas
+
+    def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+        resultado = self.db.obter_notas_filtradas(
+            data_inicio, data_fim, fornecedor, despesa)
+        valores = [dados[12] for dados in resultado]
+        soma = sum(valores)
+        result = f'R$ {soma:.2f}'
+        return result
 
     def nota_por_numero(self, num_nota):
         dados = self.db.get_nota_por_numero(num_nota)
@@ -186,6 +201,21 @@ class DadosGastos:
         modelo = dados['bateria']
         self.db.cadastrar_baterias(modelo)
 
+    def filtrar_boletos_valor(self, data_inicio=None, data_fim=None, fornecedor=None):
+        dados = self.db.obter_boletos_filtrados(
+            data_inicio, data_fim, fornecedor)
+        boletos = [dado[7] for dado in dados]
+        soma = sum(boletos)
+        result = f'R$ {soma:.2f}'
+        return result
+
+    def valor_boleto(self):
+        dados = self.db.get_boletos()
+        boletos = [dado[7] for dado in dados]
+        soma = sum(boletos)
+        result = f'R$ {soma:.2f}'
+        return result
+
 
 class DadosGastosPortal():
     def __init__(self):
@@ -262,6 +292,28 @@ class DadosGastosPortal():
             output.append(nfe)
         return output
 
+    def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+        resultado = self.db.obter_notas_filtradas(
+            data_inicio, data_fim, fornecedor, despesa)
+        valores = [dados[12] for dados in resultado]
+        soma = sum(valores)
+        result = f'R$ {soma:.2f}'
+        return result
+
+    def valor_nota(self):
+        notas = self.db.get_all_notas()
+        output = [nota[12] for nota in notas]
+        soma = sum(output)
+        result = f'R$ {soma:.2f}'
+        return result
+
+    def valor_nota(self):
+        notas = self.db.get_all_notas()
+        output = [nota[12] for nota in notas]
+        soma = sum(output)
+        result = f'R$ {soma:.2f}'
+        return result
+
     def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa)
@@ -285,6 +337,14 @@ class DadosGastosPortal():
             }
             notas.append(nfe)
         return notas
+
+    def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+        resultado = self.db.obter_notas_filtradas(
+            data_inicio, data_fim, fornecedor, despesa)
+        valores = [dados[12] for dados in resultado]
+        soma = sum(valores)
+        result = f'R$ {soma:.2f}'
+        return result
 
     def nota_por_numero(self, num_nota):
         dados = self.db.get_nota_por_numero(num_nota)
@@ -321,6 +381,13 @@ class DadosGastosPortal():
             print(boleto)
         return boletos
 
+    def valor_boleto(self):
+        dados = self.db.get_boletos()
+        boletos = [dado[7] for dado in dados]
+        soma = sum(boletos)
+        result = f'R$ {soma:.2f}'
+        return result
+
     def filtrar_boletos(self, data_inicio=None, data_fim=None, fornecedor=None):
         dados = self.db.obter_boletos_filtrados(
             data_inicio, data_fim, fornecedor)
@@ -341,6 +408,14 @@ class DadosGastosPortal():
             boletos.append(boleto)
             print(boleto)
         return boletos
+
+    def filtrar_boletos_valor(self, data_inicio=None, data_fim=None, fornecedor=None):
+        dados = self.db.obter_boletos_filtrados(
+            data_inicio, data_fim, fornecedor)
+        boletos = [dado[7] for dado in dados]
+        soma = sum(boletos)
+        result = f'R$ {soma:.2f}'
+        return result
 
     def valor_gastos(self, mes, ano):
         notas = self.db.get_valor_notas(mes, ano)

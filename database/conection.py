@@ -174,12 +174,41 @@ class Database:
 
     def faturamento_dinheiro(self, mes, ano):
         try:
-            query = 'SELECT valor_dinheiro WHERE faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            query = 'SELECT valor_dinheiro FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, mes, ano)
             result = self.cursor.fetchall()
+            print(result)
             return result
         except Exception as e:
             print(e)
+
+    def obter_ordens_filtradas(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
+        # Construindo a query SQL
+        query = "SELECT * FROM faturamento WHERE 1=1"
+        params = []
+
+        if data_inicio:
+            query += " AND data_faturamento >= ?"
+            params.append(data_inicio)
+        if data_fim:
+            query += " AND data_faturamento <= ?"
+            params.append(data_fim)
+        if mecanico:
+            query += " AND mecanico = ?"
+            params.append(str(mecanico))
+        if placa:
+            query += " AND placa  = ?"
+            params.append(placa)
+        if num_os:
+            query += ' AND num_os = ?'
+            params.append(num_os)
+        if cia:
+            query += ' AND cia = ?'
+            params.append(cia)
+
+        self.cursor.execute(query, params)
+        resultados = self.cursor.fetchall()
+        return resultados
 
 
 class DatabasePortal:
@@ -353,9 +382,37 @@ class DatabasePortal:
 
     def faturamento_dinheiro(self, mes, ano):
         try:
-            query = 'SELECT valor_dinheiro WHERE faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            query = 'SELECT valor_dinheiro FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, mes, ano)
             result = self.cursor.fetchall()
             return result
         except Exception as e:
             print(e)
+
+    def obter_ordens_filtradas(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
+        # Construindo a query SQL
+        query = "SELECT * FROM faturamento_potal WHERE 1=1"
+        params = []
+
+        if data_inicio:
+            query += " AND data_faturamento >= ?"
+            params.append(data_inicio)
+        if data_fim:
+            query += " AND data_faturamento <= ?"
+            params.append(data_fim)
+        if mecanico:
+            query += " AND mecanico = ?"
+            params.append(str(mecanico))
+        if placa:
+            query += " AND placa  = ?"
+            params.append(placa)
+        if num_os:
+            query += ' AND num_os = ?'
+            params.append(num_os)
+        if cia:
+            query += ' AND cia = ?'
+            params.append(cia)
+
+        self.cursor.execute(query, params)
+        resultados = self.cursor.fetchall()
+        return resultados

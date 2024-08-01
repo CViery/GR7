@@ -642,11 +642,16 @@ class Routes:
                     despesa = request.form.get('despesa')
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
+                    valor = db.filtrar_notas_valor(
+                        data_inicio, data_fim, fornecedor, despesa)
                 elif data_inicio or data_fim or fornecedor or despesa:
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
+                    valor = db.filtrar_notas_valor(
+                        data_inicio, data_fim, fornecedor, despesa)
                 else:
                     notas = db.todas_as_notas()
+                    valor = db.valor_nota()
 
                 # Configuração da paginação
             # page = request.args.get(get_page_parameter(), type=int, default=1)
@@ -657,7 +662,7 @@ class Routes:
                 # pagination = Pagination(page=page, total=len(notas), per_page=per_page, css_framework='bootstrap4')
 
                 return render_template('consultar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas, notas=notas,
-                                       data_inicio=data_inicio, data_fim=data_fim, fornecedor=fornecedor, despesa=despesa)
+                                       data_inicio=data_inicio, data_fim=data_fim, fornecedor=fornecedor, despesa=despesa, valor=valor)
             elif session['empresa'] == 'portal':
                 empresa = session['empresa']
                 db = dados_notas.DadosGastosPortal()
@@ -679,12 +684,16 @@ class Routes:
                     despesa = request.form.get('despesa')
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
+                    valor = db.filtrar_notas_valor(
+                        data_inicio, data_fim, fornecedor, despesa)
                 elif data_inicio or data_fim or fornecedor or despesa:
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
+                    valor = db.filtrar_notas_valor(
+                        data_inicio, data_fim, fornecedor, despesa)
                 else:
                     notas = db.todas_as_notas()
-
+                    valor = db.valor_nota()
                 # Configuração da paginação
             # page = request.args.get(get_page_parameter(), type=int, default=1)
                 # per_page = 10
@@ -694,7 +703,7 @@ class Routes:
                 # pagination = Pagination(page=page, total=len(notas), per_page=per_page, css_framework='bootstrap4')
 
                 return render_template('consultar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas, notas=notas,
-                                       data_inicio=data_inicio, data_fim=data_fim, fornecedor=fornecedor, despesa=despesa)
+                                       data_inicio=data_inicio, data_fim=data_fim, fornecedor=fornecedor, despesa=despesa, valor=valor)
         else:
             print('Usuário não está logado')
             return redirect('/')
@@ -718,21 +727,15 @@ class Routes:
                     # Obter boletos filtrados
                     boletos = db.filtrar_boletos(
                         data_inicio, data_fim, fornecedor)
+                    valor = db.filtrar_boletos_valor(
+                        data_inicio, data_fim, fornecedor)
                 else:
                     # Se não houver filtros, exibir todos os boletos
                     boletos = db.todos_os_boletos()
-
+                    valor = db.valor_boleto()
                 # Configuração da paginação
-                page = request.args.get(
-                    get_page_parameter(), type=int, default=1)
-                per_page = 10
-                offset = (page - 1) * per_page
-                paginated_boletos = boletos[offset: offset + per_page]
 
-                pagination = Pagination(page=page, total=len(
-                    boletos), per_page=per_page, css_framework='bootstrap4')
-
-                return render_template('consultar_boletos.html', empresa=empresa, fornecedores=fornecedores, boletos=paginated_boletos, pagination=pagination)
+                return render_template('consultar_boletos.html', empresa=empresa, fornecedores=fornecedores, boletos=boletos, valor=valor)
             elif session['empresa'] == 'portal':
                 empresa = session['empresa']
                 db = dados_notas.DadosGastosPortal()
@@ -746,24 +749,17 @@ class Routes:
                     data_fim = request.form.get('data_fim')
                     fornecedor = request.form.get('fornecedor')
 
-                    # Obter boletos filtrados
+                    # Obter boletos filtrado
                     boletos = db.filtrar_boletos(
+                        data_inicio, data_fim, fornecedor)
+                    valor = db.filtrar_boletos_valor(
                         data_inicio, data_fim, fornecedor)
                 else:
                     # Se não houver filtros, exibir todos os boletos
                     boletos = db.todos_os_boletos()
+                    valor = db.valor_boleto()
 
-                # Configuração da paginação
-                page = request.args.get(
-                    get_page_parameter(), type=int, default=1)
-                per_page = 10
-                offset = (page - 1) * per_page
-                paginated_boletos = boletos[offset: offset + per_page]
-
-                pagination = Pagination(page=page, total=len(
-                    boletos), per_page=per_page, css_framework='bootstrap4')
-
-                return render_template('consultar_boletos.html', empresa=empresa, fornecedores=fornecedores, boletos=paginated_boletos, pagination=pagination)
+                return render_template('consultar_boletos.html', empresa=empresa, fornecedores=fornecedores, boletos=boletos, valor=valor)
 
         else:
             print('Usuário não está logado')
@@ -790,7 +786,6 @@ class Routes:
                     anos = ['2024', '2025', '2026',
                             '2027', '2028', '2029', '2030']
 
-
                     if request.method == 'POST':
                         try:
                             mes_dados = request.form.get('mes', '')
@@ -812,6 +807,8 @@ class Routes:
                                     mes_dados, ano_dados)
                                 faturamento_servico = db.faturamento_servico(
                                     mes_dados, ano_dados)
+                                valor_dinheiro = db.faturamento_dinheiro(
+                                    mes_dados, ano_dados)
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -828,7 +825,8 @@ class Routes:
                                     mes_dados, ano_dados)
                                 faturamento_servico = db.faturamento_servico(
                                     mes_dados, ano_dados)
-
+                                valor_dinheiro = db.faturamento_dinheiro(
+                                    mes_dados, ano_dados)
                             return render_template('faturamentos.html',
                                                    anos=anos,
                                                    meses=meses,
@@ -837,7 +835,7 @@ class Routes:
                                                    faturamento_mecanicos=faturamento_mecanicos,
                                                    faturamento_companhia=faturamento_cias,
                                                    faturamento_servico=faturamento_servico,
-                                                   empresa=empresa)
+                                                   empresa=empresa, valor_dinheiro=valor_dinheiro)
                         except Exception as e:
                             print(
                                 f"Ocorreu um erro ao processar o formulário: {e}")
@@ -858,6 +856,8 @@ class Routes:
                             mes_dados, ano_dados)
                         faturamento_servico = db.faturamento_servico(
                             mes_dados, ano_dados)
+                        valor_dinheiro = db.faturamento_dinheiro(
+                            mes_dados, ano_dados)
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -866,7 +866,7 @@ class Routes:
                                                faturamento_mecanicos=faturamento_mecanicos,
                                                faturamento_companhia=faturamento_cias,
                                                faturamento_servico=faturamento_servico,
-                                               empresa=empresa)
+                                               empresa=empresa, valor_dinheiro=valor_dinheiro)
             elif session['empresa'] == 'portal':
                 if session['permission'] == 'ADMIN':
                     empresa = session['empresa']
@@ -906,6 +906,8 @@ class Routes:
                                     mes_dados, ano_dados)
                                 faturamento_servico = db.faturamento_servico(
                                     mes_dados, ano_dados)
+                                valor_dinheiro = db.faturamento_dinheiro(
+                                    mes_dados, ano_dados)
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -921,6 +923,8 @@ class Routes:
                                 faturamento_cias = db.faturamento_companhia(
                                     mes_dados, ano_dados)
                                 faturamento_servico = db.faturamento_servico(
+                                    mes_dados, ano_dados)
+                                valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
 
                             return render_template('faturamentos.html',
@@ -950,6 +954,8 @@ class Routes:
                         faturamento_cias = db.faturamento_companhia(
                             mes_dados, ano_dados)
                         faturamento_servico = db.faturamento_servico(
+                            mes_dados, ano_dados)
+                        valor_dinheiro = db.faturamento_dinheiro(
                             mes_dados, ano_dados)
                         return render_template('faturamentos.html',
                                                anos=anos,
@@ -998,6 +1004,8 @@ class Routes:
                                     mes_dados, ano_dados)
                                 faturamento_servico = db.faturamento_servico(
                                     mes_dados, ano_dados)
+                                valor_dinheiro = db.faturamento_dinheiro(
+                                    mes_dados, ano_dados)
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -1013,6 +1021,8 @@ class Routes:
                                 faturamento_cias = db.faturamento_companhia(
                                     mes_dados, ano_dados)
                                 faturamento_servico = db.faturamento_servico(
+                                    mes_dados, ano_dados)
+                                valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
 
                             return render_template('faturamentos.html',
@@ -1053,7 +1063,6 @@ class Routes:
                                                faturamento_servico=faturamento_servico,
                                                empresa=empresa)
 
-                   
         else:
             print('Usuário não está logado')
             return redirect('/')
@@ -1120,35 +1129,19 @@ class Routes:
 
                     # Implementar a lógica para buscar os faturamentos no banco de dados com base nos filtros
                     faturamentos = db.faturamentos_gerais(
-                        data_inicio, data_fim, companhia, numero_os, placa, mecanico_servico)
+                        data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
                 else:
                     # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
                     faturamentos = db.faturamentos_gerais()
-                    print(faturamentos)
 
                 if faturamentos is None:
                     faturamentos = []
-
-                # Lógica de paginação
-                page = request.args.get(
-                    get_page_parameter(), type=int, default=1)
-                per_page = 10
-                offset = (page - 1) * per_page
-                paginated_faturamentos = faturamentos[offset: offset + per_page]
-
-                total_pages = (len(faturamentos) + per_page - 1) // per_page
-
-                pagination = Pagination(page=page, total=len(
-                    faturamentos), per_page=per_page, css_framework='bootstrap4')
 
                 return render_template('consultar_faturamento.html',
                                        empresa=empresa,
                                        cias=cias,
                                        mecanicos=mecanicos,
-                                       faturamentos=paginated_faturamentos,
-                                       pagination=pagination,
-                                       paginas=total_pages,
-                                       pagina_atual=page)
+                                       faturamentos=faturamentos)
 
             elif session['empresa'] == 'portal':
                 empresa = session['empresa']
@@ -1170,36 +1163,23 @@ class Routes:
                     mecanico_servico = request.form.get('mecanico_servico')
 
                     # Implementar a lógica para buscar os faturamentos no banco de dados com base nos filtros
+
                     faturamentos = db.faturamentos_gerais(
-                        data_inicio, data_fim, companhia, numero_os, placa, mecanico_servico)
+                        data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
                 else:
                     # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
                     faturamentos = db.faturamentos_gerais()
-                    print(faturamentos)
 
                 if faturamentos is None:
                     faturamentos = []
 
                 # Lógica de paginação
-                page = request.args.get(
-                    get_page_parameter(), type=int, default=1)
-                per_page = 10
-                offset = (page - 1) * per_page
-                paginated_faturamentos = faturamentos[offset: offset + per_page]
-
-                total_pages = (len(faturamentos) + per_page - 1) // per_page
-
-                pagination = Pagination(page=page, total=len(
-                    faturamentos), per_page=per_page, css_framework='bootstrap4')
 
                 return render_template('consultar_faturamento.html',
                                        empresa=empresa,
                                        cias=cias,
                                        mecanicos=mecanicos,
-                                       faturamentos=paginated_faturamentos,
-                                       pagination=pagination,
-                                       paginas=total_pages,
-                                       pagina_atual=page)
+                                       faturamentos=faturamentos)
 
             else:
                 return redirect('/')

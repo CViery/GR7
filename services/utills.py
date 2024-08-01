@@ -100,8 +100,7 @@ class Utills:
 
         # Verifique se o faturamento é zero para evitar divisão por zero
         if faturamento == 0:
-            print("Faturamento é zero, não é possível calcular a porcentagem.")
-            return "Faturamento é zero, não é possível calcular a porcentagem."
+            return 0
 
         # Calcule a porcentagem
         calculo = (gasto / faturamento) * 100
@@ -115,7 +114,8 @@ class Utills:
         dados_faturamento = self.db.faturamento_pecas(mes, ano)
         valores_faturamento = [dado[0] for dado in dados_faturamento]
         faturamento = sum(valores_faturamento)
-
+        if faturamento == 0:
+            return 0
         calculo = (gasto / faturamento) * 100
         dados = f'{calculo:.2f} %'
         return dados
