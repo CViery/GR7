@@ -8,7 +8,7 @@ class Login:
             users = [
                 ('CRISTIAN', 'viery2312', 'ADMIN', 0),
                 ('GILBERTO', 'Giba130364@2024', 'ADMIN', 0),
-                ('THIAGO', '1234', 'ADMIN', 2),
+                ('THIAGO', 'Qazplm82*', 'ADMIN', 2),
                 ('DANIEL', '1234', 'ADMIN', 0),
                 ('FERNANDO', '1234', 'NORMAL', 2)
             ]
