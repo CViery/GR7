@@ -391,7 +391,7 @@ class DatabasePortal:
 
     def obter_ordens_filtradas(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         # Construindo a query SQL
-        query = "SELECT * FROM faturamento_potal WHERE 1=1"
+        query = "SELECT * FROM faturamento_portal WHERE 1=1"
         params = []
 
         if data_inicio:

@@ -423,9 +423,9 @@ class Routes:
                     if 'mes' in request.form and 'ano' in request.form:
                         # Processar formulário de filtro de despesas
                         mes_dados = request.form['mes']
-                        print(mes_dados)
+
                         ano_dados = request.form['ano']
-                        print(ano_dados)
+
                         dados_tipos = db.despesas(mes_dados, ano_dados)
                         valor_gasto = db.valor_gastos(mes_dados, ano_dados)
 
@@ -433,11 +433,10 @@ class Routes:
                         # Usar data atual se não houver filtros específicos para despesas
                         now = datetime.now()
                         mes_dados = now.strftime('%m')
-                        print(mes_dados)
+
                         ano_dados = now.strftime('%Y')
                         dados_tipos = db.despesas(mes_dados, ano_dados)
                         valor_gasto = db.valor_gastos(mes_dados, ano_dados)
-                        print(valor_gasto)
 
                     if 'dia' in request.form:
                         # Processar formulário de filtro de boletos
@@ -493,9 +492,9 @@ class Routes:
                         if 'mes' in request.form and 'ano' in request.form:
                             # Processar formulário de filtro de despesas
                             mes_dados = request.form['mes']
-                            print(mes_dados)
+
                             ano_dados = request.form['ano']
-                            print(ano_dados)
+
                             dados_tipos = db.despesas(mes_dados, ano_dados)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
 
@@ -503,11 +502,10 @@ class Routes:
                             # Usar data atual se não houver filtros específicos para despesas
                             now = datetime.now()
                             mes_dados = now.strftime('%m')
-                            print(mes_dados)
+
                             ano_dados = now.strftime('%Y')
                             dados_tipos = db.despesas(mes_dados, ano_dados)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
-                            print(valor_gasto)
 
                         if 'dia' in request.form:
                             # Processar formulário de filtro de boletos
@@ -600,10 +598,16 @@ class Routes:
 
     @app.route('/fornecedor_cadastrar', methods=['GET', 'POST'])
     def cadastrar_fornecedor():
-        db = utills.Utills()
-        dados = request.form.to_dict()
-        db.cadastrar_fornecedor(dados)
-        return redirect('/cadastros/fornecedor')
+        if session['empresa'] == 'gr7':
+            db = utills.Utills()
+            dados = request.form.to_dict()
+            db.cadastrar_fornecedor(dados)
+            return redirect('/cadastros/fornecedor')
+        elif session['empresa'] == 'portal':
+            db = utills.Utills_portal()
+            dados = request.form.to_dict()
+            db.cadastrar_fornecedor(dados)
+            return redirect('/cadastros/fornecedor')
 
     @app.route('/cadastros/despesas')
     def tela_cadastro_despesas():
@@ -622,7 +626,7 @@ class Routes:
                 db = dados_notas.DadosGastos()
                 db.cadastrar_despesa(despesa)
                 # Criar tela retorno
-                return 'Despesa cadastrada'
+                return redirect('/cadastros/despesas')
             else:
                 return 'erro aqui'
         elif session['empresa'] == 'portal':
@@ -630,7 +634,7 @@ class Routes:
                 despesa = request.form['despesa']
                 db = dados_notas.DadosGastosPortal()
                 db.cadastrar_despesa(despesa)
-                return 'Despesa cadastrada'
+                return redirect('/cadastros/despesas')
             else:
                 return 'erro aqui'
 
@@ -808,8 +812,6 @@ class Routes:
                             ano_dados = request.form.get('ano', '')
 
                             # Verificar se os valores estão corretos
-                            print(f"Mes selecionado: {
-                                  mes_dados}, Ano selecionado: {ano_dados}")
 
                             if mes_dados and ano_dados:
                                 # Processar filtro de faturamentos
@@ -907,8 +909,6 @@ class Routes:
                             ano_dados = request.form.get('ano', '')
 
                             # Verificar se os valores estão corretos
-                            print(f"Mes selecionado: {
-                                  mes_dados}, Ano selecionado: {ano_dados}")
 
                             if mes_dados and ano_dados:
                                 # Processar filtro de faturamentos
@@ -1005,8 +1005,6 @@ class Routes:
                             ano_dados = request.form.get('ano', '')
 
                             # Verificar se os valores estão corretos
-                            print(f"Mes selecionado: {
-                                  mes_dados}, Ano selecionado: {ano_dados}")
 
                             if mes_dados and ano_dados:
                                 # Processar filtro de faturamentos
@@ -1090,17 +1088,17 @@ class Routes:
                 empresa = session['empresa']
                 db = faturamento.Faturamento()
                 cias = db.companhias()
-                print(cias)  # Exemplo, substitua com os valores reais
+
                 mecanicos = db.funcionarios()
-                print(mecanicos)
+
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos)
             elif session['empresa'] == 'portal':
                 empresa = session['empresa']
                 db = faturamento.FaturamentoPortal()
                 cias = db.companhias()
-                print(cias)  # Exemplo, substitua com os valores reais
+              # Exemplo, substitua com os valores reais
                 mecanicos = db.funcionarios()
-                print(mecanicos)
+                print(empresa)
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos)
         else:
             print('Usuário não está logado')
@@ -1111,13 +1109,11 @@ class Routes:
         if session['empresa'] == 'gr7':
             db = faturamento.Faturamento()
             data = request.form.to_dict()
-            print(data)
             db.cadastrar(data)
             return redirect('/faturamentos/cadastrar')
         elif session['empresa'] == 'portal':
             db = faturamento.FaturamentoPortal()
             data = request.form.to_dict()
-            print(data)
             db.cadastrar(data)
             return redirect('/faturamentos/cadastrar')
 
@@ -1131,9 +1127,8 @@ class Routes:
 
                 # Listas para preencher os selects
                 cias = db.companhias()
-                print(cias)  # Exemplo, substitua com os valores reais
+
                 mecanicos = db.funcionarios()
-                print(mecanicos)  # Exemplo, substitua com os valores reais
 
                 if request.method == 'POST':
                     data_inicio = request.form.get('data_inicio')
@@ -1166,9 +1161,8 @@ class Routes:
 
                 # Listas para preencher os selects
                 cias = db.companhias()
-                print(cias)  # Exemplo, substitua com os valores reais
+
                 mecanicos = db.funcionarios()
-                print(mecanicos)  # Exemplo, substitua com os valores reais
 
                 if request.method == 'POST':
                     data_inicio = request.form.get('data_inicio')
@@ -1180,7 +1174,7 @@ class Routes:
 
                     # Implementar a lógica para buscar os faturamentos no banco de dados com base nos filtros
 
-                    faturamentos = db.faturamentos_gerais(
+                    faturamentos = db.filtrar_os(
                         data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
                 else:
                     # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão

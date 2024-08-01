@@ -293,7 +293,7 @@ class GastosDataBasePortal():
 
     def set_despesas(self, despesa):
         try:
-            query = 'INSERT INTO despesas_portal VALUES (?)'
+            query = 'INSERT INTO despesa_portal VALUES (?)'
             self.cursor.execute(query, (despesa,))
             self.db.conn.commit()
         except Exception as e:
@@ -450,6 +450,14 @@ class GastosDataBasePortal():
         try:
             query = 'INSERT INTO baterias (modelo) VALUES (?)'
             self.cursor.execute(query, (modelo))
+            self.db.conn.commit()
+        except Exception as e:
+            print(e)
+
+    def set_fornecedor(self, cnpj, nome):
+        try:
+            query = 'INSERT INTO fornecedores_portal (cnpj, nome) VALUES (?,?)'
+            self.cursor.execute(query, (cnpj, nome))
             self.db.conn.commit()
         except Exception as e:
             print(e)

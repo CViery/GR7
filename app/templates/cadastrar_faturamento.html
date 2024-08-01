@@ -73,25 +73,35 @@
                 <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input">
             </div>
             <div class="input-group">
+                {%if empresa == 'gr7' %}
                 <label for="aditivo">Aditivo:</label>
                 <input type="text" id="aditivo" name="aditivo" class="styled-input"
                     onchange="showAditivoQuantidadeField()">
+                {%endif%}
             </div>
             <div id="qntde_aditivo" class="input-group">
+                {%if empresa == 'gr7'%}
                 <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
                 <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input">
+                {%endif%}
             </div>
             <div class="input-group">
+                {%if empresa == 'gr7'%}
                 <label for="fluido_sangria">Fluido/Sangria:</label>
                 <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input">
+                {%elif empresa == 'portal'%}
+                <label for="lavagem">Lavagem</label>
+                <input type="text" id="lavagem" name="lavagem" class="styled-input">
+                {%endif%}
             </div>
             <div class="input-group">
+                {%if empresa == 'gr7'%}
                 <label for="palheta">Palheta:</label>
                 <input type="text" id="palheta" name="palheta" class="styled-input">
-            </div>
-            <div class="input-group">
-                <label for="limpeza_freios">Limpeza dos Freios:</label>
-                <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input">
+                {%elif empresa == 'portal' %}
+                <label for="alternador">Alternador/Motor de arranque:</label>
+                <input type="text" id="alternador" name="alternador" class="styled-input">
+                {%endif%}
             </div>
             <div class="input-group">
                 <label for="detergente_parabrisa">Detergente de Para-brisa:</label>
@@ -100,6 +110,15 @@
             <div class="input-group">
                 <label for="filtro">Filtro:</label>
                 <input type="text" id="filtro" name="filtro" class="styled-input">
+            </div>
+            <div class="input-group">
+                {%if empresa == 'gr7'%}
+                <label for="limpeza_freios">Limpeza dos Freios:</label>
+                <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input">
+                {%elif empresa == 'portal'%}
+                <label for="funilaria">Funilaria</label>
+                <input type="text" id="funilaria" name="funilaria" class="styled-input">
+                {%endif%}
             </div>
             <div class="input-group">
                 <label for="pneus">Pneus:</label>
@@ -388,8 +407,9 @@
         const valorTotal = parseFloat(document.getElementById('valor_total').value) || 0;
         const valorBateria = parseFloat(document.getElementById('bateria').value) || 0;
         const valorPneus = parseFloat(document.getElementById('pneus').value) || 0;
+        const valorfunilaria = parseFloat(document.getElementById('funilaria').value) || 0;
 
-        const valorMeta = valorTotal - valorBateria - valorPneus;
+        const valorMeta = valorTotal - valorBateria - valorPneus - valorfunilaria;
 
         document.getElementById('valor_meta').value = valorMeta.toFixed(2);
     }

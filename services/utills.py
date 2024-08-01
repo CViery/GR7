@@ -16,7 +16,8 @@ class Utills:
             dados = self.db.faturamento_pecas(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:.2f}'
+            print(valor_soma)
+            valor_total = self.formatar_moeda(valor_soma)
             return valor_total
         except Exception as e:
             print(e)
@@ -27,7 +28,7 @@ class Utills:
             dados = self.db.faturamento_servicos(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:.2f}'
+            valor_total = self.formatar_moeda(valor_soma)
             return valor_total
         except Exception as e:
             print(e)
@@ -42,7 +43,7 @@ class Utills:
             if falta <= 0:
                 valor_total = 'Primeira meta Atingida'
             else:
-                valor_total = f'R$ {falta:.2f}'
+                valor_total = self.formatar_moeda(falta)
             return valor_total
         except Exception as e:
             print(e)
@@ -57,7 +58,7 @@ class Utills:
             if falta <= 0:
                 valor_total = 'Segunda meta Atingida'
             else:
-                valor_total = f'R$ {falta:.2f}'
+                valor_total = self.formatar_moeda(falta)
             return valor_total
         except Exception as e:
             print(e)
@@ -126,14 +127,14 @@ class Utills:
         dados_pecas = self.db_gastos.get_gatos_por_tipo('PEÇAS', mes, ano)
         valores_gastos = [dado[0] for dado in dados_pecas]
         gasto = sum(valores_gastos)
-        valor_total = f'R$ {gasto:.2f}'
+        valor_total = self.formatar_moeda(gasto)
         return valor_total
 
     def valor_dinheiro(self, mes, ano):
         dados_dinheiro = self.db.faturamento_dinheiro(mes, ano)
         valores_dinheiro = [dado[0] for dado in dados_dinheiro]
         gasto = sum(valores_dinheiro)
-        valor_total = f'R$ {gasto:.2f}'
+        valor_total = self.formatar_moeda(gasto)
         return valor_total
 
     def emitido_para(self):
@@ -146,6 +147,10 @@ class Utills:
         razao = dados['nome_empresa']
         self.db_gastos.set_fornecedor(CNPJ, razao)
 
+    def formatar_moeda(self, valor):
+        print(valor)
+        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
 
 class Utills_portal():
     def __init__(self):
@@ -154,13 +159,16 @@ class Utills_portal():
         self.db_dados_notas = dados_notas.DadosGastosPortal()
         self.faturamento_db = faturamento.FaturamentoPortal()
 
+    def formatar_moeda(self, valor):
+        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
     def faturamento_pecas(self, mes, ano):
         try:
 
             dados = self.db.faturamento_pecas(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:.2f}'
+            valor_total = self.formatar_moeda(valor_soma)
             return valor_total
         except Exception as e:
             print(e)
@@ -171,7 +179,7 @@ class Utills_portal():
             dados = self.db.faturamento_servicos(mes, ano)
             valores = [valor[0] for valor in dados]
             valor_soma = sum(valores)
-            valor_total = f'R$ {valor_soma:.2f}'
+            valor_total = self.formatar_moeda(valor_soma)
             return valor_total
         except Exception as e:
             print(e)
@@ -181,12 +189,13 @@ class Utills_portal():
             valor_meta = self.db.faturamento_mes_meta(mes, ano)
             valores = [valor[0] for valor in valor_meta]
             valor_vendido = sum(valores)
-            meta = 180000.00
+            meta = 0
             falta = meta - valor_vendido
             if falta <= 0:
                 valor_total = 'Primeira meta Atingida'
             else:
-                valor_total = f'R$ {falta:.2f}'
+                valor_total = self.formatar_moeda(falta)
+                print(valor_total)
             return valor_total
         except Exception as e:
             print(e)
@@ -201,7 +210,7 @@ class Utills_portal():
             if falta <= 0:
                 valor_total = 'Segunda meta Atingida'
             else:
-                valor_total = f'R$ {falta:.2f}'
+                valor_total = self.formatar_moeda(falta)
             return valor_total
         except Exception as e:
             print(e)
@@ -273,17 +282,22 @@ class Utills_portal():
         dados_pecas = self.db_gastos.get_gatos_por_tipo('PEÇAS', mes, ano)
         valores_gastos = [dado[0] for dado in dados_pecas]
         gasto = sum(valores_gastos)
-        valor_total = f'R$ {gasto:.2f}'
+        valor_total = self.formatar_moeda(gasto)
         return valor_total
 
     def valor_dinheiro(self, mes, ano):
         dados_dinheiro = self.db.faturamento_dinheiro(mes, ano)
         valores_dinheiro = [dado[0] for dado in dados_dinheiro]
         gasto = sum(valores_dinheiro)
-        valor_total = f'R$ {gasto:.2f}'
+        valor_total = self.formatar_moeda(gasto)
         return valor_total
 
     def emitido_para(self):
         dados = self.db_gastos.get_recebedor()
         lista = [dado[0] for dado in dados]
         return lista
+
+    def cadastrar_fornecedor(self, dados):
+        CNPJ = dados['cnpj']
+        razao = dados['nome_empresa']
+        self.db_gastos.set_fornecedor(CNPJ, razao)

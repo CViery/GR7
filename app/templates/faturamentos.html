@@ -246,7 +246,11 @@
                             <tbody>
                                 {% for faturamento in faturamento_companhia %}
                                 <tr>
+                                    {%if faturamento[0] == 'pneu_store'%}
+                                    <td>PNEU STORE</td>
+                                    {%else%}
                                     <td>{{ faturamento[0] }}</td>
+                                    {%endif%}
                                     <td>{{ faturamento[1] }}</td>
                                     <td>{{ faturamento[2] }}</td>
                                 </tr>
@@ -276,10 +280,66 @@
                             <tbody>
                                 {% for faturamento in faturamento_servico %}
                                 <tr>
-                                    <td>{{ faturamento[0] }}</td>
+                                    {%if faturamento[0] == 'revitalizacao' %}
+                                    <td>Revitalização</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif faturamento[0] == 'aditivo' %}
+                                    {%if empresa == 'gr7'%}
+                                    <td>ADITIVO</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif empresa == portal%}
+                                    <td></td>
+                                    {%endif%}
+                                    {%elif faturamento[0] == 'fluido_sangria' %}
+                                    {%if empresa == 'gr7'%}
+                                    <td>FLUIDO E SANGRIA</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif empresa == portal%}
+                                    <td>LAVAGEM</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%endif%}
+                                    {%elif faturamento[0] == 'palheta' %}
+                                    {%if empresa == 'gr7'%}
+                                    <td>PALHETA</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif empresa == portal%}
+                                    <td>ALTERNADOR/MOTOR DE ARRANQUE</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%endif%}
+                                    {%elif faturamento[0] == 'limpeza_freios' %}
+                                    {%if empresa == 'gr7'%}
+                                    <td>LIMPEZA DE FREIOS</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif empresa == portal%}
+                                    <td>FUNILARIA</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%endif%}
+                                    {%elif faturamento[0] == 'detergente_parabrisa' %}
+                                    <td>DETERGENTE PARABRISA</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif faturamento[0] == 'filtro' %}
+                                    <td>FILTRO</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif faturamento[0] == 'pneus' %}
+                                    <td>PNEUS</td>
+                                    <td>{{ faturamento[1] }}</td>
+                                    <td>{{ faturamento[2] }}</td>
+                                    {%elif faturamento[0] == 'bateria' %}
+                                    <td>BATERIA</td>
                                     <td>{{ faturamento[1] }}</td>
                                     <td>{{ faturamento[2] }}</td>
                                 </tr>
+                                {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
