@@ -1,10 +1,17 @@
 class Login:
     def __init__(self):
         pass
-    
+
     def get_user(self, user):
         try:
-            users = [('CRISTIAN', 'viery2312', 'ADMIN'), ('GILBERTO', 'Giba130364@2024', 'ADMIN'), ('FERNANDO', '1234', 'NORMAL')]
+            # Guia 0=Acesso total, 1=GR7, 2=Portal
+            users = [
+                ('CRISTIAN', 'viery2312', 'ADMIN', 0),
+                ('GILBERTO', 'Giba130364@2024', 'ADMIN', 0),
+                ('THIAGO', '1234', 'ADMIN', 2),
+                ('DANIEL', '1234', 'ADMIN', 0),
+                ('FERNANDO', '1234', 'NORMAL', 2)
+            ]
             for person in users:
                 if person[0] == user:
                     return person

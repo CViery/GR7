@@ -26,9 +26,17 @@ class Routes:
                 session['usuario'] = usuario
                 session['empresa'] = empresa
                 if empresa == 'gr7':
-                    return redirect('/home')
+                    if session['permission_empresa'] == 0 or session['permission_empresa'] == 1:
+                        return redirect('/home')
+                    else:
+                        flash('Desculpe seu acesso não permite acessar.')
+                        return redirect('/')
                 elif empresa == 'portal':
-                    return redirect('/home')
+                    if session['permission_empresa'] == 0 or session['permission_empresa'] == 2:
+                        return redirect('/home')
+                    else:
+                        flash('Desculpe seu acesso não permite acessar.')
+                        return redirect('/')
             elif auten == 'NORMAL':
                 session['usuario'] = usuario
                 session['empresa'] = empresa
