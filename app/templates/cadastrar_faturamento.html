@@ -113,7 +113,7 @@
                 <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input">
                 {%elif empresa == 'portal'%}
                 <label for="funilaria">Funilaria</label>
-                <input type="text" id="funilaria" name="limpeza_freios" class="styled-input">
+                <input type="text" id="funilaria" name="funilaria" class="styled-input" onchange="calculateValorMeta()">
                 {%endif%}
             </div>
             <div class="input-group">
@@ -400,14 +400,35 @@
         }
     }
     function calculateValorMeta() {
-        const valorTotal = parseFloat(document.getElementById('valor_total').value) || 0;
-        const valorBateria = parseFloat(document.getElementById('bateria').value) || 0;
-        const valorPneus = parseFloat(document.getElementById('pneus').value) || 0;
-        const valorfunilaria = parseFloat(document.getElementById('funilaria').value) || 0;
+        // Obter os elementos pelo ID
+        const valorTotalElement = document.getElementById('valor_total');
+        const bateriaElement = document.getElementById('bateria');
+        const pneusElement = document.getElementById('pneus');
+        const valorMetaElement = document.getElementById('valor_meta');
 
-        const valorMeta = valorTotal - valorBateria - valorPneus - valorfunilaria;
+        // Verificar se todos os elementos necessários estão presentes
+        if (valorTotalElement && bateriaElement && pneusElement && valorMetaElement) {
+            // Obter os valores dos campos e substituir as vírgulas por pontos
+            const valorTotal = parseFloat(valorTotalElement.value.replace(',', '.')) || 0;
+            const valorBateria = parseFloat(bateriaElement.value.replace(',', '.')) || 0;
+            const valorPneus = parseFloat(pneusElement.value.replace(',', '.')) || 0;
 
-        document.getElementById('valor_meta').value = valorMeta.toFixed(2);
+            // Verificar se o elemento 'funilaria' existe
+            const funilariaElement = document.getElementById('funilaria');
+            const valorFunilaria = funilariaElement ? parseFloat(funilariaElement.value.replace(',', '.')) || 0 : 0;
+
+            // Calcular o valor da meta
+            const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria;
+
+            // Atualizar o campo de valor meta com o resultado formatado
+            valorMetaElement.value = valorMeta.toFixed(2);
+        } else {
+            // Mensagens de erro se algum elemento não for encontrado
+            if (!valorTotalElement) console.error('Elemento com ID "valor_total" não encontrado.');
+            if (!bateriaElement) console.error('Elemento com ID "bateria" não encontrado.');
+            if (!pneusElement) console.error('Elemento com ID "pneus" não encontrado.');
+            if (!valorMetaElement) console.error('Elemento com ID "valor_meta" não encontrado.');
+        }
     }
 </script>
 {%endblock%}
