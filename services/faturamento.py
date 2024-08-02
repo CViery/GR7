@@ -27,13 +27,16 @@ class Faturamento:
             fluido_sangria = fluido_sangria_str.replace(',', '.')
             palheta_str = dados['palheta']
             palheta = palheta_str.replace(',', '.')
-            limpeza_freios_str = dados['limpeza_freios']
+            if 'limpeza_freios' in dados:
+                limpeza_freios_str = dados['limpeza_freios']
+            if 'funilaria' in dados:
+                limpeza_freios_str = dados['funilaria']
             limpeza_freios = limpeza_freios_str.replace(',', '.')
             detergente_parabrisa_str = dados['detergente_parabrisa']
             detergente_parabrisa = detergente_parabrisa_str.replace(',', '.')
             filtro_str = dados['filtro']
             filtro = filtro_str.replace(',', '.')
-            pneus_str = dados['pneu']
+            pneus_str = dados['pneus']
             pneus = pneus_str.replace(',', '.')
             bateria_str = dados['bateria']
             bateria = bateria_str.replace(',', '.')
