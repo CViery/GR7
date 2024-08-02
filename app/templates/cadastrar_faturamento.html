@@ -73,17 +73,13 @@
                 <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input">
             </div>
             <div class="input-group">
-                {%if empresa == 'gr7' %}
                 <label for="aditivo">Aditivo:</label>
                 <input type="text" id="aditivo" name="aditivo" class="styled-input"
                     onchange="showAditivoQuantidadeField()">
-                {%endif%}
             </div>
             <div id="qntde_aditivo" class="input-group">
-                {%if empresa == 'gr7'%}
                 <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
                 <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input">
-                {%endif%}
             </div>
             <div class="input-group">
                 {%if empresa == 'gr7'%}
@@ -91,7 +87,7 @@
                 <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input">
                 {%elif empresa == 'portal'%}
                 <label for="lavagem">Lavagem</label>
-                <input type="text" id="lavagem" name="lavagem" class="styled-input">
+                <input type="text" id="lavagem" name="fluido_sangria" class="styled-input">
                 {%endif%}
             </div>
             <div class="input-group">
@@ -100,7 +96,7 @@
                 <input type="text" id="palheta" name="palheta" class="styled-input">
                 {%elif empresa == 'portal' %}
                 <label for="alternador">Alternador/Motor de arranque:</label>
-                <input type="text" id="alternador" name="alternador" class="styled-input">
+                <input type="text" id="alternador" name="palheta" class="styled-input">
                 {%endif%}
             </div>
             <div class="input-group">
@@ -117,7 +113,7 @@
                 <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input">
                 {%elif empresa == 'portal'%}
                 <label for="funilaria">Funilaria</label>
-                <input type="text" id="funilaria" name="funilaria" class="styled-input">
+                <input type="text" id="funilaria" name="limpeza_freios" class="styled-input">
                 {%endif%}
             </div>
             <div class="input-group">
