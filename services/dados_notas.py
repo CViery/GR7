@@ -338,7 +338,7 @@ class DadosGastosPortal():
             notas.append(nfe)
         return notas
 
-    def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+    def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa)
         valores = [dados[12] for dados in resultado]

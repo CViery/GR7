@@ -192,6 +192,9 @@ class Routes:
             enviar.cadastrar(dados)
             if dados['boleto'] == 'Sim':
                 return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
+            else:
+                flash('Nota cadastrada')
+                return redirect('/gastos/cadastros/notas')
         elif session['empresa'] == 'portal':
             # alterar dados para banco portal
             enviar = cadastrar_notas.NotasPortal()
@@ -210,9 +213,9 @@ class Routes:
             enviar.cadastrar(dados)
             if dados['boleto'] == 'Sim':
                 return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
-        else:
-            flash('Nota cadastrada')
-            return redirect('/gastos/cadastros/notas')
+            else:
+                flash('Nota cadastrada')
+                return redirect('/gastos/cadastros/notas')
 
     @app.route('/gastos/cadatro/duplicata')
     def duplicata():
@@ -704,8 +707,10 @@ class Routes:
                     despesa = request.form.get('despesa')
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
+                    print(f'Notas: {notas}')
                     valor = db.filtrar_notas_valor(
                         data_inicio, data_fim, fornecedor, despesa)
+                    print(f'Valor: {valor}')
                 elif data_inicio or data_fim or fornecedor or despesa:
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
@@ -714,6 +719,7 @@ class Routes:
                 else:
                     notas = db.todas_as_notas()
                     valor = db.valor_nota()
+
                 # Configuração da paginação
             # page = request.args.get(get_page_parameter(), type=int, default=1)
                 # per_page = 10
