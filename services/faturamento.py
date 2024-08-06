@@ -12,52 +12,30 @@ class Faturamento:
 
     def cadastrar(self, dados):
         try:
+            # Valida dados obrigatórios
+            required_fields = [
+                'data_faturamento', 'pecas', 'servicos', 'revitalizacao', 'aditivo',
+                'fluido_sangria', 'palheta', 'detergente_parabrisa', 'filtro',
+                'pneus', 'bateria', 'valor_oleo', 'valor_dinheiro', 'freios',
+                'suspensao', 'injecao_ignicao', 'cabeote_motor_arrefecimento', 'outros',
+                'oleos', 'transmissao', 'placa', 'modelo_veiculo', 'data_orcamento',
+                'dias', 'num_os', 'cia', 'conversao_pneustore', 'valor_total',
+                'quantidade_aditivo', 'modelo_bateria', 'quantidade_oleo',
+                'tipo_marca_oleo', 'mecanico', 'filtro_mecanico', 'valor_meta'
+            ]
+
+            for field in required_fields:
+                if field not in dados:
+                    raise ValueError(f"Campo obrigatório ausente: {field}")
+
+            # Extrai e processa os dados
             data = dados['data_faturamento']
-            mes = data[5:7]
-            ano = data[:4]
-            pecas_str = dados['pecas']
-            pecas = pecas_str.replace(',', '.')
-            servico_str = dados['servicos']
-            servico = servico_str.replace(',', '.')
-            revitalizacao_str = dados['revitalizacao']
-            revitalizacao = revitalizacao_str.replace(',', '.')
-            aditivo_str = dados['aditivo']
-            aditivo = aditivo_str.replace(',', '.')
-            fluido_sangria_str = dados['fluido_sangria']
-            fluido_sangria = fluido_sangria_str.replace(',', '.')
-            palheta_str = dados['palheta']
-            palheta = palheta_str.replace(',', '.')
-            if 'limpeza_freios' in dados:
-                limpeza_freios_str = dados['limpeza_freios']
-            if 'funilaria' in dados:
-                limpeza_freios_str = dados['funilaria']
-            limpeza_freios = limpeza_freios_str.replace(',', '.')
-            detergente_parabrisa_str = dados['detergente_parabrisa']
-            detergente_parabrisa = detergente_parabrisa_str.replace(',', '.')
-            filtro_str = dados['filtro']
-            filtro = filtro_str.replace(',', '.')
-            pneus_str = dados['pneus']
-            pneus = pneus_str.replace(',', '.')
-            bateria_str = dados['bateria']
-            bateria = bateria_str.replace(',', '.')
-            oleo_str = dados['valor_oleo']
-            oleo = oleo_str.replace(',', '.')
-            valor_dinheiro_str = dados['valor_dinheiro']
-            valor_dinheiro = valor_dinheiro_str.replace(',', '.')
-            freios_str = dados['freios']
-            freios = freios_str.replace(',', '.')
-            suspensao_str = dados['suspensao']
-            suspensao = suspensao_str.replace(',', '.')
-            injecao_str = dados['injecao_ignicao']
-            injecao = injecao_str.replace(',', '.')
-            motor_str = dados['cabeote_motor_arrefecimento']
-            motor = motor_str.replace(',', '.')
-            outros_str = dados['outros']
-            outros = outros_str.replace(',', '.')
-            lubrificantes_str = dados['oleos']
-            lubrificantes = lubrificantes_str.replace(',', '.')
-            transmissao_str = dados['transmissao']
-            transissao = transmissao_str.replace(',', '.')
+            mes, ano = data[5:7], data[:4]
+
+            # Processa valores monetários, substituindo vírgulas por pontos
+            def process_value(value_str):
+                return float(value_str.replace(',', '.'))
+
             ordem_servico = {
                 'placa': dados['placa'],
                 'modelo_veiculo': dados['modelo_veiculo'],
@@ -69,52 +47,61 @@ class Faturamento:
                 'numero_os': int(dados['num_os']),
                 'companhia': dados['cia'],
                 'conversao_ps': dados['conversao_pneustore'],
-                'valor_pecas': float(pecas),
-                'valor_servicos': float(servico),
+                'valor_pecas': process_value(dados['pecas']),
+                'valor_servicos': process_value(dados['servicos']),
                 'total_os': float(dados['valor_total']),
-                'valor_revitalizacao': float(revitalizacao),
-                'valor_aditivo': float(aditivo),
+                'valor_revitalizacao': process_value(dados['revitalizacao']),
+                'valor_aditivo': process_value(dados['aditivo']),
                 'quantidade_litros': int(dados['quantidade_aditivo']),
-                'valor_fluido_sangria': float(fluido_sangria),
-                'valor_palheta': float(palheta),
-                'valor_limpeza_freios': float(limpeza_freios),
-                'valor_pastilha_parabrisa': float(detergente_parabrisa),
-                'valor_filtro': float(filtro),
-                'valor_pneu': float(pneus),
-                'valor_bateria': float(bateria),
+                'valor_fluido_sangria': process_value(dados['fluido_sangria']),
+                'valor_palheta': process_value(dados['palheta']),
+                'valor_limpeza_freios': process_value(dados.get('limpeza_freios', '0')),
+                'valor_pastilha_parabrisa': process_value(dados['detergente_parabrisa']),
+                'valor_filtro': process_value(dados['filtro']),
+                'valor_pneu': process_value(dados['pneus']),
+                'valor_bateria': process_value(dados['bateria']),
                 'modelo_bateria': dados['modelo_bateria'],
                 'lts_oleo_motor': int(dados['quantidade_oleo']),
-                'valor_lt_oleo': float(oleo),
+                'valor_lt_oleo': process_value(dados['valor_oleo']),
                 'marca_e_tipo_oleo': dados['tipo_marca_oleo'],
                 'mecanico_servico': dados['mecanico'],
                 'servico_filtro': dados['filtro_mecanico'],
-                'valor_p_meta': float(dados['valor_meta']),
-                'valor_em_dinheiro': float(valor_dinheiro),
-                'valor_servico_freios': float(freios),
-                'valor_servico_suspensao': float(suspensao),
-                'valor_servico_injecao_ignicao': float(injecao),
-                'valor_servico_cabecote_motor_arr': float(motor),
-                'valor_outros_servicos': float(outros),
-                'valor_servicos_oleos': float(lubrificantes),
-                'valor_servico_transmissao': float(transissao)
+                'valor_p_meta': process_value(dados['valor_meta']),
+                'valor_em_dinheiro': process_value(dados['valor_dinheiro']),
+                'valor_servico_freios': process_value(dados['freios']),
+                'valor_servico_suspensao': process_value(dados['suspensao']),
+                'valor_servico_injecao_ignicao': process_value(dados['injecao_ignicao']),
+                'valor_servico_cabecote_motor_arr': process_value(dados['cabeote_motor_arrefecimento']),
+                'valor_outros_servicos': process_value(dados['outros']),
+                'valor_servicos_oleos': process_value(dados['oleos']),
+                'valor_servico_transmissao': process_value(dados['transmissao'])
             }
+
+            # Cadastra a ordem de serviço no banco de dados
             self.db.cadastrar_faturamento(ordem_servico)
 
+        except ValueError as ve:
+            print(f"Erro de validação: {ve}")
         except Exception as e:
-            print(e)
+            print(f"Erro ao cadastrar: {e}")
 
-    def filtrar_os(self, data_inicio=None, data_fim=None, cia=None, num_os=None, placa=None, mecanico=None):
+    def filtrar_os(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         try:
+            # Obtém as ordens de serviço filtradas do banco de dados
             faturamento = self.db.obter_ordens_filtradas(
                 data_inicio, data_fim, placa, mecanico, num_os, cia)
             faturamentos = []
+
             for ordem_servico in faturamento:
+                # Formata as datas
                 data_objeto_orcamento = datetime.strptime(
                     ordem_servico[2], "%Y-%m-%d")
                 data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
                 data_objeto_faturamento = datetime.strptime(
                     ordem_servico[3], "%Y-%m-%d")
                 data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+
+                # Cria um dicionário com as informações formatadas
                 os = {
                     'placa': ordem_servico[0],
                     'modelo_veiculo': ordem_servico[1],
@@ -143,7 +130,7 @@ class Faturamento:
                     'mecanico_servico': ordem_servico[29],
                     'servico_filtro': ordem_servico[30],
                     'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
-                    'valor_em_dinheiro': self.formatar_moeda(ordem_servico[30]),
+                    'valor_em_dinheiro': self.formatar_moeda(ordem_servico[28]),
                     'valor_servico_freios': self.formatar_moeda(ordem_servico[31]),
                     'valor_servico_suspensao': self.formatar_moeda(ordem_servico[32]),
                     'valor_servico_injecao_ignicao': self.formatar_moeda(ordem_servico[33]),
@@ -153,22 +140,37 @@ class Faturamento:
                     'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37])
                 }
                 faturamentos.append(os)
+
             return faturamentos
         except Exception as e:
             print(f"Erro ao obter faturamentos: {e}")
             return []
 
     def faturamento_total_mes(self, mes, ano):
+        """
+        Calcula o faturamento total para um mês e ano específicos.
+
+        :param mes: Mês para o qual o faturamento deve ser calculado (formato 'MM').
+        :param ano: Ano para o qual o faturamento deve ser calculado (formato 'YYYY').
+        :return: Valor total do faturamento formatado como moeda.
+        """
         try:
+            # Obtém os dados de faturamento do banco de dados
             dados = self.db.faturamento_mes(mes, ano)
+
+            # Extrai os valores da lista de dados
             valores = [dado[0] for dado in dados]
 
+            # Calcula a soma dos valores
             valor_soma = sum(valores)
+
+            # Formata o valor total como moeda
             valor_total = self.formatar_moeda(valor_soma)
+
             return valor_total
         except Exception as e:
             print(f"Erro ao calcular faturamento total do mês: {e}")
-            raise e
+            raise
 
     def faturamento_meta_mes(self, mes, ano):
         try:

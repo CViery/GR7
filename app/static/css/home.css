@@ -14,7 +14,7 @@ main{
 
 .box-infos{
     width: 400px;  /* Largura dos botões */
-    height: 300px;  /* Altura dos botões */
+    height: 400px;  /* Altura dos botões */
     background-color: white;
     color: black;
     border: 2px solid transparent;

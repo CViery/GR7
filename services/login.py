@@ -8,7 +8,14 @@ class Login:
 
     def login(self, user, password):
         try:
+            # Verifica se os dados fornecidos não estão vazios
+            if not user or not password:
+                print("Usuário e senha não podem ser vazios.")
+                return False
+
+            # Obtém os dados do usuário do banco de dados
             users = self.db.get_user(user)
+
             if users:
                 dados = {
                     'user': users[0],
@@ -16,18 +23,25 @@ class Login:
                     'permission': users[2],
                     'empresa': users[3]
                 }
-                if user == dados['user'] and password == dados['password']:
+
+                # Verifica se a senha fornecida corresponde à senha armazenada
+                if password == dados['password']:
+                    # Define as permissões e a empresa na sessão
+                    session['permission'] = dados['permission']
+                    session['permission_empresa'] = dados['empresa']
+
                     if dados['permission'] == 'ADMIN':
-                        session['permission'] = dados['permission']
-                        session['permission_empresa'] = dados['empresa']
                         return 'ADMIN'
                     elif dados['permission'] == 'NORMAL':
-                        session['permission'] = dados['permission']
-                        session['permission_empresa'] = dados['empresa']
                         return 'NORMAL'
+                else:
+                    print('Senha incorreta')
+                    return False
             else:
-                print('usuario não encontrado')
+                print('Usuário não encontrado')
                 return False
+
         except Exception as e:
+            # Trata erros específicos de autenticação
             print(f"Erro ao autenticar usuário: {e}")
             return False

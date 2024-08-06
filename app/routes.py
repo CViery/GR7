@@ -348,7 +348,7 @@ class Routes:
             # Aqui você pode salvar a duplicata no banco de dados
             # Colocar para retornar na tela de cadastos
 
-            return render_template('respota_cadastro.html', rota='/gastos/cadastros/duplicatas')
+            return render_template('resposta_cadastro.html', rota='/gastos/cadastros/duplicatas')
         elif session['empresa'] == 'portal':
             # alterar banco
             numero_duplicata = request.form['numeroDuplicata']
@@ -833,6 +833,9 @@ class Routes:
                                     mes_dados, ano_dados)
                                 valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
+                                ticket = services.ticket(mes_dados, ano_dados)
+                                passagens = services.passagens(
+                                    mes_dados, ano_dados)
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -851,6 +854,9 @@ class Routes:
                                     mes_dados, ano_dados)
                                 valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
+                                ticket = services.ticket(mes_dados, ano_dados)
+                                passagens = services.passagens(
+                                    mes_dados, ano_dados)
                             return render_template('faturamentos.html',
                                                    anos=anos,
                                                    meses=meses,
@@ -859,7 +865,10 @@ class Routes:
                                                    faturamento_mecanicos=faturamento_mecanicos,
                                                    faturamento_companhia=faturamento_cias,
                                                    faturamento_servico=faturamento_servico,
-                                                   empresa=empresa, valor_dinheiro=valor_dinheiro)
+                                                   empresa=empresa, valor_dinheiro=valor_dinheiro,
+                                                   ticket=ticket,
+                                                   passagens=passagens
+                                                   )
                         except Exception as e:
                             print(
                                 f"Ocorreu um erro ao processar o formulário: {e}")
@@ -882,6 +891,8 @@ class Routes:
                             mes_dados, ano_dados)
                         valor_dinheiro = db.faturamento_dinheiro(
                             mes_dados, ano_dados)
+                        ticket = services.ticket(mes_dados, ano_dados)
+                        passagens = services.passagens(mes_dados, ano_dados)
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -890,7 +901,7 @@ class Routes:
                                                faturamento_mecanicos=faturamento_mecanicos,
                                                faturamento_companhia=faturamento_cias,
                                                faturamento_servico=faturamento_servico,
-                                               empresa=empresa, valor_dinheiro=valor_dinheiro)
+                                               empresa=empresa, valor_dinheiro=valor_dinheiro, ticket=ticket, passagens=passagens)
             elif session['empresa'] == 'portal':
                 if session['permission'] == 'ADMIN':
                     empresa = session['empresa']
@@ -930,6 +941,9 @@ class Routes:
                                     mes_dados, ano_dados)
                                 valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
+                                ticket = services.ticket(mes_dados, ano_dados)
+                                passagens = services.passagens(
+                                    mes_dados, ano_dados)
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -948,6 +962,9 @@ class Routes:
                                     mes_dados, ano_dados)
                                 valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
+                                ticket = services.ticket(mes_dados, ano_dados)
+                                passagens = services.passagens(
+                                    mes_dados, ano_dados)
 
                             return render_template('faturamentos.html',
                                                    anos=anos,
@@ -957,7 +974,8 @@ class Routes:
                                                    faturamento_mecanicos=faturamento_mecanicos,
                                                    faturamento_companhia=faturamento_cias,
                                                    faturamento_servico=faturamento_servico,
-                                                   empresa=empresa)
+                                                   empresa=empresa, ticket=ticket,
+                                                   passagens=passagens)
                         except Exception as e:
                             print(
                                 f"Ocorreu um erro ao processar o formulário: {e}")
@@ -979,6 +997,8 @@ class Routes:
                             mes_dados, ano_dados)
                         valor_dinheiro = db.faturamento_dinheiro(
                             mes_dados, ano_dados)
+                        ticket = services.ticket(mes_dados, ano_dados)
+                        passagens = services.passagens(mes_dados, ano_dados)
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -987,7 +1007,7 @@ class Routes:
                                                faturamento_mecanicos=faturamento_mecanicos,
                                                faturamento_companhia=faturamento_cias,
                                                faturamento_servico=faturamento_servico,
-                                               empresa=empresa)
+                                               empresa=empresa, ticket=ticket, passagens=passagens)
                 elif session['permission'] == 'NORMAL':
                     empresa = session['empresa']
                     db = faturamento.FaturamentoPortal()
@@ -1026,6 +1046,9 @@ class Routes:
                                     mes_dados, ano_dados)
                                 valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
+                                ticket = services.ticket(mes_dados, ano_dados)
+                                passagens = services.passagens(
+                                    mes_dados, ano_dados)
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -1044,6 +1067,9 @@ class Routes:
                                     mes_dados, ano_dados)
                                 valor_dinheiro = db.faturamento_dinheiro(
                                     mes_dados, ano_dados)
+                                ticket = services.ticket(mes_dados, ano_dados)
+                                passagens = services.passagens(
+                                    mes_dados, ano_dados)
 
                             return render_template('faturamentos.html',
                                                    anos=anos,
@@ -1053,7 +1079,8 @@ class Routes:
                                                    faturamento_mecanicos=faturamento_mecanicos,
                                                    faturamento_companhia=faturamento_cias,
                                                    faturamento_servico=faturamento_servico,
-                                                   empresa=empresa)
+                                                   empresa=empresa, ticket=ticket,
+                                                   passagens=passagens)
                         except Exception as e:
                             print(
                                 f"Ocorreu um erro ao processar o formulário: {e}")
@@ -1073,6 +1100,8 @@ class Routes:
                             mes_dados, ano_dados)
                         faturamento_servico = db.faturamento_servico(
                             mes_dados, ano_dados)
+                        ticket = services.ticket(mes_dados, ano_dados)
+                        passagens = services.passagens(mes_dados, ano_dados)
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -1081,7 +1110,7 @@ class Routes:
                                                faturamento_mecanicos=faturamento_mecanicos,
                                                faturamento_companhia=faturamento_cias,
                                                faturamento_servico=faturamento_servico,
-                                               empresa=empresa)
+                                               empresa=empresa, ticket=ticket, passagens=passagens)
 
         else:
             print('Usuário não está logado')
@@ -1145,7 +1174,7 @@ class Routes:
                     mecanico_servico = request.form.get('mecanico_servico')
 
                     # Implementar a lógica para buscar os faturamentos no banco de dados com base nos filtros
-                    faturamentos = db.faturamentos_gerais(
+                    faturamentos = db.filtrar_os(
                         data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
                 else:
                     # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
