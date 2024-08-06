@@ -389,7 +389,7 @@ class Routes:
             # Aqui você pode salvar a duplicata no banco de dados
             # ...
 
-            return render_template('respota_cadastro.html', rota='/gastos/cadastros/duplicatas')
+            return render_template('resposta_cadastro.html', rota='/gastos/cadastros/duplicatas')
 
     @app.route('/gastos/cadastros/duplicatas')
     def tela_duplicatas():
