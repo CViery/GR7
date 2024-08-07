@@ -384,7 +384,7 @@ class Routes:
                 'parcelas': parcelas_cadastradas
             }
             db = cadastrar_duplicata.BoletosPortal()
-            db.cadastrar_duplicatas()
+            db.cadastrar_duplicatas(duplicata)
 
             # Aqui você pode salvar a duplicata no banco de dados
             # ...
