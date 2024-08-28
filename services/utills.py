@@ -120,7 +120,6 @@ class Utills:
         try:
             # Obtém os dados de faturamento para o mês e ano fornecidos
             dados = self.db.faturamento_mes_meta(mes, ano)
-            print(dados)
 
             # Extrai os valores dos dados
             valores = [dado[0] for dado in dados]
@@ -142,7 +141,7 @@ class Utills:
 
             # Formata o valor médio como moeda
             result = self.formatar_moeda(valor)
-            print(f'TICKET Médio = {result}')
+            
 
             return result
 
@@ -163,7 +162,7 @@ class Utills:
             qntd = len(valores)
 
             # Imprime a quantidade de passagens
-            print(f'PASSAGENS {qntd}')
+        
 
             return qntd
 
@@ -212,7 +211,8 @@ class Utills:
         try:
             # Obtém o valor total de gastos para o mês e ano fornecidos
             valor = self.db_dados_notas.valor_gastos(mes, ano)
-            return valor
+            valor_moeda = self.formatar_moeda(valor)
+            return valor_moeda
         except Exception as e:
             # Imprime a exceção com uma mensagem clara
             print(f"Ocorreu um erro ao obter os gastos para {mes}/{ano}: {e}")
@@ -502,25 +502,59 @@ class Utills_portal():
         razao = dados['nome_empresa']
         self.db_gastos.set_fornecedor(CNPJ, razao)
 
+        print(f"Ocorreu um erro ao calcular a segunda meta: {e}")
+        return None
+
     def ticket(self, mes, ano):
         try:
+            # Obtém os dados de faturamento para o mês e ano fornecidos
             dados = self.db.faturamento_mes_meta(mes, ano)
+
+            # Extrai os valores dos dados
             valores = [dado[0] for dado in dados]
+
+            # Verifica se há valores para evitar divisão por zero
+            if not valores:
+                print(
+                    "Nenhum dado de faturamento encontrado para o mês e ano fornecidos.")
+                return "R$ 0,00"
+
+            # Calcula a soma dos valores
             soma = sum(valores)
+
+            # Calcula a quantidade de valores
             qntd = len(valores)
+
+            # Calcula o valor médio
             valor = soma / qntd
+
+            # Formata o valor médio como moeda
             result = self.formatar_moeda(valor)
-            print(result)
+            
+
             return result
+
         except Exception as e:
-            print(e)
+            # Imprime a exceção com uma mensagem clara
+            print(f"Ocorreu um erro ao calcular o ticket médio: {e}")
+            return None
 
     def passagens(self, mes, ano):
         try:
+            # Obtém os dados de faturamento para o mês e ano fornecidos
             dados = self.db.faturamento_mes(mes, ano)
+
+            # Extrai os valores dos dados
             valores = [dado[0] for dado in dados]
+
+            # Calcula a quantidade de valores
             qntd = len(valores)
-            print(qntd)
+
+            # Imprime a quantidade de passagens
+        
+
             return qntd
         except Exception as e:
-            print(e)
+            # Imprime a exceção com uma mensagem clara
+            print(f"Ocorreu um erro ao obter as passagens: {e}")
+            return None

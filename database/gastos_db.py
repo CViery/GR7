@@ -29,7 +29,7 @@ class GastosDataBase:
 
     def get_all_gastos(self):
         try:
-            query = 'SELECT * FROM notas'
+            query = 'SELECT * FROM notas ORDER BY data_emissao ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -37,9 +37,9 @@ class GastosDataBase:
         except Exception as e:
             print(e)
 
-    def get_gatos_por_tipo(self, tipo, mes, ano):
+    def get_gastos_por_tipo(self, tipo, mes, ano):
         try:
-            query = 'SELECT valor FROM notas WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ? '
+            query = 'SELECT valor FROM notas WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?  '
             self.cursor.execute(query, (tipo, mes, ano))
             result = self.cursor.fetchall()
             return result
@@ -48,7 +48,7 @@ class GastosDataBase:
 
     def get_boletos(self):
         try:
-            query = 'SELECT * FROM boletos'
+            query = 'SELECT * FROM boletos ORDER BY data_vencimento ASC'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -92,7 +92,7 @@ class GastosDataBase:
 
     def get_all_notas(self):
         try:
-            query = 'SELECT * FROM notas'
+            query = 'SELECT * FROM notas ORDER BY data_emissao ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -101,21 +101,28 @@ class GastosDataBase:
 
     def obter_notas_filtradas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
         # Construindo a query SQL
-        query = "SELECT * FROM notas WHERE 1=1"
+        query = "SELECT * FROM notas"
         params = []
+        filters = []
 
         if data_inicio:
-            query += " AND data_emissao >= ?"
+            filters.append( " data_emissao >= ?")
             params.append(data_inicio)
         if data_fim:
-            query += " AND data_emissao <= ?"
+            filters.append(" data_emissao <= ?")
             params.append(data_fim)
         if fornecedor:
-            query += " AND fornecedor = ?"
+            filters.append(" fornecedor = ?")
             params.append(fornecedor)
         if despesa:
-            query += " AND num_nota  = ?"
+            filters.append(" num_nota  = ?")
             params.append(despesa)
+        
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY data_emissao ASC;"
+
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
@@ -145,16 +152,22 @@ class GastosDataBase:
         # Construindo a query SQL
         query = "SELECT * FROM boletos WHERE 1=1"
         params = []
+        filters = []
 
         if data_inicio:
-            query += " AND data_vencimento >= ?"
+            filters.append(" data_vencimento >= ?")
             params.append(data_inicio)
         if data_fim:
-            query += " AND data_vencimento <= ?"
+            filters.append("  data_vencimento <= ?")
             params.append(data_fim)
         if fornecedor:
-            query += " AND fornecedor = ?"
+            filters.append("  fornecedor = ?")
             params.append(fornecedor)
+        
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY data_vencimento ASC;"
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
@@ -256,9 +269,10 @@ class GastosDataBasePortal():
 
     def get_all_gastos(self):
         try:
-            query = 'SELECT * FROM notas_portal'
+            query = 'SELECT * FROM notas_portal ORDER BY data_emissao ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
+            
             return result
 
         except Exception as e:
@@ -275,7 +289,7 @@ class GastosDataBasePortal():
 
     def get_boletos(self):
         try:
-            query = 'SELECT * FROM boletos_portal'
+            query = 'SELECT * FROM boletos_portal ORDER BY data_vencimento ASC'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -319,7 +333,7 @@ class GastosDataBasePortal():
 
     def get_all_notas(self):
         try:
-            query = 'SELECT * FROM notas_portal'
+            query = 'SELECT * FROM notas_portal ORDER BY data_emissao ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -328,26 +342,33 @@ class GastosDataBasePortal():
 
     def obter_notas_filtradas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
         # Construindo a query SQL
-        query = "SELECT * FROM notas_portal WHERE 1=1"
+        query = "SELECT * FROM notas_portal"
         params = []
+        filters = []
 
         if data_inicio:
-            query += " AND data_emissao >= ?"
+            filters.append( " data_emissao >= ?")
             params.append(data_inicio)
         if data_fim:
-            query += " AND data_emissao <= ?"
+            filters.append(" data_emissao <= ?")
             params.append(data_fim)
         if fornecedor:
-            query += " AND fornecedor = ?"
+            filters.append(" fornecedor = ?")
             params.append(fornecedor)
         if despesa:
-            query += " AND num_nota  = ?"
+            filters.append(" num_nota  = ?")
             params.append(despesa)
+        
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY data_emissao ASC;"
+
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
         return resultados
-
+    
     def get_nota_por_numero(self, num_nota):
         try:
             query = 'SELECT * FROM notas_portal WHERE num_nota = ?'
@@ -370,18 +391,24 @@ class GastosDataBasePortal():
 
     def obter_boletos_filtrados(self, data_inicio=None, data_fim=None, fornecedor=None):
         # Construindo a query SQL
-        query = "SELECT * FROM boletos_portal WHERE 1=1"
+        query = "SELECT * FROM boletos WHERE 1=1"
         params = []
+        filters = []
 
         if data_inicio:
-            query += " AND data_vencimento >= ?"
+            filters.append("  data_vencimento >= ?")
             params.append(data_inicio)
         if data_fim:
-            query += " AND data_vencimento <= ?"
+            filters.append("  data_vencimento <= ?")
             params.append(data_fim)
         if fornecedor:
-            query += " AND fornecedor = ?"
+            filters.append("  fornecedor = ?")
             params.append(fornecedor)
+        
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY data_vencimento ASC;"
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()

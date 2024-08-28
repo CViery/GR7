@@ -125,6 +125,13 @@
         pointer-events: none;
         color: #ccc;
     }
+    .infos{
+        display: flex;
+        gap: 5em;
+    }
+    .infos_itens{
+
+    }
 </style>
 {% endblock %}
 
@@ -166,7 +173,16 @@
                 <button type="submit">Filtrar</button>
             </div>
         </form>
-
+        <div class="infos">
+            <div class="infos_item">
+                <h4>Total</h4>
+                <h4>{{valor}}</h4>
+            </div>
+            <div class="infos_item">
+                <h4>Total meta</h4>
+                <h4>{{valor_meta}}</h4>
+            </div>
+        </div>
         <div class="flex-container">
             <div class="flex-item">
                 <h2>Faturamentos Registrados</h2>

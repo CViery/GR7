@@ -4,6 +4,13 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
     body {
         font-family: Arial, sans-serif;
     }
@@ -64,6 +71,15 @@
         display: flex;
         flex-direction: column;
         gap: 20px;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        padding: 10px;
+        margin-bottom: 50em
+    }
+
+    .flex-container h5 {
+        width: 100%;
     }
 
     .flex-item {
@@ -71,6 +87,18 @@
         flex-wrap: wrap;
         gap: 10px;
         align-items: center;
+        text-align: center;
+        background-color: #1a4173;
+        color: white;
+        width: auto;
+        border-radius: 15px;
+        padding: 10px;
+        margin-bottom: 5em;
+
+    }
+
+    .flex-item:hover {
+        transform: scale(1.08);
     }
 
     .submenu {
@@ -123,7 +151,7 @@
 
     .button_for {
         width: 10em;
-        height: 1.5em;
+        height: 3em;
         background-color: white;
         color: black;
         border: 2px solid transparent;
@@ -145,50 +173,233 @@
         border: 2px solid #007BFF;
         /* Borda azul ao passar o mouse */
     }
+
+    .value-container {
+        width: 100%;
+    }
+
+    .description-value {
+        width: 100%;
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0;
+        }
+    }
+
+    .blink {
+        animation: blink 1s infinite;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        background: #1a4173;
+        padding: 20px 15px;
+        border-radius: 12px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-links li {
+        list-style: none;
+        margin: 0 12px;
+    }
+
+    .nav-links li a {
+        position: relative;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 500;
+        padding: 6px 0;
+        text-decoration: none;
+    }
+
+    .nav-links li a:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 0%;
+        background: #34efdf;
+        border-radius: 12px;
+        transition: all 0.4s ease;
+    }
+
+    .nav-links li a:hover:before {
+        width: 100%;
+    }
+
+    .nav-links li.center a:before {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .nav-links li.upward a:before {
+        width: 100%;
+        bottom: -5px;
+        opacity: 0;
+    }
+
+    .nav-links li.upward a:hover:before {
+        bottom: 0px;
+        opacity: 1;
+    }
+
+    .nav-links li.forward a:before {
+        width: 100%;
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.4s ease;
+    }
+
+    .nav-links li.forward a:hover:before {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+
+    select {
+        appearance: none;
+        border: 0;
+        outline: 0;
+        background: none;
+        color: inherit;
+        box-shadow: none;
+    }
+
+    select::-ms-expand {
+        display: none;
+    }
+
+    select option {
+        background-color: black;
+    }
+
+    .select {
+        position: relative;
+        display: flex;
+        width: min(20rem, 90vw);
+        background: #1a4173;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        color: #fff;
+
+        select {
+            flex: 1;
+            padding: 1em;
+            cursor: pointer;
+        }
+
+        &::after {
+            content: "\25BC";
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            transition: 0.25s all ease;
+            pointer-events: none;
+        }
+
+        &:hover::after {
+            color: #34efdf;
+            animation: bounce 0.5s infinite;
+        }
+    }
+
+    @keyframes bounce {
+        25% {
+            transform: translatey(5px);
+        }
+
+        75% {
+            transform: translatey(-5px);
+        }
+    }
 </style>
 {% endblock %}
 
 {% block main %}
 <main>
     <div class="container">
-        <h1>Faturamentos</h1>
+
         <div class="submenu">
-            <a href="/faturamentos/cadastrar"><button class="option">Cadastrar Faturamento</button></a>
-            <a href="/faturamentos/consultar"><button class="option">Consultar Faturamento</button></a>
-            <a href="/faturamentos/editar"><button class="option">Editar Faturamento</button></a>
+            <ul class="nav-links">
+                <li><a href="/faturamentos/cadastrar">Cadastrar Faturamento</a></li>
+                <li class="center"><a href="/faturamentos/consultar">Consultar Faturamento</a></li>
+                <li class="upward"><a href="/faturamentos/editar"></a></li>
+                <li class="forward"><a href=""></a></li>
+            </ul>
+
         </div>
         <form method="POST" action="/faturamento" id="filtroFaturamentosForm">
             <div class="flex-row">
-                <label for="mes">Mês:</label>
-                <select id="mes" name="mes">
-                    <option value="">Selecione o mês</option>
-                    {% for mes in meses %}
-                    <option value="{{ mes[0] }}">{{ mes[1] }}</option>
-                    {% endfor %}
-                </select>
+                <div class="select">
+                    <select id="mes" name="mes">
+                        <option value="">{{mes_escolhido}}</option>
+                        {% for mes in meses %}
+                        <option value="{{ mes[0] }}">{{ mes[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-                <label for="ano">Ano:</label>
-                <select id="ano" name="ano">
-                    <option value="">Selecione o ano</option>
-                    {% for ano in anos %}
-                    <option value="{{ ano }}">{{ ano }}</option>
-                    {% endfor %}
-                </select>
+                <div class="select">
+                    <select id="ano" name="ano">
+                        <option value="{{ano_escolhido}}">{{ano_escolhido}}</option>
+                        {% for ano in anos %}
+                        <option value="{{ ano }}">{{ ano }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
                 <button class="button_for" type="submit">Filtrar</button>
             </div>
         </form>
         <div class="container_dados">
             <div class="flex-item">
-                <h2>Faturamento Total do Mês</h2>
-                <p>Total: {{ valor_faturamento_total }}</p>
+                <h5 class="description-value">Total do Mês</h5>
+                <div class="value-container">
+                    <h5 class="description-value">{{ valor_faturamento_total }}</h5>
+                </div>
+
             </div>
             <div class="flex-item">
-                <h2>Faturamento para Meta</h2>
-                <p>Total: {{ valor_faturamento_meta }}</p>
+                <h5 class="description-value">Meta</h5>
+                <div class="value-container">
+                    {%if valor_meta_int >= 180000 %}
+                    <h5 class="description-value blink">{{ valor_faturamento_meta }}</h5>
+                    {%else%}
+                    <h5 class="description-value">{{ valor_faturamento_meta }}</h5>
+                    {%endif%}
+                </div>
+
             </div>
             <div class="flex-item">
-                <h2>Valor em Dinheiro</h2>
-                <p>Total: {{ valor_dinheiro }}</p>
+                <h5 class="description-value">Dinheiro</h5>
+                <div class="value-container">
+                    <h5 class="description-value">{{ valor_dinheiro }}</h5>
+                </div>
+
+            </div>
+            <div class="flex-item">
+                <h5 class="description-value">Ticket Medio</h5>
+                <div class="value-container">
+                    <h5 class="description-value">{{ ticket }}</h5>
+                </div>
+
+            </div>
+            <div class="flex-item">
+                <h5>Passagens</h5>
+                <div class="value-container">
+                    <h5 class="description-value">{{ passagens }}</h5>
+                </div>
+
             </div>
         </div>
         <div class="accordion" id="accordionExample">
