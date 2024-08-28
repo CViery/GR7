@@ -177,7 +177,7 @@ class Database:
             query = 'SELECT valor_dinheiro FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, mes, ano)
             result = self.cursor.fetchall()
-            print(result)
+            
             return result
         except Exception as e:
             print(e)

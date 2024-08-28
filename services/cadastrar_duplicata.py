@@ -47,7 +47,7 @@ class Boletos:
                 'ano_vencimento':ano,
                 'valor': valor
             }
-            print(boleto)
+           
             self.db.set_boleto(boleto)
 
 
@@ -96,6 +96,6 @@ class BoletosPortal:
                 'ano_vencimento':ano,
                 'valor': valor
             }
-            print(boleto)
+            
             self.db.set_boleto(boleto)
 

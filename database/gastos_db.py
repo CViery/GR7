@@ -385,7 +385,7 @@ class GastosDataBasePortal():
             self.cursor.execute(query1, (numero_duplicata, num_nota))
             self.cursor.execute(query2, (datas, num_nota))
             self.db.conn.commit()
-            print('foi')
+           
         except Exception as e:
             print(e)
 

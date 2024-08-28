@@ -868,8 +868,7 @@ class Routes:
                         try:
                             mes_dados = request.form.get('mes', '')
                             ano_dados = request.form.get('ano', '')
-                            print(mes_dados)
-                            print(ano_dados)
+                           
                             # Verificar se os valores estão corretos
 
                             if mes_dados and ano_dados:
@@ -897,8 +896,7 @@ class Routes:
                                 now = datetime.now()
                                 mes_dados = now.strftime('%m')
                                 ano_dados = now.strftime('%Y')
-                                print(mes_dados)
-                                print(ano_dados)
+                                
                                 valor_faturamento_total = db.faturamento_total_mes(
                                     mes_dados, ano_dados)
                                 valor_faturamento_meta = db.faturamento_meta_mes(
@@ -916,7 +914,7 @@ class Routes:
                                     mes_dados, ano_dados)
                                 valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
                                 mes_select = get_mes_nome(mes_dados)
-                                print(mes_select)
+                               
                                 ano_select = ano_dados
                             return render_template('faturamentos.html',
                                                    anos=anos,
@@ -943,8 +941,7 @@ class Routes:
                         now = datetime.now()
                         mes_dados = now.strftime('%m') 
                         ano_dados = now.strftime('%Y')
-                        print(mes_dados)
-                        print(ano_dados)
+                        
                         valor_faturamento_total = db.faturamento_total_mes(
                             mes_dados, ano_dados)
                         valor_faturamento_meta = db.faturamento_meta_mes(
@@ -961,7 +958,7 @@ class Routes:
                         passagens = services.passagens(mes_dados, ano_dados)
                         valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
                         mes_select = get_mes_nome(mes_dados)
-                        print(mes_select)
+                        
                         ano_select = ano_dados
                         return render_template('faturamentos.html',
                                                anos=anos,
@@ -1033,8 +1030,7 @@ class Routes:
                                 valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
                                 mes_select = get_mes_nome(mes_dados)
                                 ano_select = ano_dados
-                                print(ticket)
-                                print(passagens)
+                                
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
                                 now = datetime.now()
@@ -1096,8 +1092,7 @@ class Routes:
                         valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
                         mes_select = get_mes_nome(mes_dados)
                         ano_select = ano_dados
-                        print(ticket)
-                        print(passagens)
+                        
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -1166,8 +1161,7 @@ class Routes:
                                 valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
                                 mes_select = get_mes_nome(mes_dados)
                                 ano_select = ano_dados
-                                print(ticket)
-                                print(passagens)
+                                
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -1302,7 +1296,7 @@ class Routes:
                     data_fim = request.form.get('data_fim')
                     companhia = request.form.get('companhia')
                     numero_os = request.form.get('num_os')
-                    print(numero_os)
+                    
                     placa = request.form.get('placa')
                     mecanico_servico = request.form.get('mecanico_servico')
 

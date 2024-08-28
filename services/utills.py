@@ -337,8 +337,7 @@ class Utills:
             # Cadastra o fornecedor no banco de dados
             self.db_gastos.set_fornecedor(CNPJ, razao)
 
-            print(f"Fornecedor '{razao}' com CNPJ '{
-                  CNPJ}' cadastrado com sucesso.")
+           
 
         except ValueError as ve:
             # Trata erros de validação de dados

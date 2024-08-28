@@ -278,7 +278,6 @@ class DadosGastosPortal():
         notas = self.db.get_all_notas()
         output = []
         for nota in notas:
-            print(nota)
             data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
             valor_nota = nota[12]
