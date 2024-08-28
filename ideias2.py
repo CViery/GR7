@@ -1,15 +1,38 @@
-# Supondo que valor_soma seja um número
-valor_soma = 1230.5
-
-# Formatando o valor para o formato desejado
-valor_formatado = f'R$ {valor_soma:.2f}'
-valor_formatado = valor_formatado.replace('.', ',')  # Substitui o ponto por vírgula
-
-# Verifica se há necessidade de inserir o ponto de milhar
-if '.' in valor_formatado:
-    partes = valor_formatado.split(',')
-    parte_inteira = partes[0].replace('.', '')
-    parte_decimal = partes[1]
-    valor_formatado = f'R$ {parte_inteira}.{parte_decimal}'
-
-print(valor_formatado)
+0 placa
+1 modelo_veiculo
+2 data_orcamento
+3 data_faturamento
+4 mes_faturamento
+5 ano_faturamento
+6 dias
+7 num_os
+8 cia
+9 conversao_pneustore
+10 pecas
+11 servicos
+12 valor_os
+13 revitalizacao
+14 aditivo
+15 quantidade_aditivo
+16 fluido_sangria
+17 palheta
+18 limpeza_freios
+19 detergente_parabrisa
+20 filtro
+21 pneus
+22 bateria
+23 modelo_bateria
+24 quantidade_oleo
+25 valor_oleo
+26 tipo_marca_oleo
+27 valor_meta
+28 mecanico
+29 filtro_mecanico
+30 valor_dinheiro
+31 freios
+32 suspensao
+33 injecao_ignicao
+34 cabecote_motor_arrefecimento
+35 outros
+36 oleos
+37 transmissao

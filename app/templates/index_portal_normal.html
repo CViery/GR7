@@ -6,33 +6,37 @@
 
 {% block main %}
 <main>
-  <h5> Olá {{user}}, sejá bem-vindo ao Portal da {{empresa}}!
-    <div class="container">
-      <div class="box-infos">
-        <h3>Faturamento</h3>
-        <div>
-          <ul class="dados-container">
-            <li class="dados-home">Faturamento Geral: {{faturamento}}</li>
-            <li class="dados-home">Faturamento Meta: {{faturamento_meta}}</li>
-            <!--<li class="dados-home">Faturamento Peças: {{faturamento_pecas}}</li>
-            <li class="dados-home">Faturamento Serviços: {{faturamento_servicos}}</li> -->
-            <li class="dados-home">Primeira Meta: {{primeira_meta}}</li>
-            <li class="dados-home">Segunda Meta: {{segunda_meta}}</li>
-          </ul>
+  <h4>Faturamento</h4>
+    <div class="box-container">
+      <div class="box box1">
+          <div class="text">
+              <h2 class="topic-heading">{{faturamento}}</h2>
+              <h2 class="topic">Faturamento Mês</h2>
+          </div>
+      </div>
+
+      <div class="box box2">
+          <div class="text">
+              <h2 class="topic-heading">{{faturamento_meta}}</h2>
+              <h2 class="topic">Meta</h2>
+          </div>
+      </div>
+  
+    <div class="box box7">
+        <div class="text">
+            <h2 class="topic-heading">{{ticket}}</h2>
+            <h2 class="topic">Ticket Medio</h2>
         </div>
-      </div>
-      <!--
-      <div class="box-infos">
-        <h3>Despesas</h3>
-      <div>
-        <ul class="dados-container">
-          <li class="dados-home">Valor Gasto: {{valor_gastos}}</li>
-          <li class="dados-home">% sobre o faturamento: {{porcentagem_faturamento}}</li>
-          <li class="dados-home">Gasto em Peças: {{gastos_pecas}}</li>
-          <li class="dados-home">% pecas sobre a venda: {{porcentagem_pecas}}</li>
-        </ul>
-      </div>
-      </div> -->
+    </div>
+
+    <div class="box box8">
+        <div class="text">
+            <h2 class="topic-heading">{{passagens}}</h2>
+            <h2 class="topic">Passagens</h2>
+        </div>
+    </div>
+    </div>
+
     </div>
 </main>
 

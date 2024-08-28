@@ -1,6 +1,6 @@
 from app import app
 from flask import request, redirect, render_template, flash, session, jsonify
-from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills
+from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills, xlxs
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
 from database import gastos_db
@@ -96,7 +96,10 @@ class Routes:
                 gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
                 porcentagem_pecas = utils.porcentagem_gastos_pecas(
                     mes_dados, ano_dados)
-                return render_template('index.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
+                passagens = utils.passagens(mes_dados, ano_dados)
+                ticket = utils.ticket(mes_dados, ano_dados)
+                
+                return render_template('index.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas, ticket=ticket, passagens=passagens)
             else:
                 flash('Você não tem permissão para acessar essa pagina')
                 return redirect('/')
@@ -402,8 +405,23 @@ class Routes:
 
     @app.route('/gastos', methods=['GET', 'POST'])
     def tela_gastos():
+        def get_mes_nome(mes_codigo):
+                match mes_codigo:
+                    case "01": return 'Janeiro'
+                    case "02": return "Fevereiro"
+                    case "03": return "Março"
+                    case "04": return "Abril"
+                    case "05": return "Maio"
+                    case "06": return "Junho"
+                    case "07": return "Julho"
+                    case "08": return "Agosto"
+                    case "09": return "Setembro"
+                    case "10": return "Outubro"
+                    case "11": return "Novembro"
+                    case "12": return "Dezembro"
         if 'usuario' in session:
             if session['empresa'] == 'gr7':
+                
                 empresa = session['empresa']
                 db = dados_notas.DadosGastos()
                 meses = [
@@ -431,6 +449,8 @@ class Routes:
 
                         dados_tipos = db.despesas(mes_dados, ano_dados)
                         valor_gasto = db.valor_gastos(mes_dados, ano_dados)
+                        mes_select = get_mes_nome(mes_dados)
+                        ano_select = ano_dados
 
                     else:
                         # Usar data atual se não houver filtros específicos para despesas
@@ -440,6 +460,8 @@ class Routes:
                         ano_dados = now.strftime('%Y')
                         dados_tipos = db.despesas(mes_dados, ano_dados)
                         valor_gasto = db.valor_gastos(mes_dados, ano_dados)
+                        mes_select = get_mes_nome(mes_dados)
+                        ano_select = ano_dados
 
                     if 'dia' in request.form:
                         # Processar formulário de filtro de boletos
@@ -449,6 +471,7 @@ class Routes:
                         ano = data[:4]
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
+                        dia = data
                     else:
                         # Usar data atual se não houver filtro específico para boletos
                         now = datetime.now()
@@ -457,8 +480,9 @@ class Routes:
                         ano = now.strftime('%Y')
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
+                        dia = data
 
-                    return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar)
+                    return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar, mes_escolhido = mes_select, ano_escolhido = ano_select, dia=dia)
                 else:
                     # Caso seja uma requisição GET, usar a data atual
                     now = datetime.now()
@@ -469,7 +493,10 @@ class Routes:
                     boletos = db.boletos_do_dia(dia, mes, ano)
                     valor_gasto = db.valor_gastos(mes, ano)
                     valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
-                    return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar)
+                    mes_select = get_mes_nome(mes)
+                    ano_select = ano
+                    dia = now
+                    return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar,mes_escolhido = mes_select, ano_escolhido = ano_select, dia=dia)
             if session['empresa'] == 'portal':
                 if session['permission'] == 'ADMIN':
                     empresa = session['empresa']
@@ -500,6 +527,8 @@ class Routes:
 
                             dados_tipos = db.despesas(mes_dados, ano_dados)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
+                            mes_select = get_mes_nome(mes_dados)
+                            ano_select = ano_dados
 
                         else:
                             # Usar data atual se não houver filtros específicos para despesas
@@ -509,6 +538,8 @@ class Routes:
                             ano_dados = now.strftime('%Y')
                             dados_tipos = db.despesas(mes_dados, ano_dados)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
+                            mes_select = get_mes_nome(mes_dados)
+                            ano_select = ano_dados
 
                         if 'dia' in request.form:
                             # Processar formulário de filtro de boletos
@@ -518,6 +549,8 @@ class Routes:
                             ano = data[:4]
                             boletos = db.boletos_do_dia(dia, mes, ano)
                             valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
+                            mes_select = get_mes_nome(mes)
+                            ano_select = ano
                         else:
                             # Usar data atual se não houver filtro específico para boletos
                             now = datetime.now()
@@ -526,8 +559,10 @@ class Routes:
                             ano = now.strftime('%Y')
                             boletos = db.boletos_do_dia(dia, mes, ano)
                             valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
+                            mes_select = get_mes_nome(mes)
+                            ano_select = ano
 
-                        return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar)
+                        return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar,mes_escolhido = mes_select, ano_escolhido = ano_select, dia=dia)
                     else:
                         # Caso seja uma requisição GET, usar a data atual
                         now = datetime.now()
@@ -538,7 +573,9 @@ class Routes:
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_gasto = db.valor_gastos(mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
-                        return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar)
+                        mes_select = get_mes_nome(mes)
+                        ano_select = ano
+                        return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar,mes_escolhido = mes_select, ano_escolhido = ano_select, dia=dia)
                 elif session['permission'] == 'NORMAL':
                     empresa = session['empresa']
                     return render_template('resposta_permissao.html', empresa=empresa)
@@ -707,10 +744,10 @@ class Routes:
                     despesa = request.form.get('despesa')
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
-                    print(f'Notas: {notas}')
+                   
                     valor = db.filtrar_notas_valor(
                         data_inicio, data_fim, fornecedor, despesa)
-                    print(f'Valor: {valor}')
+                    
                 elif data_inicio or data_fim or fornecedor or despesa:
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa)
@@ -796,6 +833,21 @@ class Routes:
         if 'usuario' in session:
             if session['empresa'] == 'gr7':
                 if session['permission'] == 'ADMIN':
+                    def get_mes_nome(mes_codigo):
+                        match mes_codigo:
+                            case "01": return 'Janeiro'
+                            case "02": return "Fevereiro"
+                            case "03": return "Março"
+                            case "04": return "Abril"
+                            case "05": return "Maio"
+                            case "06": return "Junho"
+                            case "07": return "Julho"
+                            case "08": return "Agosto"
+                            case "09": return "Setembro"
+                            case "10": return "Outubro"
+                            case "11": return "Novembro"
+                            case "12": return "Dezembro"
+                            
                     empresa = session['empresa']
                     db = faturamento.Faturamento()
                     services = utills.Utills()
@@ -816,11 +868,11 @@ class Routes:
                         try:
                             mes_dados = request.form.get('mes', '')
                             ano_dados = request.form.get('ano', '')
-
+                            print(mes_dados)
+                            print(ano_dados)
                             # Verificar se os valores estão corretos
 
                             if mes_dados and ano_dados:
-                                # Processar filtro de faturamentos
                                 valor_faturamento_total = db.faturamento_total_mes(
                                     mes_dados, ano_dados)
                                 valor_faturamento_meta = db.faturamento_meta_mes(
@@ -836,12 +888,17 @@ class Routes:
                                 ticket = services.ticket(mes_dados, ano_dados)
                                 passagens = services.passagens(
                                     mes_dados, ano_dados)
+                                valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                                mes_select = get_mes_nome(mes_dados)
+                                ano_select = ano_dados
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
                                 now = datetime.now()
                                 mes_dados = now.strftime('%m')
                                 ano_dados = now.strftime('%Y')
+                                print(mes_dados)
+                                print(ano_dados)
                                 valor_faturamento_total = db.faturamento_total_mes(
                                     mes_dados, ano_dados)
                                 valor_faturamento_meta = db.faturamento_meta_mes(
@@ -857,6 +914,10 @@ class Routes:
                                 ticket = services.ticket(mes_dados, ano_dados)
                                 passagens = services.passagens(
                                     mes_dados, ano_dados)
+                                valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                                mes_select = get_mes_nome(mes_dados)
+                                print(mes_select)
+                                ano_select = ano_dados
                             return render_template('faturamentos.html',
                                                    anos=anos,
                                                    meses=meses,
@@ -867,7 +928,10 @@ class Routes:
                                                    faturamento_servico=faturamento_servico,
                                                    empresa=empresa, valor_dinheiro=valor_dinheiro,
                                                    ticket=ticket,
-                                                   passagens=passagens
+                                                   passagens=passagens,
+                                                   valor_meta_int=valor_meta_int,
+                                                   mes_escolhido = mes_select,
+                                                   ano_escolhido = ano_select
                                                    )
                         except Exception as e:
                             print(
@@ -877,8 +941,10 @@ class Routes:
                     else:
                         # Caso seja uma requisição GET, usar a data atual
                         now = datetime.now()
-                        mes_dados = now.strftime('%m')
+                        mes_dados = now.strftime('%m') 
                         ano_dados = now.strftime('%Y')
+                        print(mes_dados)
+                        print(ano_dados)
                         valor_faturamento_total = db.faturamento_total_mes(
                             mes_dados, ano_dados)
                         valor_faturamento_meta = db.faturamento_meta_mes(
@@ -893,6 +959,10 @@ class Routes:
                             mes_dados, ano_dados)
                         ticket = services.ticket(mes_dados, ano_dados)
                         passagens = services.passagens(mes_dados, ano_dados)
+                        valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                        mes_select = get_mes_nome(mes_dados)
+                        print(mes_select)
+                        ano_select = ano_dados
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -901,9 +971,25 @@ class Routes:
                                                faturamento_mecanicos=faturamento_mecanicos,
                                                faturamento_companhia=faturamento_cias,
                                                faturamento_servico=faturamento_servico,
-                                               empresa=empresa, valor_dinheiro=valor_dinheiro, ticket=ticket, passagens=passagens)
+                                               empresa=empresa, valor_dinheiro=valor_dinheiro, ticket=ticket, passagens=passagens, valor_meta_int=valor_meta_int, mes_escolhido=mes_select,
+                                               ano_escolhido=ano_select)
+                    
             elif session['empresa'] == 'portal':
                 if session['permission'] == 'ADMIN':
+                    def get_mes_nome(mes_codigo):
+                        match mes_codigo:
+                            case "01": return 'Janeiro'
+                            case "02": return "Fevereiro"
+                            case "03": return "Março"
+                            case "04": return "Abril"
+                            case "05": return "Maio"
+                            case "06": return "Junho"
+                            case "07": return "Julho"
+                            case "08": return "Agosto"
+                            case "09": return "Setembro"
+                            case "10": return "Outubro"
+                            case "11": return "Novembro"
+                            case "12": return "Dezembro"
                     empresa = session['empresa']
                     db = faturamento.FaturamentoPortal()
                     services = utills.Utills_portal()
@@ -944,7 +1030,11 @@ class Routes:
                                 ticket = services.ticket(mes_dados, ano_dados)
                                 passagens = services.passagens(
                                     mes_dados, ano_dados)
-
+                                valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                                mes_select = get_mes_nome(mes_dados)
+                                ano_select = ano_dados
+                                print(ticket)
+                                print(passagens)
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
                                 now = datetime.now()
@@ -965,7 +1055,9 @@ class Routes:
                                 ticket = services.ticket(mes_dados, ano_dados)
                                 passagens = services.passagens(
                                     mes_dados, ano_dados)
-
+                                valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                                mes_select = get_mes_nome(mes_dados)
+                                ano_select = ano_dados
                             return render_template('faturamentos.html',
                                                    anos=anos,
                                                    meses=meses,
@@ -975,7 +1067,9 @@ class Routes:
                                                    faturamento_companhia=faturamento_cias,
                                                    faturamento_servico=faturamento_servico,
                                                    empresa=empresa, ticket=ticket,
-                                                   passagens=passagens)
+                                                   passagens=passagens,
+                                                   valor_meta_int=valor_meta_int,mes_escolhido=mes_select,
+                                               ano_escolhido=ano_select,valor_dinheiro=valor_dinheiro)
                         except Exception as e:
                             print(
                                 f"Ocorreu um erro ao processar o formulário: {e}")
@@ -999,6 +1093,11 @@ class Routes:
                             mes_dados, ano_dados)
                         ticket = services.ticket(mes_dados, ano_dados)
                         passagens = services.passagens(mes_dados, ano_dados)
+                        valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                        mes_select = get_mes_nome(mes_dados)
+                        ano_select = ano_dados
+                        print(ticket)
+                        print(passagens)
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -1007,8 +1106,23 @@ class Routes:
                                                faturamento_mecanicos=faturamento_mecanicos,
                                                faturamento_companhia=faturamento_cias,
                                                faturamento_servico=faturamento_servico,
-                                               empresa=empresa, ticket=ticket, passagens=passagens)
+                                               empresa=empresa, ticket=ticket, passagens=passagens, valor_meta_int=valor_meta_int,mes_escolhido=mes_select,
+                                               ano_escolhido=ano_select,valor_dinheiro=valor_dinheiro)
                 elif session['permission'] == 'NORMAL':
+                    def get_mes_nome(mes_codigo):
+                        match mes_codigo:
+                            case "01": return 'Janeiro'
+                            case "02": return "Fevereiro"
+                            case "03": return "Março"
+                            case "04": return "Abril"
+                            case "05": return "Maio"
+                            case "06": return "Junho"
+                            case "07": return "Julho"
+                            case "08": return "Agosto"
+                            case "09": return "Setembro"
+                            case "10": return "Outubro"
+                            case "11": return "Novembro"
+                            case "12": return "Dezembro"
                     empresa = session['empresa']
                     db = faturamento.FaturamentoPortal()
                     services = utills.Utills_portal()
@@ -1049,6 +1163,11 @@ class Routes:
                                 ticket = services.ticket(mes_dados, ano_dados)
                                 passagens = services.passagens(
                                     mes_dados, ano_dados)
+                                valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                                mes_select = get_mes_nome(mes_dados)
+                                ano_select = ano_dados
+                                print(ticket)
+                                print(passagens)
 
                             else:
                                 # Usar data atual se não houver filtros específicos para faturamentos
@@ -1070,6 +1189,10 @@ class Routes:
                                 ticket = services.ticket(mes_dados, ano_dados)
                                 passagens = services.passagens(
                                     mes_dados, ano_dados)
+                                valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                                mes_select = get_mes_nome(mes_dados)
+                                ano_select = ano_dados
+                               
 
                             return render_template('faturamentos.html',
                                                    anos=anos,
@@ -1080,7 +1203,8 @@ class Routes:
                                                    faturamento_companhia=faturamento_cias,
                                                    faturamento_servico=faturamento_servico,
                                                    empresa=empresa, ticket=ticket,
-                                                   passagens=passagens)
+                                                   passagens=passagens, valor_meta_int=valor_meta_int,mes_escolhido=mes_select,
+                                               ano_escolhido=ano_select,valor_dinheiro=valor_dinheiro)
                         except Exception as e:
                             print(
                                 f"Ocorreu um erro ao processar o formulário: {e}")
@@ -1102,6 +1226,11 @@ class Routes:
                             mes_dados, ano_dados)
                         ticket = services.ticket(mes_dados, ano_dados)
                         passagens = services.passagens(mes_dados, ano_dados)
+                        mes_select = get_mes_nome(mes_dados)
+                        ano_select = ano_dados
+                        valor_meta_int = db.faturamento_meta_mes_int(mes_dados, ano_dados)
+                        valor_dinheiro = db.faturamento_dinheiro(
+                                    mes_dados, ano_dados)
                         return render_template('faturamentos.html',
                                                anos=anos,
                                                meses=meses,
@@ -1110,7 +1239,8 @@ class Routes:
                                                faturamento_mecanicos=faturamento_mecanicos,
                                                faturamento_companhia=faturamento_cias,
                                                faturamento_servico=faturamento_servico,
-                                               empresa=empresa, ticket=ticket, passagens=passagens)
+                                               empresa=empresa, ticket=ticket, passagens=passagens, valor_meta_int=valor_meta_int,mes_escolhido=mes_select,
+                                               ano_escolhido=ano_select,valor_dinheiro=valor_dinheiro)
 
         else:
             print('Usuário não está logado')
@@ -1133,7 +1263,7 @@ class Routes:
                 cias = db.companhias()
               # Exemplo, substitua com os valores reais
                 mecanicos = db.funcionarios()
-                print(empresa)
+                
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos)
         else:
             print('Usuário não está logado')
@@ -1159,26 +1289,37 @@ class Routes:
                 empresa = session['empresa']
                 # Certifique-se de passar a conexão com o banco de dados
                 db = faturamento.Faturamento()
-
+                
                 # Listas para preencher os selects
                 cias = db.companhias()
 
                 mecanicos = db.funcionarios()
 
+                exportar = None
+                
                 if request.method == 'POST':
                     data_inicio = request.form.get('data_inicio')
                     data_fim = request.form.get('data_fim')
                     companhia = request.form.get('companhia')
-                    numero_os = request.form.get('numero_os')
+                    numero_os = request.form.get('num_os')
+                    print(numero_os)
                     placa = request.form.get('placa')
                     mecanico_servico = request.form.get('mecanico_servico')
 
                     # Implementar a lógica para buscar os faturamentos no banco de dados com base nos filtros
                     faturamentos = db.filtrar_os(
                         data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
+                    
+                    valor = db.filtrar_os_valor(data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
+                    valor_meta = db.filtrar_os_valor_meta(data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
+                        
                 else:
                     # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
                     faturamentos = db.faturamentos_gerais()
+                    valor = db.faturamentos_gerais_valor()
+                    valor_meta = db.faturamentos_gerais_valor_meta()
+                    
+                        
 
                 if faturamentos is None:
                     faturamentos = []
@@ -1187,7 +1328,7 @@ class Routes:
                                        empresa=empresa,
                                        cias=cias,
                                        mecanicos=mecanicos,
-                                       faturamentos=faturamentos)
+                                       faturamentos=faturamentos, valor=valor, valor_meta=valor_meta)
 
             elif session['empresa'] == 'portal':
                 empresa = session['empresa']
@@ -1203,7 +1344,7 @@ class Routes:
                     data_inicio = request.form.get('data_inicio')
                     data_fim = request.form.get('data_fim')
                     companhia = request.form.get('companhia')
-                    numero_os = request.form.get('numero_os')
+                    numero_os = request.form.get('num_os')
                     placa = request.form.get('placa')
                     mecanico_servico = request.form.get('mecanico_servico')
 
@@ -1211,9 +1352,15 @@ class Routes:
 
                     faturamentos = db.filtrar_os(
                         data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
+                    valor = db.filtrar_os_valor(data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
+                    valor_meta = db.filtrar_os_valor_meta(data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
+                    
                 else:
                     # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
                     faturamentos = db.faturamentos_gerais()
+                    valor = db.faturamentos_gerais_valor()
+                    valor_meta = db.faturamentos_gerais_valor_meta()
+                    
 
                 if faturamentos is None:
                     faturamentos = []
@@ -1224,10 +1371,30 @@ class Routes:
                                        empresa=empresa,
                                        cias=cias,
                                        mecanicos=mecanicos,
-                                       faturamentos=faturamentos)
+                                       faturamentos=faturamentos,valor=valor, valor_meta=valor_meta)
 
             else:
                 return redirect('/')
+
+    @app.route('/baixar')
+    def baixar_excel():
+        if 'usuario' in session:
+            if 'dados_exportar' in session:
+                dados = session['dados_exportar']
+                excel = xlxs.GerarExcel()
+                arquivo = excel.exportar_faturamentos_excel(dados)
+                
+                if arquivo:
+                    return arquivo
+                else:
+                    print('Erro ao gerar o arquivo Excel.')
+                    return redirect('/faturamentos/consultar')
+            else:
+                print('Dados para exportação não encontrados na sessão.')
+                return redirect('/faturamentos/consultar')
+        else:
+            print('Usuário não está logado.')
+            return redirect('/')
 
     @app.route('/cadastros/companhias')
     def tela_cadastro_companhia():

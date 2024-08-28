@@ -147,7 +147,7 @@ class Database:
 
     def faturamento_geral(self):
         try:
-            query = 'SELECT * FROM faturamento'
+            query = 'SELECT * FROM faturamento ORDER BY data_faturamento ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -184,32 +184,37 @@ class Database:
 
     def obter_ordens_filtradas(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         # Construindo a query SQL
-        query = "SELECT * FROM faturamento WHERE 1=1"
+        query = "SELECT * FROM faturamento"
         params = []
+        filters = []
 
         if data_inicio:
-            query += " AND data_faturamento >= ?"
+            filters.append("data_faturamento >= ?")
             params.append(data_inicio)
         if data_fim:
-            query += " AND data_faturamento <= ?"
+            filters.append("data_faturamento <= ?")
             params.append(data_fim)
         if mecanico:
-            query += " AND mecanico = ?"
+            filters.append("mecanico = ?")
             params.append(str(mecanico))
         if placa:
-            query += " AND placa  = ?"
+            filters.append("placa = ?")
             params.append(placa)
         if num_os:
-            query += ' AND num_os = ?'
+            filters.append("num_os = ?")
             params.append(num_os)
         if cia:
-            query += ' AND cia = ?'
+            filters.append("cia = ?")
             params.append(cia)
+
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY data_faturamento ASC;"
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
         return resultados
-
 
 class DatabasePortal:
     def __init__(self):
@@ -355,7 +360,7 @@ class DatabasePortal:
 
     def faturamento_geral(self):
         try:
-            query = 'SELECT * FROM faturamento_portal'
+            query = 'SELECT * FROM faturamento_portal ORDER BY data_faturamento ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -391,27 +396,33 @@ class DatabasePortal:
 
     def obter_ordens_filtradas(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         # Construindo a query SQL
-        query = "SELECT * FROM faturamento_portal WHERE 1=1"
+        query = "SELECT * FROM faturamento_portal"
         params = []
+        filters = []
 
         if data_inicio:
-            query += " AND data_faturamento >= ?"
+            filters.append("data_faturamento >= ?")
             params.append(data_inicio)
         if data_fim:
-            query += " AND data_faturamento <= ?"
+            filters.append("data_faturamento <= ?")
             params.append(data_fim)
         if mecanico:
-            query += " AND mecanico = ?"
+            filters.append("mecanico = ?")
             params.append(str(mecanico))
         if placa:
-            query += " AND placa  = ?"
+            filters.append("placa = ?")
             params.append(placa)
         if num_os:
-            query += ' AND num_os = ?'
+            filters.append("num_os = ?")
             params.append(num_os)
         if cia:
-            query += ' AND cia = ?'
+            filters.append("cia = ?")
             params.append(cia)
+
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY data_faturamento ASC;"
 
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()

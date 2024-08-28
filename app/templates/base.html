@@ -1,35 +1,188 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="{{url_for('static', filename= 'css/header.css')}}">
-  <link rel="stylesheet" href="{{url_for('static', filename= 'css/index.css')}}">
   
-  {%block title%}
-  {%endblock%}
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/remixicon@2.2.0/fonts/remixicon.css'>
+  <link rel='stylesheet' href='https://unpkg.com/css-pro-layout@1.1.0/dist/css/css-pro-layout.css'>
+  <link rel='stylesheet'
+    href='https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&amp;display=swap'>
+  <link rel="stylesheet" href="{{url_for('static', filename= 'css/style.css')}}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  {% block title %}{%endblock%}
 </head>
+
 <body>
-  <header class="header_style">
-    <nav class="nav_bar">
-      {% if empresa == 'gr7' %}
-        <p>GR7</p>
-      {% elif empresa == 'portal' %}
-        <p>Portal</p>
-      {% else %}
-        <p>Teste</p>
-      {% endif %}
-      <ul class="nav_links">
-        <li><a class="link_style" href="/home">Inicio</a></li>
-        <li><a class="link_style" href="/gastos">Gastos</a></li>
-        <li><a class="link_style" href="/faturamento">Faturamento</a></li>
-        <li><a class="link_style" href="/cadastros">Cadastros</a></li>
-        <li><a class="link_style" href="/logout">Sair</a></li>
-      </ul>
-    </nav>
-  </header>
-  {%block main%}
-  {%endblock%}
+  <!-- partial:index.partial.html -->
+  <div class="layout has-sidebar fixed-sidebar fixed-header">
+    <aside id="sidebar" class="sidebar break-point-sm has-bg-image">
+      <a id="btn-collapse" class="sidebar-collapser"><i class="ri-arrow-left-s-line"></i></a>
+      <div class="image-wrapper">
+        <img src="assets/images/sidebar-bg.jpg" alt="sidebar background" />
+      </div>
+      <div class="sidebar-layout">
+        <div class="sidebar-header">
+          <div class="pro-sidebar-logo">
+            <div>G</div>
+            <h5>{{empresa}} GESTÃO</h5>
+          </div>
+        </div>
+        <div class="sidebar-content">
+          <nav class="menu open-current-submenu">
+            <ul>
+              <li class="menu-header"><span> GERAL </span></li>
+              <li class="menu-item sub-menu">
+                <a href="/home">
+                  <span class="menu-icon">
+                    <i class="bi bi-house"></i>
+                  </span>
+                  <span class="menu-title">INICIO</span>
+                </a>
+                <div class="sub-menu-list">
+                </div>
+              </li>
+              <li class="menu-item sub-menu">
+                <a href="/gastos">
+                  <span class="menu-icon">
+                    <i class="ri-shopping-cart-fill"></i>
+                  </span>
+                  <span class="menu-title">GASTOS</span>
+                </a>
+                <div class="sub-menu-list">
+                  <ul>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">INICIO</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">CADASTRAR NOTAS</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">CADASTRAR BOLETOS</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">CONSULTAR NOTAS</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">CONSULTAR BOLETOS</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="menu-item sub-menu">
+                <a href="/faturamento">
+                  <span class="menu-icon">
+                    <i class="bi bi-cash-stack"></i>
+
+                  </span>
+                  <span class="menu-title">FATURAMENTO</span>
+                </a>
+                <div class="sub-menu-list">
+                  <ul>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Cadastrar Ordem de Serviço</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Consultar</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Editar</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="menu-item sub-menu">
+                <a href="/cadastros">
+                  <span class="menu-icon">
+                    <i class="bi bi-plus"></i>
+                  </span>
+                  <span class="menu-title">Cadastros</span>
+                </a>
+                <div class="sub-menu-list">
+                  <ul>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Baterias</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Companhia</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Despesa</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Fornecedor</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Funcionarios</span>
+                      </a>
+                    </li>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Óleos</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="menu-item sub-menu">
+                <a href="/logout">
+                  <span class="menu-icon">
+                    <i class="bi bi-box-arrow-left"></i>
+                  </span>
+                  <span class="menu-title">Sair</span>
+                </a>
+                <div class="sub-menu-list">
+                  <ul>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">Editar</span>
+                      </a>
+                    </li>
+
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </nav>
+        </div>
+    </aside>
+    <div id="overlay" class="overlay"></div>
+    <div class="layout">
+      <main class="content">
+        {%block main%}
+        {%endblock%}
+      </main>
+      <div class="overlay"></div>
+    </div>
+  </div>
+  <!-- partial -->
+  <script src='https://unpkg.com/@popperjs/core@2'></script>
+  <script src="{{url_for('static', filename= 'js/script.js')}}"></script>
 </body>
+
 </html>
