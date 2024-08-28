@@ -211,8 +211,7 @@ class Utills:
         try:
             # Obtém o valor total de gastos para o mês e ano fornecidos
             valor = self.db_dados_notas.valor_gastos(mes, ano)
-            valor_moeda = self.formatar_moeda(valor)
-            return valor_moeda
+            return valor
         except Exception as e:
             # Imprime a exceção com uma mensagem clara
             print(f"Ocorreu um erro ao obter os gastos para {mes}/{ano}: {e}")
