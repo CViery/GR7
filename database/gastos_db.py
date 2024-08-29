@@ -74,7 +74,7 @@ class GastosDataBase:
 
     def get_despesas(self):
         try:
-            query = 'SELECT * FROM despesa'
+            query = 'SELECT * FROM despesa ORDER BY despesa ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -184,7 +184,7 @@ class GastosDataBase:
 
     def get_fornecedores(self):
         try:
-            query = 'SELECT * FROM fornecedores '
+            query = 'SELECT * FROM fornecedores ORDER BY nome ASC; '
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -193,7 +193,7 @@ class GastosDataBase:
 
     def get_recebedor(self):
         try:
-            query = 'SELECT * FROM emitido_para'
+            query = 'SELECT * FROM emitido_para ORDER BY nome ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -315,7 +315,7 @@ class GastosDataBasePortal():
 
     def get_despesas(self):
         try:
-            query = 'SELECT * FROM despesa_portal'
+            query = 'SELECT * FROM despesa_portal ORDER BY despesa ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -434,7 +434,7 @@ class GastosDataBasePortal():
 
     def get_recebedor(self):
         try:
-            query = 'SELECT * FROM emitido_para_portal'
+            query = 'SELECT * FROM emitido_para_portal ORDER BY nome ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result

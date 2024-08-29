@@ -89,7 +89,7 @@ class Database:
 
     def get_mecanicos(self):
         try:
-            query = 'SELECT nome FROM funcionarios '
+            query = 'SELECT nome FROM funcionarios ORDER BY nome ASC; '
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -109,7 +109,7 @@ class Database:
 
     def get_cias(self):
         try:
-            query = 'SELECT * FROM companhias'
+            query = 'SELECT * FROM companhias ORDER BY CAST(cia AS NVARCHAR(MAX)) ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -302,7 +302,7 @@ class DatabasePortal:
 
     def get_mecanicos(self):
         try:
-            query = 'SELECT nome FROM funcionarios_portal'
+            query = 'SELECT nome FROM funcionarios_portal ORDER BY nome ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -322,7 +322,7 @@ class DatabasePortal:
 
     def get_cias(self):
         try:
-            query = 'SELECT * FROM companhias_portal'
+            query = 'SELECT * FROM companhias ORDER BY CAST(cia AS NVARCHAR(MAX)) ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
