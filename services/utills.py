@@ -496,12 +496,18 @@ class Utills_portal():
         return lista
 
     def cadastrar_fornecedor(self, dados):
-        CNPJ = dados['cnpj']
-        razao = dados['nome_empresa']
-        self.db_gastos.set_fornecedor(CNPJ, razao)
+        try:
+            CNPJ = dados['cnpj']
+            razao = dados['nome_empresa']
+            self.db_gastos.set_fornecedor(CNPJ, razao)
 
-        print(f"Ocorreu um erro ao calcular a segunda meta: {e}")
-        return None
+        except ValueError as ve:
+            # Trata erros de validação de dados
+            print(f"Erro de validação: {ve}")
+
+        except Exception as e:
+            # Trata outros erros
+            print(f"Ocorreu um erro ao cadastrar o fornecedor: {e}")
 
     def ticket(self, mes, ano):
         try:
