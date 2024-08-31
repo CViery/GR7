@@ -150,7 +150,7 @@ class GastosDataBase:
 
     def obter_boletos_filtrados(self, data_inicio=None, data_fim=None, fornecedor=None):
         # Construindo a query SQL
-        query = "SELECT * FROM boletos WHERE 1=1"
+        query = "SELECT * FROM boletos"
         params = []
         filters = []
 
@@ -391,7 +391,7 @@ class GastosDataBasePortal():
 
     def obter_boletos_filtrados(self, data_inicio=None, data_fim=None, fornecedor=None):
         # Construindo a query SQL
-        query = "SELECT * FROM boletos WHERE 1=1"
+        query = "SELECT * FROM boletos "
         params = []
         filters = []
 
