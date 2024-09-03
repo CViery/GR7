@@ -259,7 +259,7 @@ class Routes:
                     db.cadastrar(boleto)
 
                     flash('Boleto Cadastrado')
-                    return redirect('/gastos/cadastros/notas')
+                return redirect('/gastos/cadastros/notas')
             except Exception as e:
                 print(f'Erro: {e}')
                 return "Erro no processamento dos dados", 400
@@ -288,7 +288,7 @@ class Routes:
                     db.cadastrar(boleto)
 
                     flash('Boleto Cadastrado')
-                    return redirect('/gastos/cadastros/notas')
+                return redirect('/gastos/cadastros/notas')
             except Exception as e:
                 print(f'Erro: {e}')
                 return "Erro no processamento dos dados", 400
