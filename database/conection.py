@@ -11,9 +11,9 @@ class Database:
 
     def cadastrar_faturamento(self, dados):
         try:
-            query = 'INSERT INTO faturamento VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            query = 'INSERT INTO faturamento VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             self.cursor.execute(query, (dados['placa'], dados['modelo_veiculo'], dados['data_orcamento'], dados['data_faturamento'], dados['mes_faturamento'], dados['ano_faturamento'], dados['dias_servico'], dados['numero_os'], dados['companhia'], dados['conversao_ps'], dados['valor_pecas'], dados['valor_servicos'], dados['total_os'], dados['valor_revitalizacao'], dados['valor_aditivo'], dados['quantidade_litros'], dados['valor_fluido_sangria'], dados['valor_palheta'], dados['valor_limpeza_freios'], dados['valor_pastilha_parabrisa'],
-                                dados['valor_filtro'], dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'], dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'],  dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'], dados['valor_servicos_oleos'], dados['valor_servico_transmissao']))
+                                dados['valor_filtro'], dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'], dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'],  dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'], dados['valor_servicos_oleos'], dados['valor_servico_transmissao'], dados['usuario'], dados['obs']))
             self.conn.commit()
         except Exception as e:
             print(e)
@@ -215,7 +215,12 @@ class Database:
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
         return resultados
-
+    
+    def buscar_os_by_number(self, num_os):
+        self.cursor.execute('SELECT * FROM faturamento WHERE num_os = ?', (num_os,))
+        result = self.cursor.fetchone()
+        return result
+    
 class DatabasePortal:
     def __init__(self):
         conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7server.database.windows.net,1433;Database=admingr7;Uid=cristian;Pwd=viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
@@ -224,9 +229,9 @@ class DatabasePortal:
 
     def cadastrar_faturamento(self, dados):
         try:
-            query = 'INSERT INTO faturamento_portal VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            query = 'INSERT INTO faturamento_portal VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             self.cursor.execute(query, (dados['placa'], dados['modelo_veiculo'], dados['data_orcamento'], dados['data_faturamento'], dados['mes_faturamento'], dados['ano_faturamento'], dados['dias_servico'], dados['numero_os'], dados['companhia'], dados['conversao_ps'], dados['valor_pecas'], dados['valor_servicos'], dados['total_os'], dados['valor_revitalizacao'], dados['valor_aditivo'], dados['quantidade_litros'], dados['valor_fluido_sangria'], dados['valor_palheta'], dados['valor_limpeza_freios'], dados['valor_pastilha_parabrisa'],
-                                dados['valor_filtro'], dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'], dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'],  dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'], dados['valor_servicos_oleos'], dados['valor_servico_transmissao']))
+                                dados['valor_filtro'], dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'], dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'],  dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'], dados['valor_servicos_oleos'], dados['valor_servico_transmissao'], dados['usuario'], dados['obs']))
             self.conn.commit()
         except Exception as e:
             print(e)

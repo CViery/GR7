@@ -8,9 +8,9 @@ class GastosDataBase:
 
     def set_nota(self, nota):
         try:
-            query = 'INSERT INTO notas VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            query = 'INSERT INTO notas VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             self.cursor.execute(query, (nota['pago_por'], nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], nota['duplicata'], nota['fornecedor'],
-                                nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], nota['despesa'], ))
+                                nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], nota['despesa'], nota['obs'],nota['usuario'] ))
             result = 'Nota Cadastrada'
             self.db.conn.commit()
         except Exception as e:
@@ -248,9 +248,9 @@ class GastosDataBasePortal():
 
     def set_nota(self, nota):
         try:
-            query = 'INSERT INTO notas_portal VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            query = 'INSERT INTO notas_portal VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             self.cursor.execute(query, (nota['pago_por'], nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], nota['duplicata'], nota['fornecedor'],
-                                nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], nota['despesa'], ))
+                                nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], nota['despesa'],nota['obs'],nota['usuario'] ))
             result = 'Nota Cadastrada'
             self.db.conn.commit()
         except Exception as e:

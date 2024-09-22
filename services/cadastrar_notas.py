@@ -5,7 +5,7 @@ class Notas:
     def __init__(self):
         self.db = gastos_db.GastosDataBase()
 
-    def cadastrar(self, dados):
+    def cadastrar(self, dados, usuario):
         try:
             emissao = dados['emissao']
             dia = emissao[8:]
@@ -29,6 +29,8 @@ class Notas:
                 'vencimentos': '',
                 'valor' : valor,
                 'despesa' : dados['despesa'],
+                'obs':dados['obs'],
+                'usuario': usuario,
                 
             }
             self.db.set_nota(nota)
@@ -67,7 +69,7 @@ class NotasPortal:
     def __init__(self):
         self.db = gastos_db.GastosDataBasePortal()
 
-    def cadastrar(self, dados):
+    def cadastrar(self, dados, usuario):
         try:
             emissao = dados['emissao']
             dia = emissao[8:]
@@ -91,6 +93,8 @@ class NotasPortal:
                 'vencimentos': '',
                 'valor' : valor,
                 'despesa' : dados['despesa'],
+                'obs':dados['obs'],
+                'usuario': usuario,
                 
             }
             self.db.set_nota(nota)

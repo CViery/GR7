@@ -10,7 +10,7 @@ class Faturamento:
     def formatar_moeda(self, valor):
         return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-    def cadastrar(self, dados):
+    def cadastrar(self, dados, usuario):
         try:
             # Valida dados obrigatórios
             required_fields = [
@@ -74,11 +74,17 @@ class Faturamento:
                 'valor_servico_cabecote_motor_arr': process_value(dados['cabeote_motor_arrefecimento']),
                 'valor_outros_servicos': process_value(dados['outros']),
                 'valor_servicos_oleos': process_value(dados['oleos']),
-                'valor_servico_transmissao': process_value(dados['transmissao'])
+                'valor_servico_transmissao': process_value(dados['transmissao']),
+                'usuario': usuario,
+                'obs':dados['obs']
             }
-
-            # Cadastra a ordem de serviço no banco de dados
-            self.db.cadastrar_faturamento(ordem_servico)
+            buscar_os = self.db.buscar_os_by_number(int(dados['num_os']))
+            if buscar_os:
+                return True
+            else:
+                # Cadastra a ordem de serviço no banco de dados
+                self.db.cadastrar_faturamento(ordem_servico)
+                return False
 
         except ValueError as ve:
             print(f"Erro de validação: {ve}")
@@ -137,7 +143,8 @@ class Faturamento:
                     'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
                     'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
                     'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
-                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37])
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
                 }
                 faturamentos.append(os)
                 
@@ -310,7 +317,8 @@ class Faturamento:
                     'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
                     'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
                     'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
-                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37])
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
                 }
                 faturamentos.append(os)
             return faturamentos
@@ -403,7 +411,7 @@ class FaturamentoPortal():
     def formatar_moeda(self, valor):
         return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-    def cadastrar(self, dados):
+    def cadastrar(self, dados, usuario):
         try:
             data = dados['data_faturamento']
             mes = data[5:7]
@@ -489,7 +497,9 @@ class FaturamentoPortal():
                 'valor_servico_cabecote_motor_arr': float(motor),
                 'valor_outros_servicos': float(outros),
                 'valor_servicos_oleos': float(lubrificantes),
-                'valor_servico_transmissao': float(transissao)
+                'valor_servico_transmissao': float(transissao),
+                'usuario': usuario,
+                'obs':dados['obs']
             }
             self.db.cadastrar_faturamento(ordem_servico)
 
@@ -626,7 +636,8 @@ class FaturamentoPortal():
                     'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
                     'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
                     'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
-                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37])
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
                 }
                 faturamentos.append(os)
             return faturamentos
@@ -690,7 +701,8 @@ class FaturamentoPortal():
                     'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
                     'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
                     'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
-                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37])
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
                 }
                 faturamentos.append(os)
                 

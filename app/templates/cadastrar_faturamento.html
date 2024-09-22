@@ -9,23 +9,24 @@
 
         <fieldset>
             <legend>Dados do Veículo</legend>
+            <p>{{response}}</p>
             <div class="input-group">
                 <label for="placa">Placa:</label>
-                <input type="text" id="placa" name="placa" class="styled-input">
+                <input type="text" id="placa" name="placa" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="modelo_veiculo">Modelo do Veículo:</label>
-                <input type="text" id="modelo_veiculo" name="modelo_veiculo" class="styled-input">
+                <input type="text" id="modelo_veiculo" name="modelo_veiculo" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="data_orcamento">Data de Orçamento:</label>
                 <input type="date" id="data_orcamento" name="data_orcamento" class="styled-input"
-                    onchange="calculateDias()">
+                    onchange="calculateDias()" required>
             </div>
             <div class="input-group">
                 <label for="data_faturamento">Data de Faturamento:</label>
                 <input type="date" id="data_faturamento" name="data_faturamento" class="styled-input"
-                    onchange="calculateDias()">
+                    onchange="calculateDias()" required>
             </div>
             <div class="input-group">
                 <label for="dias">Dias (Orçamento - Faturamento):</label>
@@ -33,7 +34,7 @@
             </div>
             <div class="input-group">
                 <label for="num_os">Número OS:</label>
-                <input type="text" id="num_os" name="num_os" class="styled-input">
+                <input type="text" id="num_os" name="num_os" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="cia">CIA:</label>
@@ -58,11 +59,11 @@
             <legend>Peças e Serviços</legend>
             <div class="input-group">
                 <label for="pecas">Peças:</label>
-                <input type="text" id="pecas" name="pecas" class="styled-input" onchange="calculateValorTotal()">
+                <input type="text" id="pecas" name="pecas" class="styled-input" onchange="calculateValorTotal()" required>
             </div>
             <div class="input-group">
                 <label for="servicos">Serviços:</label>
-                <input type="text" id="servicos" name="servicos" class="styled-input" onchange="calculateValorTotal()">
+                <input type="text" id="servicos" name="servicos" class="styled-input" onchange="calculateValorTotal()" required>
             </div>
             <div class="input-group">
                 <label for="valor_total">Valor Total (Peças + Serviços):</label>
@@ -70,60 +71,60 @@
             </div>
             <div class="input-group">
                 <label for="revitalizacao">Revitalização:</label>
-                <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input">
+                <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="aditivo">Aditivo:</label>
                 <input type="text" id="aditivo" name="aditivo" class="styled-input"
-                    onchange="showAditivoQuantidadeField()">
+                    onchange="showAditivoQuantidadeField()" required>
             </div>
             <div id="qntde_aditivo" class="input-group">
                 <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
-                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input">
+                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" required>
             </div>
             <div class="input-group">
                 {%if empresa == 'gr7'%}
                 <label for="fluido_sangria">Fluido/Sangria:</label>
-                <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input">
+                <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input" required>
                 {%elif empresa == 'portal'%}
                 <label for="lavagem">Lavagem</label>
-                <input type="text" id="lavagem" name="fluido_sangria" class="styled-input">
+                <input type="text" id="lavagem" name="fluido_sangria" class="styled-input" required>
                 {%endif%}
             </div>
             <div class="input-group">
                 {%if empresa == 'gr7'%}
                 <label for="palheta">Palheta:</label>
-                <input type="text" id="palheta" name="palheta" class="styled-input">
+                <input type="text" id="palheta" name="palheta" class="styled-input" required>
                 {%elif empresa == 'portal' %}
                 <label for="alternador">Alternador/Motor de arranque:</label>
-                <input type="text" id="alternador" name="palheta" class="styled-input">
+                <input type="text" id="alternador" name="palheta" class="styled-input" required>
                 {%endif%}
             </div>
             <div class="input-group">
                 <label for="detergente_parabrisa">Detergente de Para-brisa:</label>
-                <input type="text" id="detergente_parabrisa" name="detergente_parabrisa" class="styled-input">
+                <input type="text" id="detergente_parabrisa" name="detergente_parabrisa" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="filtro">Filtro:</label>
-                <input type="text" id="filtro" name="filtro" class="styled-input">
+                <input type="text" id="filtro" name="filtro" class="styled-input" required>
             </div>
             <div class="input-group">
                 {%if empresa == 'gr7'%}
                 <label for="limpeza_freios">Limpeza dos Freios:</label>
-                <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input">
+                <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input" required>
                 {%elif empresa == 'portal'%}
                 <label for="funilaria">Funilaria</label>
-                <input type="text" id="funilaria" name="funilaria" class="styled-input" onchange="calculateValorMeta()">
+                <input type="text" id="funilaria" name="funilaria" class="styled-input" onchange="calculateValorMeta()" required>
                 {%endif%}
             </div>
             <div class="input-group">
                 <label for="pneus">Pneus:</label>
-                <input type="text" id="pneus" name="pneus" class="styled-input" onchange="calculateValorMeta()">
+                <input type="text" id="pneus" name="pneus" class="styled-input" onchange="calculateValorMeta()" required>
             </div>
             <div class="input-group">
                 <label for="bateria">Bateria:</label>
                 <input type="text" id="bateria" name="bateria" class="styled-input"
-                    onchange="showModeloBateriaField(); calculateValorMeta()">
+                    onchange="showModeloBateriaField(); calculateValorMeta()" required>
             </div>
             <div id="modelo_bateria_field" class="input-group" style="display: none;">
                 <label for="modelo_bateria">Modelo da Bateria:</label>
@@ -143,16 +144,21 @@
                     <option value="MA60AD">MA60AD</option>
                     <option value="MF60AD">MF60AD</option>
                     <option value="MF72LD">MF72LD</option>
+                    <option value="M75LD">M75LD</option>
                     <option value="M80RD">M80RD</option>
+                    <option value="ST50HD">ST50HD</option>
+                    <option value="ST60HD">ST60HD</option>
+                    <option value="ST60DD">ST60DD</option>
+                    
                 </select>
             </div>
             <div class="input-group">
                 <label for="quantidade_oleo">Quantidade Óleo:</label>
-                <input type="text" id="quantidade_oleo" name="quantidade_oleo" class="styled-input">
+                <input type="text" id="quantidade_oleo" name="quantidade_oleo" class="styled-input" required onchange="calcularOleo()">
             </div>
             <div class="input-group">
                 <label for="valor_oleo">Valor do Óleo:</label>
-                <input type="text" id="valor_oleo" name="valor_oleo" class="styled-input">
+                <input type="text" id="valor_oleo" name="valor_oleo" class="styled-input" required onchange="calcularOleo()">
             </div>
             <div class="input-group">
                 <label for="tipo_marca_oleo">Tipo/Marca do Óleo:</label>
@@ -167,6 +173,7 @@
                     <option value="Total 0W30">Total 0W30</option>
                     <option value="Motorcraft 5W20">Motorcraft 5W20</option>
                     <option value="Futura 5W30">Futura 5W30</option>
+                    <option value="Maxon oil 5W30">Maxon oil 5W30</option>
                     <option value="Motorcraft 5W30">Motorcraft 5W30</option>
                     <option value="Total 5W30">Total 5W30</option>
                     <option value="Acdelco 5W30">Acdelco 5W30</option>
@@ -176,6 +183,7 @@
                     <option value="Petronas 10W30">Petronas 10W30</option>
                     <option value="imperium oil 10W40">imperium oil 10W40</option>
                     <option value="Menzoil 10W40">Menzoil 10W40</option>
+                    <option value="Menzoil 15W40">Menzoil 15W40</option>
                     <option value="Menzoil 20W50">Menzoil 20W50</option>
                 </select>
             </div>
@@ -203,7 +211,7 @@
             </div>
             <div class="input-group">
                 <label for="valor_dinheiro">Valor em Dinheiro:</label>
-                <input type="text" id="valor_dinheiro" name="valor_dinheiro" class="styled-input">
+                <input type="text" id="valor_dinheiro" name="valor_dinheiro" class="styled-input" required>
             </div>
         </fieldset>
 
@@ -211,33 +219,37 @@
             <legend>Outros Serviços</legend>
             <div class="input-group">
                 <label for="freios">Freios:</label>
-                <input type="text" id="freios" name="freios" class="styled-input">
+                <input type="text" id="freios" name="freios" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="suspensao">Suspensão:</label>
-                <input type="text" id="suspensao" name="suspensao" class="styled-input">
+                <input type="text" id="suspensao" name="suspensao" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="injecao_ignicao">Injeção/Ignição:</label>
-                <input type="text" id="injecao_ignicao" name="injecao_ignicao" class="styled-input">
+                <input type="text" id="injecao_ignicao" name="injecao_ignicao" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="cabeote_motor_arrefecimento">Cabeçote Motor Arrefecimento:</label>
                 <input type="text" id="cabeote_motor_arrefecimento" name="cabeote_motor_arrefecimento"
-                    class="styled-input">
+                    class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="outros">Outros:</label>
-                <input type="text" id="outros" name="outros" class="styled-input">
+                <input type="text" id="outros" name="outros" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="oleos">Óleos:</label>
-                <input type="text" id="oleos" name="oleos" class="styled-input">
+                <input type="text" id="oleos" name="oleos" class="styled-input" required>
             </div>
             <div class="input-group">
                 <label for="transmissao">Transmissão:</label>
-                <input type="text" id="transmissao" name="transmissao" class="styled-input">
+                <input type="text" id="transmissao" name="transmissao" class="styled-input" required>
             </div>
+        </fieldset>
+        <fieldset>
+            <legend>Observações</legend>
+            <textarea name="obs" id="obs" cols="90" rows="5"></textarea>
         </fieldset>
 
         <button type="submit" class="styled-button">Enviar</button>
@@ -430,6 +442,17 @@
             if (!pneusElement) console.error('Elemento com ID "pneus" não encontrado.');
             if (!valorMetaElement) console.error('Elemento com ID "valor_meta" não encontrado.');
         }
+    }
+    const calcularOleo =()=>{
+        let quantidade = document.getElementById('quantidade_oleo').value
+        let valor_unitario = document.getElementById('valor_oleo').value
+        let valor_convert = valor_unitario.replace(',', '.')
+        let valor_float = parseFloat(valor_convert) || 0
+        let qntd = parseInt(quantidade) || 0
+        let valor_total = qntd * valor_float
+
+        document.getElementById('oleos').value = valor_total
+
     }
 </script>
 {%endblock%}
