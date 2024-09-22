@@ -180,6 +180,7 @@ class Routes:
     def cadastrar_nota():
         if session['empresa'] == 'gr7':
             enviar = cadastrar_notas.Notas()
+            USUARIO = session['usuario']
             dados = {
                 'empresa': session['empresa'],
                 'emitido_para': request.form['emitido-para'],
@@ -190,9 +191,11 @@ class Routes:
                 'fornecedor': request.form['fornecedor'],
                 'emissao': request.form['emissao'],
                 'valor': request.form['valor'],
-                'despesa': request.form['despesa']
+                'despesa': request.form['despesa'],
+                'usuario': USUARIO,
+                'obs':request.form['obs']
             }
-            enviar.cadastrar(dados)
+            enviar.cadastrar(dados, USUARIO)
             if dados['boleto'] == 'Sim':
                 return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
             else:
@@ -201,6 +204,7 @@ class Routes:
         elif session['empresa'] == 'portal':
             # alterar dados para banco portal
             enviar = cadastrar_notas.NotasPortal()
+            USUARIO = session['usuario']
             dados = {
                 'empresa': session['empresa'],
                 'emitido_para': request.form['emitido-para'],
@@ -211,9 +215,11 @@ class Routes:
                 'fornecedor': request.form['fornecedor'],
                 'emissao': request.form['emissao'],
                 'valor': request.form['valor'],
-                'despesa': request.form['despesa']
+                'despesa': request.form['despesa'],
+                'usuario': USUARIO,
+                'obs':request.form['obs']
             }
-            enviar.cadastrar(dados)
+            enviar.cadastrar(dados,USUARIO)
             if dados['boleto'] == 'Sim':
                 return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
             else:
@@ -480,9 +486,9 @@ class Routes:
                         ano = now.strftime('%Y')
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
-                        dia = data
+                        
 
-                    return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar, mes_escolhido = mes_select, ano_escolhido = ano_select, dia=dia)
+                    return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar, mes_escolhido = mes_select, ano_escolhido = ano_select)
                 else:
                     # Caso seja uma requisição GET, usar a data atual
                     now = datetime.now()
@@ -1247,18 +1253,17 @@ class Routes:
                 empresa = session['empresa']
                 db = faturamento.Faturamento()
                 cias = db.companhias()
-
                 mecanicos = db.funcionarios()
-
-                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos)
+                response = ''
+                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
             elif session['empresa'] == 'portal':
                 empresa = session['empresa']
                 db = faturamento.FaturamentoPortal()
                 cias = db.companhias()
               # Exemplo, substitua com os valores reais
                 mecanicos = db.funcionarios()
-                
-                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos)
+                response = ''
+                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
         else:
             print('Usuário não está logado')
             return redirect('/')
@@ -1268,13 +1273,42 @@ class Routes:
         if session['empresa'] == 'gr7':
             db = faturamento.Faturamento()
             data = request.form.to_dict()
-            db.cadastrar(data)
-            return redirect('/faturamentos/cadastrar')
+            USUARIO = session['usuario']
+            cadastrar = db.cadastrar(data, USUARIO)
+            if cadastrar:
+                db = faturamento.Faturamento()
+                cias = db.companhias()
+                empresa = session['empresa']
+                mecanicos = db.funcionarios()
+                response = f'A OS {data['num_os']} Já esta cadastrada'
+                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
+            else:
+                db = faturamento.Faturamento()
+                cias = db.companhias()
+                empresa = session['empresa']
+                mecanicos = db.funcionarios()
+                response = f'A OS {data['num_os']} CADASTRADA COM SUCESSO'
+                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
         elif session['empresa'] == 'portal':
             db = faturamento.FaturamentoPortal()
             data = request.form.to_dict()
-            db.cadastrar(data)
-            return redirect('/faturamentos/cadastrar')
+            USUARIO = session['usuario']
+            cadastrar = db.cadastrar(data, USUARIO)
+            if cadastrar:
+                db = faturamento.Faturamento()
+                cias = db.companhias()
+                empresa = session['empresa']
+                mecanicos = db.funcionarios()
+                response = f'A OS {data['num_os']} Já esta cadastrada'
+                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
+            else:
+                db = faturamento.Faturamento()
+                cias = db.companhias()
+                empresa = session['empresa']
+                mecanicos = db.funcionarios()
+                response = f'A OS {data['num_os']} CADASTRADA COM SUCESSO'
+                return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
+            
 
     @app.route('/faturamentos/consultar', methods=['GET', 'POST'])
     def consultar_faturamentos():
