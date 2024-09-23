@@ -1295,14 +1295,14 @@ class Routes:
             USUARIO = session['usuario']
             cadastrar = db.cadastrar(data, USUARIO)
             if cadastrar:
-                db = faturamento.Faturamento()
+                db = faturamento.FaturamentoPortal()
                 cias = db.companhias()
                 empresa = session['empresa']
                 mecanicos = db.funcionarios()
                 response = f'A OS {data['num_os']} Já esta cadastrada'
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
             else:
-                db = faturamento.Faturamento()
+                db = faturamento.FaturamentoPortal()
                 cias = db.companhias()
                 empresa = session['empresa']
                 mecanicos = db.funcionarios()
