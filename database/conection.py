@@ -432,3 +432,8 @@ class DatabasePortal:
         self.cursor.execute(query, params)
         resultados = self.cursor.fetchall()
         return resultados
+
+    def buscar_os_by_number(self, num_os):
+        self.cursor.execute('SELECT * FROM faturamento_portal WHERE num_os = ?', (num_os,))
+        result = self.cursor.fetchone()
+        return result
