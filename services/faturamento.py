@@ -501,7 +501,13 @@ class FaturamentoPortal():
                 'usuario': usuario,
                 'obs':dados['obs']
             }
-            self.db.cadastrar_faturamento(ordem_servico)
+            buscar_os = self.db.buscar_os_by_number(int(dados['num_os']))
+            if buscar_os:
+                return True
+            else:
+                # Cadastra a ordem de serviço no banco de dados
+                self.db.cadastrar_faturamento(ordem_servico)
+                return False
 
         except Exception as e:
             print(e)
