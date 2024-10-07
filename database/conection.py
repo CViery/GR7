@@ -182,6 +182,15 @@ class Database:
         except Exception as e:
             print(e)
 
+    def faturamento_dinheiro_ordens(self, mes, ano):
+        try:
+            query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ? ORDER BY data_faturamento ASC;'
+            self.cursor.execute(query, mes, ano)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+
     def obter_ordens_filtradas(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         # Construindo a query SQL
         query = "SELECT * FROM faturamento"
@@ -399,6 +408,15 @@ class DatabasePortal:
         except Exception as e:
             print(e)
 
+    def faturamento_dinheiro_ordens(self, mes, ano):
+        try:
+            query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, mes, ano)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+
     def obter_ordens_filtradas(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         # Construindo a query SQL
         query = "SELECT * FROM faturamento_portal"
@@ -437,3 +455,12 @@ class DatabasePortal:
         self.cursor.execute('SELECT * FROM faturamento_portal WHERE num_os = ?', (num_os,))
         result = self.cursor.fetchone()
         return result
+
+    def faturamento_dinheiro_ordens(self, mes, ano):
+        try:
+            query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ? ORDER BY data_faturamento ASC;'
+            self.cursor.execute(query, mes, ano)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)

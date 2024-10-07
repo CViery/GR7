@@ -102,7 +102,7 @@
                     <tr class="dados_boletos">
                         <td>{{ boleto['valor'] }}</td>
                         <td>{{ boleto['vencimento'] }}</td>
-                        <td>{{ boleto['numero_nota'] }}</td>
+                        <td><a href="/dados_boletos/{{boleto['numero_nota']}}">{{ boleto['numero_nota'] }}</a></td>
                         <td>{{ boleto['notas'] }}</td>
                         <td>{{ boleto['fornecedor'] }}</td>
                     </tr>

@@ -9,10 +9,6 @@
         line-height: 1.6;
     }
 
-    main {
-        background-color: #333;
-    }
-
     .container {
         max-width: 1200px;
         margin: 20px auto;
@@ -34,10 +30,6 @@
         margin-bottom: 20px;
     }
 
-    input {
-        width: 8em;
-    }
-
     label {
         margin-right: 5px;
     }
@@ -50,7 +42,6 @@
         border: 1px solid #ddd;
         border-radius: 3px;
         font-size: 14px;
-        width: 8em;
     }
 
     button {
@@ -70,10 +61,6 @@
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 20px;
-    }
-
-    td {
-        font-size: 12px;
     }
 
     th,
@@ -112,18 +99,6 @@
         gap: 10px;
         margin-top: 20px;
         flex-wrap: wrap;
-        /* Garante que os itens quebrem linha quando não houver espaço */
-    }
-
-    ul {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-        list-style: none;
     }
 
     .pagination-container a,
@@ -150,72 +125,60 @@
         pointer-events: none;
         color: #ccc;
     }
+    .infos{
+        display: flex;
+        gap: 5em;
+    }
+    .infos_itens{
+       
+    }
 </style>
 {% endblock %}
 
 {% block main %}
 <main>
     <div class="container">
-        <h1>Consultas de Notas</h1>
-
-        <form method="POST" action="/consultar_notas">
-            <div class="flex-row">
-                <label for="data_inicio">Início:</label>
-                <input type="date" id="data_inicio" name="data_inicio">
-
-                <label for="data_fim">Fim:</label>
-                <input type="date" id="data_fim" name="data_fim">
-
-                <label for="fornecedor">Fornecedor:</label>
-                <select id="fornecedor" name="fornecedor">
-                    <option value="">Selecione o fornecedor</option>
-                    {% for fornecedor in fornecedores %}
-                    <option value="{{ fornecedor }}">{{ fornecedor }}</option>
-                    {% endfor %}
-                </select>
-
-                <label for="despesa">Nota:</label>
-                <input type="text" id="despesa" name="despesa">
-
-                <label for="">Observação</label>
-                <input type="text" name='obs'>
-
-                <button type="submit">Filtrar</button>
+        <h1>Consultas de Faturamentos</h1>
+        <div class="infos">
+            <div class="infos_item">
+                <h4>Total</h4>
+                <h4>{{valor}}</h4>
             </div>
-        </form>
-        <div>
-            <h5>Valor Total:</h5>
-            <p>{{valor}}</p>
         </div>
         <div class="flex-container">
             <div class="flex-item">
-                <h2>Notas</h2>
+                <h2>OS Dinheiro</h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>Data</th>
-                            <th>Emitido Para</th>
-                            <th>Status</th>
-                            <th>Boleto</th>
-                            <th>Duplicata</th>
-                            <th>Fornecedor</th>
-                            <th>Número da Nota</th>
-                            <th>Valor</th>
-                            <th>observações</th>
+                            <th>Placa</th>
+                            <th>Modelo Veículo</th>
+                            <th>Data Orçamento</th>
+                            <th>Data Faturamento</th>
+                            <th>Dias de Serviço</th>
+                            <th>Número OS</th>
+                            <th>Companhia</th>
+                            <th>Valor Peças</th>
+                            <th>Valor Serviços</th>
+                            <th>Total OS</th>
+                            <th>Valor Dinheiro</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
-                        {% for nota in notas %}
+                        {% for faturamento in faturamentos %}
                         <tr>
-                            <td>{{ nota['data_emissao'] }}</td>
-                            <td>{{ nota['emitido_para'] }}</td>
-                            <td>{{ nota['status'] }}</td>
-                            <td><a href="/dados_boletos/{{nota['numero_nota']}}">{{ nota['boleto'] }}</a></td>
-                            <td><a href="/dados_boletos/{{nota['duplicata']}}">{{ nota['duplicata'] }}</a></td>
-                            <td>{{ nota['fornecedor'] }}</td>
-                            <td>{{ nota['numero_nota'] }}</td>
-                            <td>{{ nota['valor'] }}</td>
-                            <td>{{ nota['obs'] }}</td>
+                            <td>{{ faturamento['placa'] }}</td>
+                            <td>{{ faturamento['modelo_veiculo'] }}</td>
+                            <td>{{ faturamento['data_orcamento'] }}</td>
+                            <td>{{ faturamento['data_faturamento'] }}</td>
+                            <td>{{ faturamento['dias_servico'] }}</td>
+                            <td>{{ faturamento['numero_os'] }}</td>
+                            <td>{{ faturamento['companhia'] }}</td>
+                            <td>{{ faturamento['valor_pecas'] }}</td>
+                            <td>{{ faturamento['valor_servicos'] }}</td>
+                            <td>{{ faturamento['total_os'] }}</td>
+                            <td>{{ faturamento['valor_em_dinheiro'] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

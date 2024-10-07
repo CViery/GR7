@@ -55,6 +55,24 @@ class GastosDataBase:
         except Exception as e:
             print(e)
 
+    def get_boletos_por_nota(self, num_nota):
+        try:
+            query = 'SELECT * FROM boletos WHERE num_nota = ? ORDER BY data_vencimento ASC'
+            self.cursor.execute(query, (num_nota,))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+
+    def get_boletos_por_nota_valor(self, num_nota):
+        try:
+            query = 'SELECT valor FROM boletos WHERE num_nota = ? ORDER BY data_vencimento ASC'
+            self.cursor.execute(query, (num_nota,))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+
     def get_boleto_by_day(self, dia, mes, ano):
         try:
             query = 'SELECT * FROM boletos WHERE dia_vencimento = ? AND mes_vencimento = ? AND ano_vencimento = ?'
@@ -66,7 +84,7 @@ class GastosDataBase:
 
     def set_despesas(self, despesa):
         try:
-            query = 'INSERT INTO despesas VALUES (?)'
+            query = 'INSERT INTO despesa (despesa) VALUES (?)'
             self.cursor.execute(query, (despesa,))
             self.db.conn.commit()
         except Exception as e:
@@ -99,12 +117,21 @@ class GastosDataBase:
         except Exception as e:
             print(e)
 
-    def obter_notas_filtradas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+    def get_all_notas_mes(self, mes, ano):
+        try:
+            query = 'SELECT * FROM notas WHERE mes_emissao = ? AND ano_emissao = ? ORDER BY data_emissao ASC;'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e)
+
+    def obter_notas_filtradas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None, obs=None):
         # Construindo a query SQL
         query = "SELECT * FROM notas"
         params = []
         filters = []
-
+        print(obs)
         if data_inicio:
             filters.append( " data_emissao >= ?")
             params.append(data_inicio)
@@ -117,6 +144,10 @@ class GastosDataBase:
         if despesa:
             filters.append(" num_nota  = ?")
             params.append(despesa)
+        if obs:
+            
+            filters.append(" observacoes LIKE ?")
+            params.append(f'%{obs}%')
         
         if filters:
             query += " WHERE " + " AND ".join(filters)
@@ -324,7 +355,7 @@ class GastosDataBasePortal():
 
     def get_valor_despesa(self, despesa, mes, ano):
         try:
-            query = 'SELECT valor FROM notas WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?'
+            query = 'SELECT valor FROM notas_portal WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?'
             self.cursor.execute(query, (despesa, mes, ano))
             result = self.cursor.fetchall()
             return result
@@ -391,7 +422,7 @@ class GastosDataBasePortal():
 
     def obter_boletos_filtrados(self, data_inicio=None, data_fim=None, fornecedor=None):
         # Construindo a query SQL
-        query = "SELECT * FROM boletos "
+        query = "SELECT * FROM boletos_portal "
         params = []
         filters = []
 
@@ -486,5 +517,24 @@ class GastosDataBasePortal():
             query = 'INSERT INTO fornecedores_portal (cnpj, nome) VALUES (?,?)'
             self.cursor.execute(query, (cnpj, nome))
             self.db.conn.commit()
+        except Exception as e:
+            print(e)
+
+    def get_boletos_por_nota_valor(self, num_nota):
+        try:
+            query = 'SELECT valor FROM boletos_portal WHERE num_nota = ? ORDER BY data_vencimento ASC'
+            self.cursor.execute(query, (num_nota,))
+            result = self.cursor.fetchall()
+            print(result)
+            return result
+        except Exception as e:
+            print(e)
+        
+    def get_boletos_por_nota(self, num_nota):
+        try:
+            query = 'SELECT * FROM boletos_portal WHERE num_nota = ? ORDER BY data_vencimento ASC'
+            self.cursor.execute(query, (num_nota,))
+            result = self.cursor.fetchall()
+            return result
         except Exception as e:
             print(e)

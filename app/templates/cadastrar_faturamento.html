@@ -73,6 +73,7 @@
                 <label for="revitalizacao">Revitalização:</label>
                 <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input" required>
             </div>
+            {% if empresa == 'gr7' %}
             <div class="input-group">
                 <label for="aditivo">Aditivo:</label>
                 <input type="text" id="aditivo" name="aditivo" class="styled-input"
@@ -82,6 +83,19 @@
                 <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
                 <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" required>
             </div>
+            {% elif empresa == 'portal' %}
+            <div class="input-group">
+                <label for="aditivo">Ar Condicionado:</label>
+                <input type="text" id="aditivo" name="ar_condicionado" class="styled-input"
+                    onchange="showAditivoQuantidadeField()" required>
+            </div>
+            <div id="qntde_aditivo" class="input-group" style="display: none;">
+                <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
+                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" required>
+            </div>
+
+            {% endif %}
+           
             <div class="input-group">
                 {%if empresa == 'gr7'%}
                 <label for="fluido_sangria">Fluido/Sangria:</label>
@@ -121,6 +135,7 @@
                 <label for="pneus">Pneus:</label>
                 <input type="text" id="pneus" name="pneus" class="styled-input" onchange="calculateValorMeta()" required>
             </div>
+
             <div class="input-group">
                 <label for="bateria">Bateria:</label>
                 <input type="text" id="bateria" name="bateria" class="styled-input"
@@ -417,6 +432,7 @@
         const valorTotalElement = document.getElementById('valor_total');
         const bateriaElement = document.getElementById('bateria');
         const pneusElement = document.getElementById('pneus');
+        
         const valorMetaElement = document.getElementById('valor_meta');
 
         // Verificar se todos os elementos necessários estão presentes
@@ -424,14 +440,16 @@
             // Obter os valores dos campos e substituir as vírgulas por pontos
             const valorTotal = parseFloat(valorTotalElement.value.replace(',', '.')) || 0;
             const valorBateria = parseFloat(bateriaElement.value.replace(',', '.')) || 0;
+            
             const valorPneus = parseFloat(pneusElement.value.replace(',', '.')) || 0;
 
             // Verificar se o elemento 'funilaria' existe
             const funilariaElement = document.getElementById('funilaria');
+            const ar_condicionadoElement = document.getElementById('ar_condicionado')
             const valorFunilaria = funilariaElement ? parseFloat(funilariaElement.value.replace(',', '.')) || 0 : 0;
-
+            const valorAr = ar_condicionadoElement ? parseFloat(ar_condicionadoElement.value.replace(',', '.')) || 0 : 0;
             // Calcular o valor da meta
-            const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria;
+            const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria - valorAr;
 
             // Atualizar o campo de valor meta com o resultado formatado
             valorMetaElement.value = valorMeta.toFixed(2);
