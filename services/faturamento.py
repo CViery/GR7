@@ -362,6 +362,62 @@ class Faturamento:
             return result
         except Exception as e:
             print(e)
+
+    def faturamento_dinheiro_ordens(self, mes, ano):
+        try:
+            dados = self.db.faturamento_dinheiro_ordens(mes, ano)
+            faturamentos = []
+            for ordem_servico in dados:
+                data_objeto_orcamento = datetime.strptime(
+                    ordem_servico[2], "%Y-%m-%d")
+                data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
+                data_objeto_faturamento = datetime.strptime(
+                    ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                if ordem_servico[30] > 0:
+                    os = {
+                    'placa': ordem_servico[0],
+                    'modelo_veiculo': ordem_servico[1],
+                    'data_orcamento': data_orcamento,
+                    'data_faturamento': data_faturamento,
+                    'dias_servico': ordem_servico[6],
+                    'numero_os': ordem_servico[7],
+                    'companhia': ordem_servico[8],
+                    'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                    'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                    'total_os': self.formatar_moeda(ordem_servico[12]),
+                    'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                    'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                    'quantidade_litros': ordem_servico[15],
+                    'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                    'valor_palheta': self.formatar_moeda(ordem_servico[17]),
+                    'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                    'valor_pastilha_parabrisa': self.formatar_moeda(ordem_servico[19]),
+                    'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                    'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                    'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                    'modelo_bateria': ordem_servico[23],
+                    'lts_oleo_motor': ordem_servico[24],
+                    'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                    'marca_e_tipo_oleo': ordem_servico[26],
+                    'mecanico_servico': ordem_servico[28],
+                    'servico_filtro': ordem_servico[29],
+                    'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                    'valor_em_dinheiro': self.formatar_moeda(ordem_servico[30]),
+                    'valor_servico_freios': self.formatar_moeda(ordem_servico[31]),
+                    'valor_servico_suspensao': self.formatar_moeda(ordem_servico[32]),
+                    'valor_servico_injecao_ignicao': self.formatar_moeda(ordem_servico[33]),
+                    'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
+                    'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
+                    'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
+                }
+                    faturamentos.append(os)
+            return faturamentos
+        except Exception as e:
+            print(e)
+
     def filtrar_os_valor(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         try:
             # Obtém as ordens de serviço filtradas do banco de dados
@@ -422,7 +478,12 @@ class FaturamentoPortal():
             servico = servico_str.replace(',', '.')
             revitalizacao_str = dados['revitalizacao']
             revitalizacao = revitalizacao_str.replace(',', '.')
-            aditivo_str = dados['aditivo']
+            if 'aditivo' in dados:
+                aditivo_str = dados['aditivo']
+                lts = int(dados['quantidade_aditivo'])
+            if 'ar_condicionado' in dados:
+                aditivo_str = dados['ar_condicionado']
+                lts = 0
             aditivo = aditivo_str.replace(',', '.')
             fluido_sangria_str = dados['fluido_sangria']
             fluido_sangria = fluido_sangria_str.replace(',', '.')
@@ -475,7 +536,7 @@ class FaturamentoPortal():
                 'total_os': float(dados['valor_total']),
                 'valor_revitalizacao': float(revitalizacao),
                 'valor_aditivo': float(aditivo),
-                'quantidade_litros': int(dados['quantidade_aditivo']),
+                'quantidade_litros': lts,
                 'valor_fluido_sangria': float(fluido_sangria),
                 'valor_palheta': float(palheta),
                 'valor_limpeza_freios': float(limpeza_freios),
@@ -799,5 +860,60 @@ class FaturamentoPortal():
             soma = sum(faturamentos)
             result = self.formatar_moeda(soma)
             return result
+        except Exception as e:
+            print(e)
+    
+    def faturamento_dinheiro_ordens(self, mes, ano):
+        try:
+            dados = self.db.faturamento_dinheiro_ordens(mes, ano)
+            faturamentos = []
+            for ordem_servico in dados:
+                data_objeto_orcamento = datetime.strptime(
+                    ordem_servico[2], "%Y-%m-%d")
+                data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
+                data_objeto_faturamento = datetime.strptime(
+                    ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                if ordem_servico[30] > 0:
+                    os = {
+                    'placa': ordem_servico[0],
+                    'modelo_veiculo': ordem_servico[1],
+                    'data_orcamento': data_orcamento,
+                    'data_faturamento': data_faturamento,
+                    'dias_servico': ordem_servico[6],
+                    'numero_os': ordem_servico[7],
+                    'companhia': ordem_servico[8],
+                    'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                    'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                    'total_os': self.formatar_moeda(ordem_servico[12]),
+                    'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                    'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                    'quantidade_litros': ordem_servico[15],
+                    'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                    'valor_palheta': self.formatar_moeda(ordem_servico[17]),
+                    'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                    'valor_pastilha_parabrisa': self.formatar_moeda(ordem_servico[19]),
+                    'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                    'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                    'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                    'modelo_bateria': ordem_servico[23],
+                    'lts_oleo_motor': ordem_servico[24],
+                    'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                    'marca_e_tipo_oleo': ordem_servico[26],
+                    'mecanico_servico': ordem_servico[28],
+                    'servico_filtro': ordem_servico[29],
+                    'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                    'valor_em_dinheiro': self.formatar_moeda(ordem_servico[30]),
+                    'valor_servico_freios': self.formatar_moeda(ordem_servico[31]),
+                    'valor_servico_suspensao': self.formatar_moeda(ordem_servico[32]),
+                    'valor_servico_injecao_ignicao': self.formatar_moeda(ordem_servico[33]),
+                    'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
+                    'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
+                    'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
+                }
+                    faturamentos.append(os)
+            return faturamentos
         except Exception as e:
             print(e)

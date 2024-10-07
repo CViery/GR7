@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-<title>Consultas - {{ empresa }}</title>
+<title>Boletos - {{ empresa }}</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -9,12 +9,8 @@
         line-height: 1.6;
     }
 
-    main {
-        background-color: #333;
-    }
-
     .container {
-        max-width: 1200px;
+        max-width: 1000px;
         margin: 20px auto;
         padding: 20px;
         background-color: #fff;
@@ -34,10 +30,6 @@
         margin-bottom: 20px;
     }
 
-    input {
-        width: 8em;
-    }
-
     label {
         margin-right: 5px;
     }
@@ -50,7 +42,6 @@
         border: 1px solid #ddd;
         border-radius: 3px;
         font-size: 14px;
-        width: 8em;
     }
 
     button {
@@ -72,8 +63,15 @@
         margin-bottom: 20px;
     }
 
-    td {
-        font-size: 12px;
+    ul {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        list-style: none;
     }
 
     th,
@@ -112,18 +110,6 @@
         gap: 10px;
         margin-top: 20px;
         flex-wrap: wrap;
-        /* Garante que os itens quebrem linha quando não houver espaço */
-    }
-
-    ul {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-        list-style: none;
     }
 
     .pagination-container a,
@@ -156,68 +142,64 @@
 {% block main %}
 <main>
     <div class="container">
-        <h1>Consultas de Notas</h1>
-
-        <form method="POST" action="/consultar_notas">
-            <div class="flex-row">
-                <label for="data_inicio">Início:</label>
-                <input type="date" id="data_inicio" name="data_inicio">
-
-                <label for="data_fim">Fim:</label>
-                <input type="date" id="data_fim" name="data_fim">
-
-                <label for="fornecedor">Fornecedor:</label>
-                <select id="fornecedor" name="fornecedor">
-                    <option value="">Selecione o fornecedor</option>
-                    {% for fornecedor in fornecedores %}
-                    <option value="{{ fornecedor }}">{{ fornecedor }}</option>
-                    {% endfor %}
-                </select>
-
-                <label for="despesa">Nota:</label>
-                <input type="text" id="despesa" name="despesa">
-
-                <label for="">Observação</label>
-                <input type="text" name='obs'>
-
-                <button type="submit">Filtrar</button>
-            </div>
-        </form>
+        <button><a href="{{link}}">voltar</a></button>
+        <h1>Consulta de Boletos</h1>
         <div>
-            <h5>Valor Total:</h5>
-            <p>{{valor}}</p>
+            <h5>Valor Total</h5>
+            <h5>{{valor}}</h5>
         </div>
         <div class="flex-container">
             <div class="flex-item">
-                <h2>Notas</h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>Data</th>
-                            <th>Emitido Para</th>
-                            <th>Status</th>
-                            <th>Boleto</th>
-                            <th>Duplicata</th>
+                            <th>Data Emissão</th>
                             <th>Fornecedor</th>
-                            <th>Número da Nota</th>
-                            <th>Valor</th>
-                            <th>observações</th>
+                            <th>Valor Nota</th>
+                            <th>obs</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for nota in notas %}
                         <tr>
                             <td>{{ nota['data_emissao'] }}</td>
-                            <td>{{ nota['emitido_para'] }}</td>
-                            <td>{{ nota['status'] }}</td>
-                            <td><a href="/dados_boletos/{{nota['numero_nota']}}">{{ nota['boleto'] }}</a></td>
-                            <td><a href="/dados_boletos/{{nota['duplicata']}}">{{ nota['duplicata'] }}</a></td>
-                            <td>{{ nota['fornecedor'] }}</td>
-                            <td>{{ nota['numero_nota'] }}</td>
+                            <td>{{nota['fornecedor'] }}</td>
                             <td>{{ nota['valor'] }}</td>
                             <td>{{ nota['obs'] }}</td>
                         </tr>
+                    </tbody>
+                </div>
+        <div class="flex-container">
+            <div class="flex-item">
+                <h2>Dados da Nota: {{num_nota}}</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número da Nota</th>
+                           
+                            <th>Fornecedor</th>
+                            <th>Data de Vencimento</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for boleto in boletos %}
+                        <tr>
+                            <td>{{ boleto['num_nota'] }}</td>
+                            
+                            <td>{{ boleto['fornecedor'] }}</td>
+                            <td>{{ boleto['data_vencimento'] }}</td>
+                            <td>{{ boleto['valor'] }}</td>
+                        </tr>
                         {% endfor %}
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            
+                            <td></td>
+                            <td>{{valor}}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

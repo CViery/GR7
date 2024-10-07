@@ -427,7 +427,7 @@ class Routes:
                     case "12": return "Dezembro"
         if 'usuario' in session:
             if session['empresa'] == 'gr7':
-                
+                session['link'] = '/gastos'
                 empresa = session['empresa']
                 db = dados_notas.DadosGastos()
                 meses = [
@@ -506,6 +506,7 @@ class Routes:
             if session['empresa'] == 'portal':
                 if session['permission'] == 'ADMIN':
                     empresa = session['empresa']
+                    session['link'] = '/gastos'
                     db = dados_notas.DadosGastosPortal()
                     meses = [
                         ('01', 'Janeiro'),
@@ -689,9 +690,11 @@ class Routes:
         if 'usuario' in session:
             if session['empresa'] == 'gr7':
                 empresa = session['empresa']
+                session['link'] = '/consultar_notas'
                 db = dados_notas.DadosGastos()
                 db_utils = utills.Utills()
-
+                mes = str(datetime.now().month)
+                ano = str(datetime.now().year)
                 fornecedores = db_utils.fornecedores()
                 despesas = db_utils.despesas()
                 notas = []
@@ -700,23 +703,26 @@ class Routes:
                 data_fim = request.args.get('data_fim')
                 fornecedor = request.args.get('fornecedor')
                 despesa = request.args.get('despesa')
+                obs = request.args.get('obs')
 
                 if request.method == 'POST':
                     data_inicio = request.form.get('data_inicio')
                     data_fim = request.form.get('data_fim')
                     fornecedor = request.form.get('fornecedor')
                     despesa = request.form.get('despesa')
+                    obs = request.form.get('obs')
                     notas = db.filtrar_notas(
-                        data_inicio, data_fim, fornecedor, despesa)
+                        data_inicio, data_fim, fornecedor, despesa, obs)
                     valor = db.filtrar_notas_valor(
-                        data_inicio, data_fim, fornecedor, despesa)
-                elif data_inicio or data_fim or fornecedor or despesa:
+                        data_inicio, data_fim, fornecedor, despesa, obs)
+                elif data_inicio or data_fim or fornecedor or despesa or obs:
                     notas = db.filtrar_notas(
-                        data_inicio, data_fim, fornecedor, despesa)
+                        data_inicio, data_fim, fornecedor, despesa, obs)
                     valor = db.filtrar_notas_valor(
-                        data_inicio, data_fim, fornecedor, despesa)
+                        data_inicio, data_fim, fornecedor, despesa, obs)
                 else:
-                    notas = db.todas_as_notas()
+                    notas = db.todas_as_notas_mes(mes, ano)
+                    
                     valor = db.valor_nota()
 
                 # Configuração da paginação
@@ -733,7 +739,7 @@ class Routes:
                 empresa = session['empresa']
                 db = dados_notas.DadosGastosPortal()
                 db_utils = utills.Utills_portal()
-
+                session['link'] = '/consultar_notas'
                 fornecedores = db_utils.fornecedores()
                 despesas = db_utils.despesas()
                 notas = []
@@ -777,10 +783,35 @@ class Routes:
             print('Usuário não está logado')
             return redirect('/')
 
+
+    @app.route('/dados_boletos/<num_nota>', methods=['GET', 'POST'])
+    def dados_boletos(num_nota):
+         if 'usuario' in session:
+            if session['empresa'] == 'gr7':
+                empresa = session['empresa']
+                db = dados_notas.DadosGastos()
+                boletos = db.todos_os_boletos_por_nota(num_nota)
+                quantidade = len(boletos)
+                valor = db.valor_gastos_boletos_valor(num_nota)
+                link = session['link']
+                nota = db.nota_por_numero(num_nota)
+                return render_template('dados_boletos.html', empresa=empresa, boletos=boletos, valor=valor, quantidade=quantidade, num_nota=num_nota, link=link, nota=nota)
+            elif session['empresa'] == 'portal':
+                empresa = session['empresa']
+                db = dados_notas.DadosGastosPortal()
+                boletos = db.todos_os_boletos_por_nota(num_nota)
+                quantidade = len(boletos)
+                valor = db.valor_gastos_boletos_valor(num_nota)
+                link = session['link']
+                nota = db.nota_por_numero(num_nota)
+                return render_template('dados_boletos.html', empresa=empresa, boletos=boletos, valor=valor, quantidade=quantidade, num_nota=num_nota, link=link, nota=nota)
+        
+
     @app.route('/consultar_boletos', methods=['GET', 'POST'])
     def consultar_boletos():
         if 'usuario' in session:
             if session['empresa'] == 'gr7':
+                session['link'] = '/consultar_boleto'
                 empresa = session['empresa']
                 db = dados_notas.DadosGastos()
                 db_utils = utills.Utills()
@@ -807,6 +838,7 @@ class Routes:
                 return render_template('consultar_boletos.html', empresa=empresa, fornecedores=fornecedores, boletos=boletos, valor=valor)
             elif session['empresa'] == 'portal':
                 empresa = session['empresa']
+                session['link'] = '/consultar_boleto'
                 db = dados_notas.DadosGastosPortal()
                 db_utils = utills.Utills_portal()
                 fornecedores = db_utils.fornecedores()
@@ -878,6 +910,8 @@ class Routes:
                             # Verificar se os valores estão corretos
 
                             if mes_dados and ano_dados:
+                                session['mes_atual'] = mes_dados
+                                session['ano_atual'] = ano_dados
                                 valor_faturamento_total = db.faturamento_total_mes(
                                     mes_dados, ano_dados)
                                 valor_faturamento_meta = db.faturamento_meta_mes(
@@ -902,7 +936,9 @@ class Routes:
                                 now = datetime.now()
                                 mes_dados = now.strftime('%m')
                                 ano_dados = now.strftime('%Y')
-                                
+                                session['mes_atual'] = mes_dados
+                                print(mes_dados)
+                                session['ano_atual'] = ano_dados
                                 valor_faturamento_total = db.faturamento_total_mes(
                                     mes_dados, ano_dados)
                                 valor_faturamento_meta = db.faturamento_meta_mes(
@@ -1081,6 +1117,7 @@ class Routes:
                         now = datetime.now()
                         mes_dados = now.strftime('%m')
                         ano_dados = now.strftime('%Y')
+                        
                         valor_faturamento_total = db.faturamento_total_mes(
                             mes_dados, ano_dados)
                         valor_faturamento_meta = db.faturamento_meta_mes(
@@ -1400,6 +1437,48 @@ class Routes:
                                        cias=cias,
                                        mecanicos=mecanicos,
                                        faturamentos=faturamentos,valor=valor, valor_meta=valor_meta)
+
+            else:
+                return redirect('/')
+            
+    @app.route('/faturamentos/ordens_com_dinheiro/', methods=['GET', 'POST'])
+    def consultar_faturamentos_c_dinheiro():
+        if 'usuario' in session:
+            if session['empresa'] == 'gr7':
+                mes = session.get('mes_atual')
+                ano = session.get('ano_atual')
+                empresa = session['empresa']
+                # Certifique-se de passar a conexão com o banco de dados
+                db = faturamento.Faturamento()
+                
+                # Listas para preencher os selects
+                
+
+                faturamentos = db.faturamento_dinheiro_ordens(mes,ano)
+                valor = db.faturamento_dinheiro(mes,ano)
+                if faturamentos is None:
+                    faturamentos = []
+
+                return render_template('consultar_faturamento_dinheiro.html',
+                                       empresa=empresa,
+                                       faturamentos=faturamentos, valor=valor)
+
+            elif session['empresa'] == 'portal':
+                mes = session.get('mes_atual')
+                ano = session.get('ano_atual')
+                empresa = session['empresa']
+                # Certifique-se de passar a conexão com o banco de dados
+                db = faturamento.FaturamentoPortal()
+                
+
+                faturamentos = db.faturamento_dinheiro_ordens(mes,ano)
+                valor = db.faturamento_dinheiro(mes,ano)
+                if faturamentos is None:
+                    faturamentos = []
+
+                return render_template('consultar_faturamento_dinheiro.html',
+                                       empresa=empresa,
+                                       faturamentos=faturamentos, valor=valor)
 
             else:
                 return redirect('/')
