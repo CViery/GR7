@@ -11,7 +11,8 @@ class Login:
                 ('THIAGO', 'Qazplm82*', 'ADMIN', 2),
                 ('DANIEL', '415263', 'ADMIN', 0),
                 ('FERNANDO', '1234', 'NORMAL', 2),
-                ('ANA MARIA', '1234', 'NORMAL', 2)
+                ('ANA MARIA', '1234', 'NORMAL', 2),
+                ('ESTEVAM', '1234', 'NORMAL', 2)
 
             ]
             for person in users:
