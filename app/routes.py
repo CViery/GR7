@@ -129,7 +129,9 @@ class Routes:
                 gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
                 porcentagem_pecas = utils.porcentagem_gastos_pecas(
                     mes_dados, ano_dados)
-                return render_template('index_portal_admin.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas)
+                ticket = utils.ticket(mes_dados, ano_dados)
+                passagens = utils.passagens(mes_dados, ano_dados)
+                return render_template('index_portal_admin.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas, ticket=ticket, passagens=passagens)
             elif session['permission'] == 'NORMAL':
                 empresa = session['empresa']
                 usuario = session['usuario']
