@@ -95,12 +95,15 @@ h5{
   }
   .box:nth-child(5) {
     background-color: #1a4173;
+    width: 300px;
   }
   .box:nth-child(6) {
     background-color: #1a4173;
+    width: 300px;
   }
   .box:nth-child(7) {
     background-color: #1a4173;
+    
   }
   .box:nth-child(8) {
     background-color:  #1a4173;
