@@ -11,44 +11,50 @@
       <div class="box box1">
           <div class="text">
               <h2 class="topic-heading">{{faturamento}}</h2>
-              <h2 class="topic">Faturamento Mês</h2>
+              <h2 class="topic">Faturamento Bruto:</h2>
           </div>
       </div>
 
       <div class="box box2">
           <div class="text">
               <h2 class="topic-heading">{{faturamento_meta}}</h2>
-              <h2 class="topic">Meta</h2>
+              <h2 class="topic">Faturamento Liquido</h2>
           </div>
       </div>
 
       <div class="box box3">
           <div class="text">
               <h2 class="topic-heading">{{faturamento_pecas}}</h2>
-              <h2 class="topic">Peças</h2>
+              <h2 class="topic">Venda de Peças</h2>
           </div>
       </div>
 
       <div class="box box4">
           <div class="text">
               <h2 class="topic-heading">{{faturamento_servicos}}</h2>
-              <h2 class="topic">Serviços</h2>
+              <h2 class="topic">Venda de Serviços</h2>
           </div>
       </div>
+      {% if empresa == 'gr7' %}
       <div class="box box5">
         <div class="text">
+            <h2>Valor para Atingir:</h2>
             <h2 class="topic-heading">{{primeira_meta}}</h2>
-            <h2 class="topic">Primeira Meta</h2>
+            <h2 class="topic">Primeira Meta: R$ 180.000,00</h2>
         </div>
     </div>
 
+        {% endif %}
+     
+        {% if empresa == 'gr7' %}
     <div class="box box6">
         <div class="text">
+            <h2>Valor para Atingir:</h2>
             <h2 class="topic-heading">{{segunda_meta}}</h2>
-            <h2 class="topic">Segunda Meta</h2>
+            <h2 class="topic">Segunda Meta: R$220.000,00</h2>
         </div>
     </div>
-
+    {% endif %}
     <div class="box box7">
         <div class="text">
             <h2 class="topic-heading">{{ticket}}</h2>
