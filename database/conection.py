@@ -336,7 +336,7 @@ class DatabasePortal:
 
     def get_cias(self):
         try:
-            query = 'SELECT * FROM companhias ORDER BY CAST(cia AS NVARCHAR(MAX)) ASC;'
+            query = 'SELECT * FROM companhias_portal ORDER BY CAST(cia AS NVARCHAR(MAX)) ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
