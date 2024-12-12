@@ -1,10 +1,11 @@
 from app import app
-from flask import request, redirect, render_template, flash, session, jsonify
+from flask import request, redirect, render_template, flash, session, jsonify, make_response, Response
 from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills, xlxs
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
 from database import gastos_db
-
+from xhtml2pdf import pisa
+from io import BytesIO
 
 class Routes:
     def __init__(self):
@@ -715,6 +716,7 @@ class Routes:
                     obs = request.form.get('obs')
                     notas = db.filtrar_notas(
                         data_inicio, data_fim, fornecedor, despesa, obs)
+                    
                     valor = db.filtrar_notas_valor(
                         data_inicio, data_fim, fornecedor, despesa, obs)
                 elif data_inicio or data_fim or fornecedor or despesa or obs:
@@ -724,7 +726,6 @@ class Routes:
                         data_inicio, data_fim, fornecedor, despesa, obs)
                 else:
                     notas = db.todas_as_notas_mes(mes, ano)
-                    
                     valor = db.valor_nota()
 
                 # Configuração da paginação
@@ -1604,3 +1605,76 @@ class Routes:
                 return redirect('/cadastros/oleos')
         else:
             return 'erro aqui'
+
+    @app.route('/relatorios')
+    def page_relatorios():
+        return render_template('relatorios.html')
+
+
+
+
+    @app.route('/fechamento_mensal', methods=['GET', 'POST'])
+    def gerar_pdf():
+        mes = request.form.get('mes')
+        ano = request.form.get('ano')
+        print(f'mes selecionado {mes}')
+        print(f'Ano selecionado {ano}')
+        # Dados para o template
+        db = faturamento.Faturamento()
+        services = utills.Utills()
+        empresa = 'gr7'
+        valor_faturamento_total = db.faturamento_total_mes(mes, ano)
+        valor_faturamento_meta = db.faturamento_meta_mes(mes, ano)
+        faturamento_mecanicos = db.faturamento_mecanico(mes, ano)
+        faturamento_cias = db.faturamento_companhia(mes, ano)
+        faturamento_servico = db.faturamento_servico(mes, ano)
+        valor_dinheiro = db.faturamento_dinheiro(mes, ano)
+        ticket = services.ticket(mes, ano)
+        passagens = services.passagens(mes, ano)
+        valor_meta_int = db.faturamento_meta_mes_int(mes, ano)
+        mecanicos = db.faturamento_mecanico(mes, ano)
+        dados_filtros = db.filtros_mecanico(mes, ano) 
+        context = {
+            'valor_faturamento_total': valor_faturamento_total,
+            'valor_faturamento_meta': valor_faturamento_meta,
+            'faturamento_mecanicos': faturamento_mecanicos,
+            'faturamento_companhia': faturamento_cias,
+            'faturamento_servico': faturamento_servico,
+            'empresa': 'empresa',
+            'valor_dinheiro': valor_dinheiro,
+            'ticket': ticket,
+            'passagens': passagens,
+            'valor_meta_int': valor_meta_int,
+            'mes_escolhido': mes,
+            'ano_escolhido': ano,
+            'dados_filtros': dados_filtros
+        }
+        
+        # Renderiza o template HTML
+        html = render_template('relatorio_faturamento.html', **context)
+        
+        # Gera um buffer em memória para o PDF
+        pdf_buffer = BytesIO()
+        
+        # Gera o PDF
+        pisa_status = pisa.CreatePDF(
+            html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
+        )
+        
+        # Verifica se ocorreu um erro
+        if pisa_status.err:
+            return "Erro ao gerar o PDF", 500
+
+        # Nome seguro para o arquivo
+        name_arquivo = f"Relatorio_{mes}_{ano}".replace(" ", "_").replace("/", "-")
+        
+        # Movendo o ponteiro do buffer para o início
+        pdf_buffer.seek(0)
+        
+        # Retorna o PDF como uma resposta Flask
+        response = Response(
+            pdf_buffer,
+            content_type='application/pdf'
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{name_arquivo}.pdf"'
+        return response

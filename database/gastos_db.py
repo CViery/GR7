@@ -8,13 +8,57 @@ class GastosDataBase:
 
     def set_nota(self, nota):
         try:
-            query = 'INSERT INTO notas VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-            self.cursor.execute(query, (nota['pago_por'], nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], nota['duplicata'], nota['fornecedor'],
-                                nota['data_emissao'], nota['dia_emissao'], nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], nota['despesa'], nota['obs'],nota['usuario'] ))
-            result = 'Nota Cadastrada'
+            # Log para exibir a nota recebida
+            print("Recebendo nota:", nota)
+            
+            # Obter o último ID salvo
+            print("Executando consulta para obter o último ID...")
+            self.cursor.execute("SELECT MAX(id) FROM notas")
+            ultimo_id = self.cursor.fetchone()[0]
+            print("Último ID obtido:", ultimo_id)
+            
+            # Definir o novo ID incrementando em 1 (se último_id for None, começamos com 1)
+            novo_id = (ultimo_id + 1) if ultimo_id else 1
+            print("Novo ID definido:", novo_id)
+            
+            # Log para exibir a query antes da execução
+            print("Preparando a query de inserção...")
+            query = '''
+                INSERT INTO notas (pago_por, emitido_para, status, boleto, num_nota, duplicata, fornecedor, 
+                                data_emissao, dia_emissao, mes_emissao, ano_emissao, vencimentos, valor, 
+                                despesa, observacoes, usuario, id) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            '''
+            print("Query preparada:", query)
+            
+            # Log para exibir os valores que serão inseridos
+            valores = (
+                nota['pago_por'], nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], 
+                nota['duplicata'], nota['fornecedor'], nota['data_emissao'], nota['dia_emissao'], 
+                nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], 
+                nota['despesa'], nota['obs'], nota['usuario'], novo_id,
+            )
+            print("Valores a serem inseridos:", valores)
+            
+
+            # Executar a query
+            print("Executando a query de inserção...")
+            self.cursor.execute(query, valores)
+            
+            # Confirmar transação no banco de dados
+            print("Comitando transação no banco de dados...")
             self.db.conn.commit()
+            
+            # Mensagem de sucesso
+            result = 'Nota Cadastrada'
+            print(result)
+            return result
+        
         except Exception as e:
-            print(e)
+            # Log detalhado do erro
+            print(f"Erro ao cadastrar a nota: {e}")
+            return f"Erro: {e}"
+
 
     def set_boleto(self, boleto):
         try:

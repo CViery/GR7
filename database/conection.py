@@ -229,6 +229,32 @@ class Database:
         self.cursor.execute('SELECT * FROM faturamento WHERE num_os = ?', (num_os,))
         result = self.cursor.fetchone()
         return result
+    def valor_filtro(self, mes, ano, mecanico):
+        try:
+            if mecanico != 'BATERIA_DOMICILIO':
+                query = '''
+                    SELECT filtro 
+                    FROM faturamento 
+                    WHERE mes_faturamento = ? 
+                    AND ano_faturamento = ? 
+                    AND filtro_mecanico = ?
+                '''
+                self.cursor.execute(query, (mes, ano, mecanico))
+                result = self.cursor.fetchone()
+                return result[0] if result else None  # Retorna o valor do filtro ou None se não encontrar
+            return None  # Retorna None se for 'BATERIA_DOMICILIO'
+        except Exception as e:
+            print(f"Erro ao executar a consulta: {e}")
+            return None
+    
+    def relatorio_filtro(self, mes, ano , mecanico):
+        try:
+            query = 'SELECT filtro, filtro_mecanico FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ? AND filtro_mecanico = ?'
+            self.cursor.execute(query, (mes, ano, mecanico))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            print(e) 
     
 class DatabasePortal:
     def __init__(self):

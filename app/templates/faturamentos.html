@@ -361,6 +361,28 @@
                 <button class="button_for" type="submit">Filtrar</button>
             </div>
         </form>
+        <form action="/exportar_relatorio/{{ mes_escolhido }}/{{ ano_escolhido }}" method="post">
+            <div class="flex-row">
+                <div class="select">
+                    <select name="mes" required>
+                        <option value="">Selecione o mês</option>
+                        {% for mes in meses %}
+                        <option value="{{ mes[0] }}">{{ mes[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="select">
+                    <select name="ano" required>
+                        <option value="">Selecione o ano</option>
+                        {% for ano in anos %}
+                        <option value="{{ ano }}">{{ ano }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="button_for" type="submit">Exportar</button>
+            </div>
+        </form>
+        <a href="/exportar_relatorio/{}/{}">Exportar</a>
         <div class="container_dados">
             <div class="flex-item">
                 <h5 class="description-value">Faturamento Bruto</h5>

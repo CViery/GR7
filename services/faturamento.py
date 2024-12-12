@@ -215,31 +215,51 @@ class Faturamento:
         try:
             faturamentos = []
             mecanicos = self.db.get_mecanicos()
+
             for mecanico in mecanicos:
-                dados = self.db.faturamento_por_mecanico(mecanico[0], mes, ano)
+                # Faturamento por mecânico
+                dados = self.db.faturamento_por_mecanico(mecanico[0], mes, ano) or []
                 valores = [dado[0] for dado in dados]
                 valor_soma = sum(valores)
                 valor_total = self.formatar_moeda(valor_soma)
-                dados_filtro = self.db.get_qntd_filtros_mec(
-                    mecanico[0], mes, ano)
-                qntd_filtro = [qntd[0] for qntd in dados_filtro]
-                filtro = len(qntd_filtro)
-                dados_revitalizacao = self.db.get_revitalizacao_mecanico(
-                    mecanico[0], mes, ano)
-                valores_revi = []
 
-                for valor in dados_revitalizacao:
-                    if valor[0] > 0.00:
-                        valores_revi.append(valor[0])
-                qnd_revi = len(valores_revi)
+                # Dados de filtros
+                dados_filtro = self.db.get_qntd_filtros_mec(mecanico[0], mes, ano) or []
+                qntd_filtro = [qntd[0] for qntd in dados_filtro]
+                filtro_valor = self.db.valor_filtro(mes, ano, mecanico[0])
+
+                # Se filtro_valor for um float, soma diretamente, senão soma a lista
+                filtro_count = len(qntd_filtro)
+
+                # Dados de revitalização
+                dados_revitalizacao = self.db.get_revitalizacao_mecanico(mecanico[0], mes, ano) or []
+                valores_revi = [valor[0] for valor in dados_revitalizacao if valor[0] > 0.00]
+                qntd_revi = len(valores_revi)
                 valor_soma_revi = sum(valores_revi)
                 valor_total_revi = self.formatar_moeda(valor_soma_revi)
-                faturamentos.append((mecanico[0], valor_total, len(
-                    valores), filtro, qnd_revi, valor_total_revi))
+
+                # Adicionando ao faturamento
+                faturamentos.append((
+                    mecanico[0],         # Nome do mecânico ou identificador
+                    valor_total,         # Valor total faturado (formatado)
+                    len(valores),        # Quantidade de serviços
+                    filtro_count,        # Quantidade de filtros
+                    qntd_revi,           # Quantidade de revitalizações
+                    valor_total_revi,    # Valor total de revitalizações (formatado)
+                             # Soma dos valores de filtros
+                ))
+
             return faturamentos
+
         except Exception as e:
+            print(f"Erro ao calcular faturamento dos mecânicos: {e}")
             raise e
 
+    def valor_filtro_mecanico(self, mecanico, mes, ano):
+        dados = self.db.valor_filtro(mecanico, mes, ano)
+        print(dados)
+
+        
     def faturamento_companhia(self, mes, ano):
         try:
             faturamentos = []
@@ -459,6 +479,36 @@ class Faturamento:
             return result
         except Exception as e:
             print(e)
+    
+    def filtros_mecanico(self, mes, ano):
+        try: 
+            mecanicos = self.db.get_mecanicos()  # Obtém a lista de mecânicos
+            dados = []
+            
+            for mecanico in mecanicos:
+                if mecanico[0] == 'BATERIA_DOMICILIO':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+
+                filtros = self.db.relatorio_filtro(mes, ano, mecanico[0])
+               
+                # Filtra apenas valores numéricos
+                filtro_valores = [info[0] for info in filtros]
+                valor = sum(filtro_valores)  # Soma os valores
+                quantidade = len(filtro_valores)  # Conta as entradas
+
+                dados.append({
+                    'mecanico': mecanico[0],
+                    'valor': valor,
+                    'quantidade': quantidade
+                })
+
+            print(dados)  # Mostra os resultados finais
+            return dados  # Retorna os dados processados
+
+        except Exception as e:
+            print(f"Erro ao processar filtros: {e}")  # Mensagem detalhada do erro
+            return []  # Retorna uma lista vazia em caso de erro
+
 
 class FaturamentoPortal():
     def __init__(self):
