@@ -198,9 +198,11 @@
                             <th>Status</th>
                             <th>Boleto</th>
                             <th>Duplicata</th>
+                            <th>Vencimentos</th>
                             <th>Fornecedor</th>
                             <th>Número da Nota</th>
                             <th>Valor</th>
+                            <th>Departamento</th>
                             <th>observações</th>
                         </tr>
                     </thead>
@@ -212,9 +214,11 @@
                             <td>{{ nota['status'] }}</td>
                             <td><a href="/dados_boletos/{{nota['numero_nota']}}">{{ nota['boleto'] }}</a></td>
                             <td><a href="/dados_boletos/{{nota['duplicata']}}">{{ nota['duplicata'] }}</a></td>
+                            <td>vencimentos</td>
                             <td>{{ nota['fornecedor'] }}</td>
                             <td>{{ nota['numero_nota'] }}</td>
                             <td>{{ nota['valor'] }}</td>
+                            <td>{{nota['tipo_despesa']}}</td>
                             <td>{{ nota['obs'] }}</td>
                         </tr>
                         {% endfor %}
