@@ -954,7 +954,7 @@ class GastosDataBase:
 
     def notas_por_subcategoria(self, subcategorias, mes, ano):
         try:
-            query  = 'SELECT * FROM notas WHERE subcategoria = ? AND mes_emissao = ? AND ano_emissao = ?'
+            query  = 'SELECT * FROM notas WHERE sub_categoria = ? AND mes_emissao = ? AND ano_emissao = ?'
             parametros = (subcategorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
