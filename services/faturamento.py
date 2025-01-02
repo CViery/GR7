@@ -94,7 +94,7 @@ class Faturamento:
                 'usuario': usuario,
                 'obs': dados.get('obs', '')  # Caso o campo 'obs' seja opcional
             }
-
+            print(ordem_servico)
             # Verifica se a ordem de serviço já existe
             buscar_os = self.db.buscar_os_by_number(int(dados['num_os']))
             if buscar_os:
