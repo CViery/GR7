@@ -506,7 +506,6 @@ class Routes:
                             ano_dados = request.form['ano']
 
                             dados_tipos = db.dados_gastos(mes_dados, ano_dados)
-                            print(dados_tipos)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
                             mes_select = get_mes_nome(mes_dados)
                             ano_select = ano_dados
