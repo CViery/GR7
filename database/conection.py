@@ -23,18 +23,19 @@ class Database:
         """
         try:
             # Query com os nomes das colunas explicitamente definidos
+            print(dados)
             query = '''
                 INSERT INTO faturamento (
                     placa, modelo_veiculo, data_orcamento, data_faturamento, mes_faturamento, ano_faturamento, 
-                    dias_servico, numero_os, companhia, conversao_ps, valor_pecas, valor_servicos, total_os, 
-                    valor_revitalizacao, valor_aditivo, quantidade_litros, valor_fluido_sangria, valor_palheta, 
-                    valor_limpeza_freios, valor_pastilha_parabrisa, valor_filtro, valor_pneu, valor_bateria, 
-                    modelo_bateria, lts_oleo_motor, valor_lt_oleo, marca_e_tipo_oleo, valor_p_meta, mecanico_servico, 
-                    servico_filtro, valor_em_dinheiro, valor_servico_freios, valor_servico_suspensao, 
-                    valor_servico_injecao_ignicao, valor_servico_cabecote_motor_arr, valor_outros_servicos, 
-                    valor_servicos_oleos, valor_servico_transmissao, usuario, obs
+                    dias, num_os, cia, conversao_pneustore, pecas, servicos, valor_os, 
+                    revitalizacao, aditivo, quantidade_aditivo, fluido_sangria, palheta, 
+                    limpeza_freios, detergente_parabrisa, filtro, pneus, bateria, 
+                    modelo_bateria, quantidade_oleo, valor_oleo, tipo_marca_oleo, valor_meta, mecanico, 
+                    filtro_mecanico, valor_dinheiro, freios, suspensao, 
+                    injecao_ignicao,cabecote_motor_arrefecimento, outros, 
+                    oleos, transmissao, usuario, observacoes
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
             '''
 
