@@ -86,8 +86,8 @@
             {% elif empresa == 'portal' %}
             <div class="input-group">
                 <label for="aditivo">Ar Condicionado:</label>
-                <input type="text" id="aditivo" name="ar_condicionado" class="styled-input"
-                    onchange="showAditivoQuantidadeField()" required>
+                <input type="text" id="ar_condicionado" name="ar_condicionado" class="styled-input"
+                    onchange="calculateValorMeta()" required>
             </div>
             <div id="qntde_aditivo" class="input-group" style="display: none;">
                 <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
@@ -448,8 +448,12 @@
             const ar_condicionadoElement = document.getElementById('ar_condicionado')
             const valorFunilaria = funilariaElement ? parseFloat(funilariaElement.value.replace(',', '.')) || 0 : 0;
             const valorAr = ar_condicionadoElement ? parseFloat(ar_condicionadoElement.value.replace(',', '.')) || 0 : 0;
+            console.log(valorAr)
+            console.log(ar_condicionadoElement)
+            
             // Calcular o valor da meta
             const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria - valorAr;
+            console.log(valorMeta);
 
             // Atualizar o campo de valor meta com o resultado formatado
             valorMetaElement.value = valorMeta.toFixed(2);
