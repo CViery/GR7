@@ -1,4 +1,6 @@
 from database import conection
+import json
+import pyodbc
 
 from datetime import datetime
 
@@ -8,11 +10,25 @@ class Faturamento:
         self.db = conection.Database()
 
     def formatar_moeda(self, valor):
-        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        """
+        Formata um valor numérico como uma string de moeda no formato brasileiro (R$).
+        
+        Parâmetros:
+            valor (float): O valor numérico a ser formatado.
+            
+        Retorna:
+            str: O valor formatado como moeda no formato brasileiro (R$).
+        """
+        try:
+            # Formatação do valor como moeda no formato brasileiro
+            return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        except Exception as e:
+            # Caso haja um erro, retornamos uma mensagem
+            return f"Erro ao formatar o valor: {e}"
 
     def cadastrar(self, dados, usuario):
         try:
-            # Valida dados obrigatórios
+            # Valida campos obrigatórios
             required_fields = [
                 'data_faturamento', 'pecas', 'servicos', 'revitalizacao', 'aditivo',
                 'fluido_sangria', 'palheta', 'detergente_parabrisa', 'filtro',
@@ -28,11 +44,11 @@ class Faturamento:
                 if field not in dados:
                     raise ValueError(f"Campo obrigatório ausente: {field}")
 
-            # Extrai e processa os dados
+            # Processa dados da ordem de serviço
             data = dados['data_faturamento']
             mes, ano = data[5:7], data[:4]
 
-            # Processa valores monetários, substituindo vírgulas por pontos
+            # Função para processar valores monetários
             def process_value(value_str):
                 return float(value_str.replace(',', '.'))
 
@@ -76,20 +92,22 @@ class Faturamento:
                 'valor_servicos_oleos': process_value(dados['oleos']),
                 'valor_servico_transmissao': process_value(dados['transmissao']),
                 'usuario': usuario,
-                'obs':dados['obs']
+                'obs': dados.get('obs', '')  # Caso o campo 'obs' seja opcional
             }
+
+            # Verifica se a ordem de serviço já existe
             buscar_os = self.db.buscar_os_by_number(int(dados['num_os']))
             if buscar_os:
-                return True
+                return True  # Ordem já cadastrada, retorna True
             else:
-                # Cadastra a ordem de serviço no banco de dados
+                # Cadastra a ordem de serviço
                 self.db.cadastrar_faturamento(ordem_servico)
-                return False
+                return False  # Ordem cadastrada com sucesso
 
         except ValueError as ve:
             print(f"Erro de validação: {ve}")
         except Exception as e:
-            print(f"Erro ao cadastrar: {e}")
+            print(f"Erro ao cadastrar ordem de serviço: {e}")
 
     def filtrar_os(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         try:
@@ -508,6 +526,48 @@ class Faturamento:
         except Exception as e:
             print(f"Erro ao processar filtros: {e}")  # Mensagem detalhada do erro
             return []  # Retorna uma lista vazia em caso de erro
+    
+    
+
+    def ordem_de_servico(self, num_os):
+        try:
+            # Buscando a ordem de serviço pelo número
+            db = self.db.buscar_os_by_number(num_os)
+            
+            # Verificando se não há retorno
+            if not db:
+                return json.dumps({"erro": "Ordem de serviço não encontrada"}, ensure_ascii=False)
+            
+            
+
+            # Lista das chaves fornecidas
+            keys = [
+                "placa", "modelo_veiculo", "data_orcamento", "data_faturamento",
+                "mes_faturamento", "ano_faturamento", "dias", "num_os", "cia",
+                "conversao_pneustore", "pecas", "servicos", "valor_os",
+                "revitalizacao", "aditivo", "quantidade_aditivo", "fluido_sangria",
+                "palheta", "limpeza_freios", "detergente_parabrisa", "filtro",
+                "pneus", "bateria", "modelo_bateria", "quantidade_oleo",
+                "valor_oleo", "tipo_marca_oleo", "valor_meta", "mecanico",
+                "filtro_mecanico", "valor_dinheiro", "freios", "suspensao",
+                "injecao_ignicao", "cabecote_motor_arrefecimento", "outros",
+                "oleos", "transmissao", "usuario", "observacoes"
+            ]
+            
+            # Convertendo os dados
+            if isinstance(db, pyodbc.Row):
+                db_dict = {key: value for key, value in zip(keys, db)}
+            else:
+                return json.dumps({"erro": "Formato de dados inesperado", "tipo": str(type(db))}, ensure_ascii=False)
+            
+            # Retornando o dicionário como JSON
+            return json.dumps(db_dict, ensure_ascii=False)
+        
+        except Exception as e:
+            print(f"Erro ao buscar ordem de serviço: {e}")
+            return json.dumps({"erro": "Não foi possível buscar a ordem de serviço"}, ensure_ascii=False)
+
+
 
 
 class FaturamentoPortal():

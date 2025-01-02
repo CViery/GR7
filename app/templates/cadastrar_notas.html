@@ -76,12 +76,20 @@
 
             <div class="form-group">
                 <label for="despesa">Despesa:</label>
-                <select id="despesa" name="despesa">
-                    {%for despesa in despesas%}
-                    <option value="{{despesa}}">{{despesa}}</option>
-                    {%endfor%}
+                <select id="despesa" name="despesa" onchange="fetchSubcategories()">
+                    {% for despesa in despesas %}
+                    <option value="{{ despesa }}">{{ despesa }}</option>
+                    {% endfor %}
                 </select>
             </div>
+            
+            <div class="form-group">
+                <label for="subcategoria">SubCategoria:</label>
+                <select id="subcategoria" name="subcategoria">
+                    <option value="">Selecione uma subcategoria</option>
+                </select>
+            </div>
+            
         </div>
         <fieldset>
             <legend style="color: white;">Observações</legend>
@@ -94,5 +102,25 @@
         </div>
     </form>
 </main>
-
+<script>
+    function fetchSubcategories() {
+        const despesa = document.getElementById('despesa').value;
+        const subcategoriaSelect = document.getElementById('subcategoria');
+    
+        if (!despesa) {
+            subcategoriaSelect.innerHTML = '<option value="">Selecione uma subcategoria</option>';
+            return;
+        }
+    
+        fetch(`/api/subcategorias?despesa=${encodeURIComponent(despesa)}`)
+            .then(response => response.json())
+            .then(data => {
+                subcategoriaSelect.innerHTML = data.map(subcategoria => 
+                    `<option value="${subcategoria}">${subcategoria}</option>`
+                ).join('');
+            })
+            .catch(error => console.error('Erro ao buscar subcategorias:', error));
+    }
+    </script>
+    
 {% endblock %}

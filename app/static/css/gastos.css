@@ -268,3 +268,59 @@ select option {
   margin-bottom: 10px;
   gap: 20px;
 }
+
+.container-despesas{
+  width: 100%;
+  background-color: white;
+}
+.container-acordion{
+  
+}
+
+.accordion{
+  display: flex;
+  flex-wrap: wrap;
+}
+.accordion-item{
+  width: 50%;
+}
+.custom-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #333;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-accordion-header:hover {
+  background-color: #e2e6ea;
+  color: #000;
+}
+
+.despesa-nome {
+  font-size: 1.2em;
+  color: #000;
+  flex-grow: 1; /* Ocupa o espaço restante */
+  text-align: left; /* Alinha o texto à esquerda */
+}
+
+.despesa-valor {
+  font-size: 1.2em;
+  color: #000;
+  flex-shrink: 0; /* Impede que encolha */
+  text-align: right; /* Alinha o texto à direita */
+  margin-left: 20px; /* Adiciona espaço entre nome e valor */
+}
+
+.accordion-body {
+  background-color: #fff;
+  padding: 15px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}

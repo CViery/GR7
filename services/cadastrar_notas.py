@@ -31,6 +31,7 @@ class Notas:
                 'despesa' : dados['despesa'],
                 'obs':dados['obs'],
                 'usuario': usuario,
+                'sub': dados['sub']
                 
             }
             self.db.set_nota(nota)
@@ -95,6 +96,7 @@ class NotasPortal:
                 'despesa' : dados['despesa'],
                 'obs':dados['obs'],
                 'usuario': usuario,
+                'sub': dados['sub']
                 
             }
             self.db.set_nota(nota)
