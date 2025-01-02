@@ -23,7 +23,7 @@ class Login:
                     'permission': users[2],
                     'empresa': users[3]
                 }
-
+                print(session)
                 # Verifica se a senha fornecida corresponde à senha armazenada
                 if password == dados['password']:
                     # Define as permissões e a empresa na sessão

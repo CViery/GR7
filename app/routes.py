@@ -1,11 +1,17 @@
 from app import app
 from flask import request, redirect, render_template, flash, session, jsonify, make_response, Response
-from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills, xlxs
+from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills, xlxs, rotas
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
 from database import gastos_db
 from xhtml2pdf import pisa
 from io import BytesIO
+import json
+
+
+PERMISSAO_TOTAL_ADMIN = 0
+PERMISSAO_GR7_USER = 1
+PERMISSAO_PORTAL_ADMIN = 2
 
 class Routes:
     def __init__(self):
@@ -18,145 +24,106 @@ class Routes:
     @app.route('/autenticar', methods=['POST'])
     def autenticar():
         try:
-            usuario = request.form['usuario']
-            senha = request.form['senha']
-            empresa = request.form['empresa']
+            usuario = request.form.get('usuario')
+            senha = request.form.get('senha')
+            empresa = request.form.get('empresa')
+
+            # Verificar se os campos obrigatórios estão presentes
+            if not usuario or not senha or not empresa:
+                flash('Preencha todos os campos!')
+                return redirect('/')
+
             db = login.Login()
             auten = db.login(usuario.upper(), senha)
+
             if auten == 'ADMIN':
                 session['usuario'] = usuario
                 session['empresa'] = empresa
                 if empresa == 'gr7':
-                    if session['permission_empresa'] == 0 or session['permission_empresa'] == 1:
+                    if session['permission_empresa'] in [PERMISSAO_TOTAL_ADMIN, PERMISSAO_GR7_USER]:
                         return redirect('/home')
                     else:
-                        flash('Desculpe seu acesso não permite acessar.')
+                        flash('Desculpe, seu acesso não permite acessar esta área.')
                         return redirect('/')
                 elif empresa == 'portal':
-                    if session['permission_empresa'] == 0 or session['permission_empresa'] == 2:
+                    if session['permission_empresa'] in [PERMISSAO_PORTAL_ADMIN, PERMISSAO_TOTAL_ADMIN]:
                         return redirect('/home')
                     else:
-                        flash('Desculpe empresa invalida.')
+                        flash('Desculpe, empresa inválida ou sem permissão.')
                         return redirect('/')
             elif auten == 'NORMAL':
                 session['usuario'] = usuario
                 session['empresa'] = empresa
                 if empresa == 'gr7':
-                    if session['permission_empresa'] == 0 or session['permission_empresa'] == 1:
+                    if session['permission_empresa'] in [PERMISSAO_GR7_ADMIN, PERMISSAO_GR7_USER]:
                         return redirect('/home')
                     else:
-                        flash('Desculpe empresa invalida.')
+                        flash('Desculpe, empresa inválida ou sem permissão.')
                         return redirect('/')
                 elif empresa == 'portal':
-                    if session['permission_empresa'] == 0 or session['permission_empresa'] == 2:
+                    if session['permission_empresa'] == PERMISSAO_PORTAL_ADMIN:
                         return redirect('/home')
                     else:
-                        flash('Desculpe empresa invalida.')
+                        flash('Desculpe, empresa inválida ou sem permissão.')
                         return redirect('/')
-                return 'Usuario Normal'
+                return 'Usuário Normal'
             else:
                 flash('Usuário ou senha incorretos.')
                 return redirect('/')
+
         except Exception as e:
             print(f"Erro durante autenticação: {e}")
-            flash(f'Ocorreu um erro. Tente novamente.{e}')
+            flash('Ocorreu um erro. Tente novamente.')
             return redirect('/')
 
     @app.route('/logout')
     def logout():
+        # Remover todas as variáveis de sessão relacionadas ao usuário
         session.pop('usuario', None)
         session.pop('empresa', None)
+        session.pop('permission_empresa', None)  # Caso esteja utilizando esta variável
         flash('Você saiu da sessão com sucesso.')
         return redirect('/')
 
+    
     @app.route('/home')
     def home():
-        if 'usuario' in session and session['empresa'] == 'gr7':
-            if session['permission'] == 'ADMIN':
-                empresa = session['empresa']
-                usuario = session['usuario']
-                utils = utills.Utills()
-                db = faturamento.Faturamento()
-
-                now = datetime.now()
-                mes_dados = now.strftime('%m')
-                ano_dados = now.strftime('%Y')
-                valor_faturamento_total = db.faturamento_total_mes(
-                    mes_dados, ano_dados)
-                valor_faturamento_meta = db.faturamento_meta_mes(
-                    mes_dados, ano_dados)
-                valor_faturamento_pecas = utils.faturamento_pecas(
-                    mes_dados, ano_dados)
-                valor_faturamento_servico = utils.faturamento_servicos(
-                    mes_dados, ano_dados)
-                valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
-                valor_segunda_meta = utils.segunda_meta(mes_dados, ano_dados)
-                valor_gastos = utils.gastos(mes_dados, ano_dados)
-                porcentagem_faturamento = utils.porcentagem_faturamento(
-                    mes_dados, ano_dados)
-                gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
-                porcentagem_pecas = utils.porcentagem_gastos_pecas(
-                    mes_dados, ano_dados)
-                passagens = utils.passagens(mes_dados, ano_dados)
-                ticket = utils.ticket(mes_dados, ano_dados)
-                
-                return render_template('index.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas, ticket=ticket, passagens=passagens)
-            else:
-                flash('Você não tem permissão para acessar essa pagina')
+        try:
+            # Verificar se o usuário está logado
+            if 'usuario' not in session:
+                flash('Usuário não está logado.')
                 return redirect('/')
-        elif 'usuario' in session and session['empresa'] == 'portal':
-            if session['permission'] == 'ADMIN':
-                # mudar dados para receber os dados da portal
-                empresa = session['empresa']
-                usuario = session['usuario']
-                utils = utills.Utills_portal()
-                db = faturamento.FaturamentoPortal()
-                now = datetime.now()
-                mes_dados = now.strftime('%m')
-                ano_dados = now.strftime('%Y')
-                valor_faturamento_total = db.faturamento_total_mes(
-                    mes_dados, ano_dados)
-                valor_faturamento_meta = db.faturamento_meta_mes(
-                    mes_dados, ano_dados)
-                valor_faturamento_pecas = utils.faturamento_pecas(
-                    mes_dados, ano_dados)
-                valor_faturamento_servico = utils.faturamento_servicos(
-                    mes_dados, ano_dados)
-                valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
-                valor_segunda_meta = utils.segunda_meta(mes_dados, ano_dados)
-                valor_gastos = utils.gastos(mes_dados, ano_dados)
-                porcentagem_faturamento = utils.porcentagem_faturamento(
-                    mes_dados, ano_dados)
-                gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
-                porcentagem_pecas = utils.porcentagem_gastos_pecas(
-                    mes_dados, ano_dados)
-                ticket = utils.ticket(mes_dados, ano_dados)
-                passagens = utils.passagens(mes_dados, ano_dados)
-                return render_template('index_portal_admin.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta, faturamento_pecas=valor_faturamento_pecas, faturamento_servicos=valor_faturamento_servico, primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta, valor_gastos=valor_gastos, porcentagem_faturamento=porcentagem_faturamento, gastos_pecas=gastos_pecas, porcentagem_pecas=porcentagem_pecas, ticket=ticket, passagens=passagens)
-            elif session['permission'] == 'NORMAL':
-                empresa = session['empresa']
-                usuario = session['usuario']
-                utils = utills.Utills_portal()
-                db = faturamento.FaturamentoPortal()
-                now = datetime.now()
-                mes_dados = now.strftime('%m')
-                ano_dados = now.strftime('%Y')
-                valor_faturamento_total = db.faturamento_total_mes(
-                    mes_dados, ano_dados)
-                valor_faturamento_meta = db.faturamento_meta_mes(
-                    mes_dados, ano_dados)
-                # valor_faturamento_pecas = utils.faturamento_pecas(mes_dados, ano_dados)
-                # valor_faturamento_servico = utils.faturamento_servicos(mes_dados,ano_dados)
-                valor_primeira_meta = utils.primeira_meta(mes_dados, ano_dados)
-                valor_segunda_meta = utils.segunda_meta(mes_dados, ano_dados)
-                # valor_gastos = utils.gastos(mes_dados, ano_dados)
-                # porcentagem_faturamento = utils.porcentagem_faturamento(mes_dados, ano_dados)
-                # gastos_pecas = utils.gastos_pecas(mes_dados, ano_dados)
-                # porcentagem_pecas = utils.porcentagem_gastos_pecas(mes_dados, ano_dados)
-                return render_template('index_portal_normal.html', empresa=empresa, user=usuario, faturamento=valor_faturamento_total, faturamento_meta=valor_faturamento_meta,  primeira_meta=valor_primeira_meta, segunda_meta=valor_segunda_meta)
-        else:
-            flash('usario não está logado')
+
+            # Obter as informações da sessão
+            usuario = session['usuario']
+            empresa = session['empresa']
+            permission = session.get('permission', None)
+
+            if empresa == 'gr7':
+                if permission == 'ADMIN':
+                    return rotas.render_gr7_admin(usuario)
+                else:
+                    flash('Você não tem permissão para acessar esta página.')
+                    return redirect('/')
+
+            elif empresa == 'portal':
+                if permission == 'ADMIN':
+                    return rotas.render_portal_admin(usuario)
+                elif permission == 'NORMAL':
+                    return rotas.render_portal_normal(usuario)
+                else:
+                    flash('Permissão de acesso inválida.')
+                    return redirect('/')
+
+            else:
+                flash('Empresa não reconhecida.')
+                return redirect('/')
+
+        except Exception as e:
+            print(f"Erro no carregamento da página home: {e}")
+            flash('Ocorreu um erro ao carregar a página. Tente novamente.')
             return redirect('/')
+
 
     @app.route('/gastos/cadastros/notas')
     def tela_cadastro_notas():
@@ -195,9 +162,11 @@ class Routes:
                 'emissao': request.form['emissao'],
                 'valor': request.form['valor'],
                 'despesa': request.form['despesa'],
+                'sub': request.form['subcategoria'],
                 'usuario': USUARIO,
                 'obs':request.form['obs']
             }
+            print(dados)
             enviar.cadastrar(dados, USUARIO)
             if dados['boleto'] == 'Sim':
                 return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
@@ -219,6 +188,7 @@ class Routes:
                 'emissao': request.form['emissao'],
                 'valor': request.form['valor'],
                 'despesa': request.form['despesa'],
+                'sub': request.form['subcategoria'],
                 'usuario': USUARIO,
                 'obs':request.form['obs']
             }
@@ -456,7 +426,7 @@ class Routes:
 
                         ano_dados = request.form['ano']
 
-                        dados_tipos = db.despesas(mes_dados, ano_dados)
+                        dados_tipos = db.dados_gastos(mes_dados, ano_dados)
                         valor_gasto = db.valor_gastos(mes_dados, ano_dados)
                         mes_select = get_mes_nome(mes_dados)
                         ano_select = ano_dados
@@ -467,7 +437,7 @@ class Routes:
                         mes_dados = now.strftime('%m')
 
                         ano_dados = now.strftime('%Y')
-                        dados_tipos = db.despesas(mes_dados, ano_dados)
+                        dados_tipos = db.dados_gastos(mes_dados, ano_dados)
                         valor_gasto = db.valor_gastos(mes_dados, ano_dados)
                         mes_select = get_mes_nome(mes_dados)
                         ano_select = ano_dados
@@ -498,7 +468,7 @@ class Routes:
                     dia = now.strftime('%d')
                     mes = now.strftime('%m')
                     ano = now.strftime('%Y')
-                    dados_tipos = db.despesas(mes, ano)
+                    dados_tipos = db.dados_gastos(mes, ano)
                     boletos = db.boletos_do_dia(dia, mes, ano)
                     valor_gasto = db.valor_gastos(mes, ano)
                     valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
@@ -535,7 +505,8 @@ class Routes:
 
                             ano_dados = request.form['ano']
 
-                            dados_tipos = db.despesas(mes_dados, ano_dados)
+                            dados_tipos = db.dados_gastos(mes_dados, ano_dados)
+                            print(dados_tipos)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
                             mes_select = get_mes_nome(mes_dados)
                             ano_select = ano_dados
@@ -546,7 +517,8 @@ class Routes:
                             mes_dados = now.strftime('%m')
 
                             ano_dados = now.strftime('%Y')
-                            dados_tipos = db.despesas(mes_dados, ano_dados)
+                            dados_tipos = db.dados_gastos(mes_dados, ano_dados)
+                            print(dados_tipos)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
                             mes_select = get_mes_nome(mes_dados)
                             ano_select = ano_dados
@@ -579,12 +551,13 @@ class Routes:
                         dia = now.strftime('%d')
                         mes = now.strftime('%m')
                         ano = now.strftime('%Y')
-                        dados_tipos = db.despesas(mes, ano)
+                        dados_tipos = db.dados_gastos(mes, ano)
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_gasto = db.valor_gastos(mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
                         mes_select = get_mes_nome(mes)
                         ano_select = ano
+
                         return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar,mes_escolhido = mes_select, ano_escolhido = ano_select, dia=dia)
                 elif session['permission'] == 'NORMAL':
                     empresa = session['empresa']
@@ -1678,3 +1651,66 @@ class Routes:
         )
         response.headers['Content-Disposition'] = f'attachment; filename="{name_arquivo}.pdf"'
         return response
+
+    @app.route('/api/subcategorias', methods=['GET'])
+    def get_subcategorias():
+        if session['empresa'] == 'gr7' or 'portal':
+            despesa = request.args.get('despesa')
+            if not despesa:
+                return jsonify([])
+
+            # Substitua com sua lógica para buscar subcategorias no banco de dados
+            db = gastos_db.GastosDataBase()
+            dados = db.get_subcategorias(despesa)
+            subcategorias = dados
+            subcategorias = [sub[3] for sub in subcategorias]
+            print(subcategorias)
+            return jsonify(subcategorias)
+
+    @app.route('/editar/faturamento/<int:num_os>', methods=['GET', 'POST'])
+    def editar_faturamento(num_os):
+        if 'usuario' in session:
+            if session['permission'] == 'ADMIN' and session['empresa'] == 'gr7':
+                db = faturamento.Faturamento()
+                try:
+                    # Obter os dados da ordem de serviço
+                    ordem = db.ordem_de_servico(num_os)
+                    ordem_dict = json.loads(ordem)
+
+                    if request.method == 'POST':
+                        try:
+                            # Validar e processar os dados enviados pelo formulário
+                            updated_data = {
+                                "placa": request.form.get('placa'),
+                                "modelo_veiculo": request.form.get('modelo_veiculo'),
+                                "data_orcamento": request.form.get('data_orcamento'),
+                                "data_faturamento": request.form.get('data_faturamento'),
+                                "mes_faturamento": request.form.get('mes_faturamento'),
+                                "ano_faturamento": request.form.get('ano_faturamento'),
+                                "dias_servico": request.form.get('dias_servico'),
+                                "numero_os": request.form.get('numero_os'),
+                                "companhia": request.form.get('companhia'),
+                                "valor_pecas": float(request.form.get('valor_pecas', 0)),
+                                "valor_servicos": float(request.form.get('valor_servicos', 0)),
+                                "total_os": float(request.form.get('total_os', 0)),
+                                "mecanico_servico": request.form.get('mecanico_servico'),
+                                "valor_servico_freios": float(request.form.get('valor_servico_freios', 0)),
+                                "valor_servico_suspensao": float(request.form.get('valor_servico_suspensao', 0)),
+                                "valor_servico_injecao_ignicao": float(request.form.get('valor_servico_injecao_ignicao', 0)),
+                                "valor_servico_cabecote_motor_arr": float(request.form.get('valor_servico_cabecote_motor_arr', 0)),
+                                "valor_outros_servicos": float(request.form.get('valor_outros_servicos', 0)),
+                                "valor_servicos_oleos": float(request.form.get('valor_servicos_oleos', 0)),
+                                "valor_servico_transmissao": float(request.form.get('valor_servico_transmissao', 0)),
+                                "obs": request.form.get('obs'),
+                            }
+
+                            # Atualizar no banco de dados
+                            db.atualizar_ordem_de_servico(num_os, updated_data)
+                            flash("Ordem de serviço atualizada com sucesso!", "success")
+                            return redirect('/faturamentos/consultar')
+                        except Exception as e:
+                            flash(f"Erro ao atualizar: {e}", "danger")
+                    return render_template('editar_faturamento.html', ordem=ordem_dict)
+                except Exception as e:
+                    return f"Erro ao buscar ordem de serviço: {e}", 500
+        return "Acesso negado", 403

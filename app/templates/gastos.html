@@ -47,36 +47,42 @@
                 </div>
             </form>
         </div>
-        <div class="accordion" id="accordionExample">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        Despesas por Departamento
-                    </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tipo</th>
-                                    <th>Valor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for despesa in tipo_despesa %}
-                                <tr>
-                                    <td>{{ despesa[0] }}</td>
-                                    <td>{{ despesa[1] }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="container-despesas">
+          <div class="accordion" id="accordionExample">
+              {% for despesa in tipo_despesa %}
+              <div class="accordion-item">
+                  <h2 class="accordion-header" id="heading{{ loop.index }}">
+                      <button class="accordion-button custom-accordion-header" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                          <span class="despesa-nome">{{ despesa['despesa'] }}</span>
+                          <span class="despesa-valor">{{ despesa['valor'] }}</span>
+                      </button>
+                  </h2>
+                  <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#accordionExample">
+                      <div class="accordion-body">
+                          <table class="table table-striped">
+                              <thead>
+                                  <tr>
+                                      <th>Sub</th>
+                                      <th>Valor</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for sub in despesa['subs'] %}
+                                  <tr>
+                                      <td>{{ sub['descricao'] }}</td>
+                                      <td>{{ sub['valor_mes'] }}</td>
+                                  </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+              {% endfor %}
+          </div>
+      </div>
+      
+      
         <div class="flex-item container-boletos">
             <h3 class="gastos">Boletos</h3>
             <form method="POST" id="filtroBoletosForm" action="/gastos">
