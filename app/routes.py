@@ -1292,14 +1292,14 @@ class Routes:
                 cias = db.companhias()
                 empresa = session['empresa']
                 mecanicos = db.funcionarios()
-                response = f'A OS {data['num_os']} Já esta cadastrada'
+                response = f"A OS {data['num_os']} Já está cadastrada"
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
             else:
                 db = faturamento.Faturamento()
                 cias = db.companhias()
                 empresa = session['empresa']
                 mecanicos = db.funcionarios()
-                response = f'A OS {data['num_os']} CADASTRADA COM SUCESSO'
+                response = f"A OS {data['num_os']} CADASTRADA COM SUCESSO"
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
         elif session['empresa'] == 'portal':
             db = faturamento.FaturamentoPortal()
@@ -1311,14 +1311,14 @@ class Routes:
                 cias = db.companhias()
                 empresa = session['empresa']
                 mecanicos = db.funcionarios()
-                response = f'A OS {data['num_os']} Já esta cadastrada'
+                response = f"A OS {data['num_os']} Já está cadastrada"
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
             else:
                 db = faturamento.FaturamentoPortal()
                 cias = db.companhias()
                 empresa = session['empresa']
                 mecanicos = db.funcionarios()
-                response = f'A OS {data['num_os']} CADASTRADA COM SUCESSO'
+                response = f"A OS {data['num_os']} CADASTRADA COM SUCESSO"
                 return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
             
 
