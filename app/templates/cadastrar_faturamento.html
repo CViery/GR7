@@ -91,7 +91,7 @@
             </div>
             <div id="qntde_aditivo" class="input-group" style="display: none;">
                 <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
-                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" required>
+                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" value="">
             </div>
 
             {% endif %}
@@ -267,7 +267,9 @@
             <textarea name="obs" id="obs" cols="90" rows="5"></textarea>
         </fieldset>
 
-        <button type="submit" class="styled-button">Enviar</button>
+        <div class="input-group">
+            <button type="submit" id="submit-button" class="styled-button" onclick="logButtonClick(event)">Enviar</button>
+        </div>
 
     </form>
 </main>
@@ -475,6 +477,20 @@
 
         document.getElementById('oleos').value = valor_total
 
+    }
+    function logButtonClick(event) {
+        console.log("Botão clicado");
+        
+        // Prevenir envio de formulário para fins de teste
+        // event.preventDefault();
+
+        // Opcional: Verificar se todos os campos obrigatórios foram preenchidos
+        const placa = document.getElementById("placa").value;
+        const modeloVeiculo = document.getElementById("modelo_veiculo").value;
+
+        console.log(`Valores inseridos: Placa=${placa}, Modelo=${modeloVeiculo}`);
+
+        // Adicione qualquer lógica adicional aqui para depurar o problema
     }
 </script>
 {%endblock%}
