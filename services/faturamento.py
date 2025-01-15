@@ -506,6 +506,12 @@ class Faturamento:
             for mecanico in mecanicos:
                 if mecanico[0] == 'BATERIA_DOMICILIO':
                     continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'OUTROS':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'DOMICILIO':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'TERCEIROS':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
 
                 filtros = self.db.relatorio_filtro(mes, ano, mecanico[0])
                
@@ -525,6 +531,45 @@ class Faturamento:
 
         except Exception as e:
             print(f"Erro ao processar filtros: {e}")  # Mensagem detalhada do erro
+            return []  # Retorna uma lista vazia em caso de erro
+        
+    def revitalizacao_mecanico(self, mes, ano):
+        try: 
+            mecanicos = self.db.get_mecanicos()  # Obtém a lista de mecânicos
+            dados = []
+            
+            for mecanico in mecanicos:
+                if mecanico[0] == 'BATERIA_DOMICILIO':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'OUTROS':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'DOMICILIO':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'TERCEIROS':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+
+                revitalizacoes = self.db.relatorio_revitalizacao(mes, ano, mecanico[0])
+               
+                # Filtra apenas valores numéricos
+                revitalizacao_valores = []
+                for info in revitalizacoes:
+                    if info[0] != 0.0:
+                        revitalizacao_valores.append(info[0])
+
+                valor = sum(revitalizacao_valores)  # Soma os valores
+                quantidade = len(revitalizacao_valores)  # Conta as entradas
+
+                dados.append({
+                    'mecanico': mecanico[0],
+                    'valor': valor,
+                    'quantidade': quantidade
+                })
+
+            print(dados)  # Mostra os resultados finais
+            return dados  # Retorna os dados processados
+
+        except Exception as e:
+            print(f"Erro ao processar revitalizacao: {e}")  # Mensagem detalhada do erro
             return []  # Retorna uma lista vazia em caso de erro
     
     
@@ -567,9 +612,241 @@ class Faturamento:
             print(f"Erro ao buscar ordem de serviço: {e}")
             return json.dumps({"erro": "Não foi possível buscar a ordem de serviço"}, ensure_ascii=False)
 
+    def ordens_filtro_e_higienizacao(self, mes, ano, mecanico):
+        try:
+            # Adicionando print para verificar os parâmetros recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            dados = self.db.detalhes_filtros(mes, ano, mecanico)
+            
+            # Verificando os dados obtidos de detalhes_filtros
+            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
+            faturamentos = []
+            
+            for ordem_servico in dados:
+                # Verificando os dados de cada ordem de serviço
+                print(f"Processando ordem de serviço: {ordem_servico}")
+                
+                data_objeto_orcamento = datetime.strptime(ordem_servico[2], "%Y-%m-%d")
+                
+                data_objeto_faturamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                
+                # Verificando a condição do valor na posição 30
+                os = {
+                        'placa': ordem_servico[0],
+                        'data_faturamento': data_faturamento,
+                        'numero_os': ordem_servico[7],
+                        'companhia': ordem_servico[8],
+                        'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                        'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                        'total_os': self.formatar_moeda(ordem_servico[12]),
+                        'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                        'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                        'quantidade_litros': ordem_servico[15],
+                        'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                        'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                        'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                        'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                        'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                        'lts_oleo_motor': ordem_servico[24],
+                        'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                        'mecanico_servico': ordem_servico[28],
+                        'servico_filtro': ordem_servico[29],
+                        'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                        'obs': ordem_servico[39]
+                    }
+                    
+                    # Verificando o objeto os antes de adicionar
+                print(f"Ordem de serviço preparada para adicionar: {os}")
+                    
+                faturamentos.append(os)
+            
+            # Verificando o resultado final
+            print(f"Faturamentos preparados: {faturamentos}")
+            
+            return faturamentos
+        except Exception as e:
+            # Verificando erros
+            print(f"Erro ao processar ordens de serviço: {e}")
 
+    def ordens_revitalizacao(self, mes, ano, mecanico):
+        try:
+            # Adicionando print para verificar os parâmetros recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            dados = self.db.detalhes_revitalizacao(mes, ano, mecanico)
+            
+            # Verificando os dados obtidos de detalhes_filtros
+            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
+            faturamentos = []
+            
+            for ordem_servico in dados:
+                if ordem_servico[13] > 0:
+                    # Verificando os dados de cada ordem de serviço
+                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
+                    data_objeto_orcamento = datetime.strptime(ordem_servico[2], "%Y-%m-%d")
+                    
+                    data_objeto_faturamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
+                    data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                    
+                    # Verificando a condição do valor na posição 30
+                    os = {
+                            'placa': ordem_servico[0],
+                            'data_faturamento': data_faturamento,
+                            'numero_os': ordem_servico[7],
+                            'companhia': ordem_servico[8],
+                            'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                            'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                            'total_os': self.formatar_moeda(ordem_servico[12]),
+                            'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                            'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                            'quantidade_litros': ordem_servico[15],
+                            'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                            'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                            'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                            'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                            'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                            'lts_oleo_motor': ordem_servico[24],
+                            'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                            'mecanico_servico': ordem_servico[28],
+                            'servico_filtro': ordem_servico[29],
+                            'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                            'obs': ordem_servico[39]
+                        }
+                        
+                        # Verificando o objeto os antes de adicionar
+                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                        
+                    faturamentos.append(os)
+                
+            # Verificando o resultado final
+            print(f"Faturamentos preparados: {faturamentos}")
+            
+            return faturamentos
+        except Exception as e:
+            # Verificando erros
+            print(f"Erro ao processar ordens de serviço: {e}")
+    
+    def ordens_dinheiro_relat(self, mes, ano):
+        try:
+            # Adicionando print para verificar os parâmetros recebidos
+            print(f"Mes: {mes}, Ano: {ano}")
+            
+            dados = self.db.ordens(mes, ano)
+            
+            # Verificando os dados obtidos de detalhes_filtros
+            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
+            faturamentos = []
+            
+            for ordem_servico in dados:
+                if ordem_servico[30] > 0:
+                    # Verificando os dados de cada ordem de serviço
+                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
+                    data_objeto_orcamento = datetime.strptime(ordem_servico[2], "%Y-%m-%d")
+                    
+                    data_objeto_faturamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
+                    data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                    
+                    # Verificando a condição do valor na posição 30
+                    os = {
+                            'placa': ordem_servico[0],
+                            'data_faturamento': data_faturamento,
+                            'numero_os': ordem_servico[7],
+                            'companhia': ordem_servico[8],
+                            'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                            'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                            'total_os': self.formatar_moeda(ordem_servico[12]),
+                            'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                            'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                            'quantidade_litros': ordem_servico[15],
+                            'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                            'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                            'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                            'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                            'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                            'lts_oleo_motor': ordem_servico[24],
+                            'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                            'mecanico_servico': ordem_servico[28],
+                            'servico_filtro': ordem_servico[29],
+                            'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                            'valor_em_dinheiro': self.formatar_moeda(ordem_servico[30]),
+                            'obs': ordem_servico[39]
+                        }
+                        
+                        # Verificando o objeto os antes de adicionar
+                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                        
+                    faturamentos.append(os)
+                
+            # Verificando o resultado final
+            print(f"Faturamentos preparados: {faturamentos}")
+            
+            return faturamentos
+        except Exception as e:
+            # Verificando erros
+            print(f"Erro ao processar ordens de serviço: {e}")
 
-
+    def faturamentos_ordens(self, mes, ano):
+        try:
+            faturamentos = []
+            faturamento = self.db.faturamento_ordens(mes, ano)
+            for ordem_servico in faturamento:
+                data_objeto_orcamento = datetime.strptime(
+                    ordem_servico[2], "%Y-%m-%d")
+                data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
+                data_objeto_faturamento = datetime.strptime(
+                    ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                os = {
+                    'placa': ordem_servico[0],
+                    'modelo_veiculo': ordem_servico[1],
+                    'data_orcamento': data_orcamento,
+                    'data_faturamento': data_faturamento,
+                    'dias_servico': ordem_servico[6],
+                    'numero_os': ordem_servico[7],
+                    'companhia': ordem_servico[8],
+                    'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                    'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                    'total_os': self.formatar_moeda(ordem_servico[12]),
+                    'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                    'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                    'quantidade_litros': ordem_servico[15],
+                    'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                    'valor_palheta': self.formatar_moeda(ordem_servico[17]),
+                    'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                    'valor_pastilha_parabrisa': self.formatar_moeda(ordem_servico[19]),
+                    'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                    'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                    'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                    'modelo_bateria': ordem_servico[23],
+                    'lts_oleo_motor': ordem_servico[24],
+                    'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                    'marca_e_tipo_oleo': ordem_servico[26],
+                    'mecanico_servico': ordem_servico[28],
+                    'servico_filtro': ordem_servico[29],
+                    'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                    'valor_em_dinheiro': self.formatar_moeda(ordem_servico[30]),
+                    'valor_servico_freios': self.formatar_moeda(ordem_servico[31]),
+                    'valor_servico_suspensao': self.formatar_moeda(ordem_servico[32]),
+                    'valor_servico_injecao_ignicao': self.formatar_moeda(ordem_servico[33]),
+                    'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
+                    'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
+                    'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
+                }
+                faturamentos.append(os)
+            return faturamentos
+        except Exception as e:
+            print(f"Erro ao obter faturamentos: {e}")
+            return []
+    
 class FaturamentoPortal():
     def __init__(self):
         self.db = conection.DatabasePortal()
@@ -1027,3 +1304,307 @@ class FaturamentoPortal():
             return faturamentos
         except Exception as e:
             print(e)
+
+    def revitalizacao_mecanico(self, mes, ano):
+        try: 
+            mecanicos = self.db.get_mecanicos()  # Obtém a lista de mecânicos
+            dados = []
+            
+            for mecanico in mecanicos:
+                if mecanico[0] == 'BATERIA_DOMICILIO':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'OUTROS':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+
+                revitalizacoes = self.db.relatorio_revitalizacao(mes, ano, mecanico[0])
+               
+                # Filtra apenas valores numéricos
+                revitalizacao_valores = []
+                for info in revitalizacoes:
+                    if info[0] != 0.0:
+                        revitalizacao_valores.append(info[0])
+
+                valor = sum(revitalizacao_valores)  # Soma os valores
+                quantidade = len(revitalizacao_valores)  # Conta as entradas
+
+                dados.append({
+                    'mecanico': mecanico[0],
+                    'valor': valor,
+                    'quantidade': quantidade
+                })
+
+            print(dados)  # Mostra os resultados finais
+            return dados  # Retorna os dados processados
+
+        except Exception as e:
+            print(f"Erro ao processar revitalizacao: {e}")  # Mensagem detalhada do erro
+            return []  # Retorna uma lista vazia em caso de erro
+        
+
+    def filtros_mecanico(self, mes, ano):
+        try: 
+            mecanicos = self.db.get_mecanicos()  # Obtém a lista de mecânicos
+            dados = []
+            
+            for mecanico in mecanicos:
+                if mecanico[0] == 'BATERIA_DOMICILIO':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+                if mecanico[0] == 'OUTROS':
+                    continue  # Ignora o mecânico 'BATERIA_DOMICILIO'
+
+                filtros = self.db.relatorio_filtro(mes, ano, mecanico[0])
+               
+                # Filtra apenas valores numéricos
+                filtro_valores = [info[0] for info in filtros]
+                valor = sum(filtro_valores)  # Soma os valores
+                quantidade = len(filtro_valores)  # Conta as entradas
+
+                dados.append({
+                    'mecanico': mecanico[0],
+                    'valor': valor,
+                    'quantidade': quantidade
+                })
+
+            print(dados)  # Mostra os resultados finais
+            return dados  # Retorna os dados processados
+
+        except Exception as e:
+            print(f"Erro ao processar filtros: {e}")  # Mensagem detalhada do erro
+            return []  # Retorna uma lista vazia em caso de erro
+        
+    
+    def ordens_filtro_e_higienizacao(self, mes, ano, mecanico):
+        try:
+            # Adicionando print para verificar os parâmetros recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            dados = self.db.detalhes_filtros(mes, ano, mecanico)
+            
+            # Verificando os dados obtidos de detalhes_filtros
+            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
+            faturamentos = []
+            
+            for ordem_servico in dados:
+                # Verificando os dados de cada ordem de serviço
+                print(f"Processando ordem de serviço: {ordem_servico}")
+                
+                data_objeto_orcamento = datetime.strptime(ordem_servico[2], "%Y-%m-%d")
+                
+                data_objeto_faturamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                
+                # Verificando a condição do valor na posição 30
+                os = {
+                        'placa': ordem_servico[0],
+                        'data_faturamento': data_faturamento,
+                        'numero_os': ordem_servico[7],
+                        'companhia': ordem_servico[8],
+                        'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                        'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                        'total_os': self.formatar_moeda(ordem_servico[12]),
+                        'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                        'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                        'quantidade_litros': ordem_servico[15],
+                        'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                        'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                        'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                        'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                        'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                        'lts_oleo_motor': ordem_servico[24],
+                        'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                        'mecanico_servico': ordem_servico[28],
+                        'servico_filtro': ordem_servico[29],
+                        'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                        'obs': ordem_servico[39]
+                    }
+                    
+                    # Verificando o objeto os antes de adicionar
+                print(f"Ordem de serviço preparada para adicionar: {os}")
+                    
+                faturamentos.append(os)
+            
+            # Verificando o resultado final
+            print(f"Faturamentos preparados: {faturamentos}")
+            
+            return faturamentos
+        except Exception as e:
+            # Verificando erros
+            print(f"Erro ao processar ordens de serviço: {e}")
+
+    def ordens_revitalizacao(self, mes, ano, mecanico):
+        try:
+            # Adicionando print para verificar os parâmetros recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            dados = self.db.detalhes_revitalizacao(mes, ano, mecanico)
+            
+            # Verificando os dados obtidos de detalhes_filtros
+            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
+            faturamentos = []
+            
+            for ordem_servico in dados:
+                if ordem_servico[13] > 0:
+                    # Verificando os dados de cada ordem de serviço
+                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
+                    data_objeto_orcamento = datetime.strptime(ordem_servico[2], "%Y-%m-%d")
+                    
+                    data_objeto_faturamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
+                    data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                    
+                    # Verificando a condição do valor na posição 30
+                    os = {
+                            'placa': ordem_servico[0],
+                            'data_faturamento': data_faturamento,
+                            'numero_os': ordem_servico[7],
+                            'companhia': ordem_servico[8],
+                            'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                            'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                            'total_os': self.formatar_moeda(ordem_servico[12]),
+                            'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                            'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                            'quantidade_litros': ordem_servico[15],
+                            'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                            'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                            'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                            'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                            'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                            'lts_oleo_motor': ordem_servico[24],
+                            'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                            'mecanico_servico': ordem_servico[28],
+                            'servico_filtro': ordem_servico[29],
+                            'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                            'obs': ordem_servico[39]
+                        }
+                        
+                        # Verificando o objeto os antes de adicionar
+                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                        
+                    faturamentos.append(os)
+                
+            # Verificando o resultado final
+            print(f"Faturamentos preparados: {faturamentos}")
+            
+            return faturamentos
+        except Exception as e:
+            # Verificando erros
+            print(f"Erro ao processar ordens de serviço: {e}")
+
+    
+    def ordens_dinheiro_relat(self, mes, ano):
+        try:
+            # Adicionando print para verificar os parâmetros recebidos
+            print(f"Mes: {mes}, Ano: {ano}")
+            
+            dados = self.db.ordens(mes, ano)
+            
+            # Verificando os dados obtidos de detalhes_filtros
+            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
+            faturamentos = []
+            
+            for ordem_servico in dados:
+                if ordem_servico[30] > 0:
+                    # Verificando os dados de cada ordem de serviço
+                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
+                    data_objeto_orcamento = datetime.strptime(ordem_servico[2], "%Y-%m-%d")
+                    
+                    data_objeto_faturamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
+                    data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                    
+                    # Verificando a condição do valor na posição 30
+                    os = {
+                            'placa': ordem_servico[0],
+                            'data_faturamento': data_faturamento,
+                            'numero_os': ordem_servico[7],
+                            'companhia': ordem_servico[8],
+                            'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                            'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                            'total_os': self.formatar_moeda(ordem_servico[12]),
+                            'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                            'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                            'quantidade_litros': ordem_servico[15],
+                            'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                            'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                            'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                            'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                            'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                            'lts_oleo_motor': ordem_servico[24],
+                            'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                            'mecanico_servico': ordem_servico[28],
+                            'servico_filtro': ordem_servico[29],
+                            'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                            'valor_em_dinheiro': self.formatar_moeda(ordem_servico[30]),
+                            'obs': ordem_servico[39]
+                        }
+                        
+                        # Verificando o objeto os antes de adicionar
+                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                        
+                    faturamentos.append(os)
+                
+            # Verificando o resultado final
+            print(f"Faturamentos preparados: {faturamentos}")
+            
+            return faturamentos
+        except Exception as e:
+            # Verificando erros
+            print(f"Erro ao processar ordens de serviço: {e}")
+
+    def faturamentos_ordens(self, mes, ano):
+        try:
+            faturamentos = []
+            faturamento = self.db.faturamento_ordens(mes, ano)
+            for ordem_servico in faturamento:
+                data_objeto_orcamento = datetime.strptime(
+                    ordem_servico[2], "%Y-%m-%d")
+                data_orcamento = data_objeto_orcamento.strftime("%d/%m/%Y")
+                data_objeto_faturamento = datetime.strptime(
+                    ordem_servico[3], "%Y-%m-%d")
+                data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
+                os = {
+                    'placa': ordem_servico[0],
+                    'modelo_veiculo': ordem_servico[1],
+                    'data_orcamento': data_orcamento,
+                    'data_faturamento': data_faturamento,
+                    'dias_servico': ordem_servico[6],
+                    'numero_os': ordem_servico[7],
+                    'companhia': ordem_servico[8],
+                    'valor_pecas': self.formatar_moeda(ordem_servico[10]),
+                    'valor_servicos': self.formatar_moeda(ordem_servico[11]),
+                    'total_os': self.formatar_moeda(ordem_servico[12]),
+                    'valor_revitalizacao': self.formatar_moeda(ordem_servico[13]),
+                    'valor_aditivo': self.formatar_moeda(ordem_servico[14]),
+                    'quantidade_litros': ordem_servico[15],
+                    'valor_fluido_sangria': self.formatar_moeda(ordem_servico[16]),
+                    'valor_palheta': self.formatar_moeda(ordem_servico[17]),
+                    'valor_limpeza_freios': self.formatar_moeda(ordem_servico[18]),
+                    'valor_pastilha_parabrisa': self.formatar_moeda(ordem_servico[19]),
+                    'valor_filtro': self.formatar_moeda(ordem_servico[20]),
+                    'valor_pneu': self.formatar_moeda(ordem_servico[21]),
+                    'valor_bateria': self.formatar_moeda(ordem_servico[22]),
+                    'modelo_bateria': ordem_servico[23],
+                    'lts_oleo_motor': ordem_servico[24],
+                    'valor_lt_oleo': self.formatar_moeda(ordem_servico[25]),
+                    'marca_e_tipo_oleo': ordem_servico[26],
+                    'mecanico_servico': ordem_servico[28],
+                    'servico_filtro': ordem_servico[29],
+                    'valor_p_meta': self.formatar_moeda(ordem_servico[27]),
+                    'valor_em_dinheiro': self.formatar_moeda(ordem_servico[30]),
+                    'valor_servico_freios': self.formatar_moeda(ordem_servico[31]),
+                    'valor_servico_suspensao': self.formatar_moeda(ordem_servico[32]),
+                    'valor_servico_injecao_ignicao': self.formatar_moeda(ordem_servico[33]),
+                    'valor_servico_cabecote_motor_arr': self.formatar_moeda(ordem_servico[34]),
+                    'valor_outros_servicos': self.formatar_moeda(ordem_servico[35]),
+                    'valor_servicos_oleos': self.formatar_moeda(ordem_servico[36]),
+                    'valor_servico_transmissao': self.formatar_moeda(ordem_servico[37]),
+                    'obs':ordem_servico[39]
+                }
+                faturamentos.append(os)
+            return faturamentos
+        except Exception as e:
+            print(f"Erro ao obter faturamentos: {e}")
+            return []

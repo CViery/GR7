@@ -40,7 +40,7 @@
             </select>
             <button type="submit">Exportar</button>
         </form>
-        <form action="/fechamento_mensal" method="post">
+        <form action="/fechamento_filtros" method="post">
             <h3>Filtro por mecanico</h3>
             <select name="mes" id="mes">
                 <option value="01">Janeiro</option>
@@ -70,11 +70,13 @@
                 <option value="2034">2034</option>
             </select>
             <select name="mecanico" id="">
-                <option value="">Mecanicos</option>
+                {% for mecanico in mecanicos  %}
+                <option value="{{mecanico}}">{{mecanico}}</option>
+                {% endfor %}>
             </select>
             <button type="submit">Exportar</button>
         </form>
-        <form action="/fechamento_mensal" method="post">
+        <form action="/fechamento_revitalizacao" method="post">
             <h3>Revitalização por mecanico</h3>
             <select name="mes" id="mes">
                 <option value="01">Janeiro</option>
@@ -104,12 +106,45 @@
                 <option value="2034">2034</option>
             </select>
             <select name="mecanico" id="">
-                <option value="">Mecanicos</option>
+                {% for mecanico in mecanicos  %}
+                <option value="{{mecanico}}">{{mecanico}}</option>
+                {% endfor %}>
             </select>
             <button type="submit">Exportar</button>
         </form>
-        <form action="/fechamento_mensal" method="post">
+        <form action="/fechamento_dinheiro" method="post">
             <h3>Fechamento do mês Os com Dinheiro</h3>
+            <select name="mes" id="mes">
+                <option value="01">Janeiro</option>
+                <option value="02">Fevereiro</option>
+                <option value="03">Março</option>
+                <option value="04">Abril</option>
+                <option value="05">Maio</option>
+                <option value="06">Junho</option>
+                <option value="07">Julho</option>
+                <option value="08">Agosto</option>
+                <option value="09">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+            </select>
+            <select name="ano" id="ano">
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+                <option value="2031">2031</option>
+                <option value="2032">2032</option>
+                <option value="2033">2033</option>
+                <option value="2034">2034</option>
+            </select>
+            <button type="submit">Exportar</button>
+        </form>
+        <form action="/baixar_os" method="post">
+            <h3>Ordens de Serviço do mês</h3>
             <select name="mes" id="mes">
                 <option value="01">Janeiro</option>
                 <option value="02">Fevereiro</option>
@@ -142,8 +177,8 @@
     </summary>
     <summary>
         <legend>Despesas</legend>
-        <form action="/fechamento_mensal" method="post">
-            <h3>Despesas do mês</h3>
+        <form action="/relatorio_notas" method="post">
+            <h3>Baixar Notas</h3>
             <select name="mes" id="mes">
                 <option value="01">Janeiro</option>
                 <option value="02">Fevereiro</option>
@@ -173,41 +208,7 @@
             </select>
             <button type="submit">Exportar</button>
         </form>
-        <form action="/fechamento_mensal" method="post">
-            <h3>Gastos por departamento</h3>
-            <select name="mes" id="mes">
-                <option value="01">Janeiro</option>
-                <option value="02">Fevereiro</option>
-                <option value="03">Março</option>
-                <option value="04">Abril</option>
-                <option value="05">Maio</option>
-                <option value="06">Junho</option>
-                <option value="07">Julho</option>
-                <option value="08">Agosto</option>
-                <option value="09">Setembro</option>
-                <option value="10">Outubro</option>
-                <option value="11">Novembro</option>
-                <option value="12">Dezembro</option>
-            </select>
-            <select name="ano" id="ano">
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-                <option value="2029">2029</option>
-                <option value="2030">2030</option>
-                <option value="2031">2031</option>
-                <option value="2032">2032</option>
-                <option value="2033">2033</option>
-                <option value="2034">2034</option>
-            </select>
-            <select name="mecanico" id="">
-                <option value="">Departamentos</option>
-            </select>
-            <button type="submit">Exportar</button>
-        </form>
-        <form action="/fechamento_mensal" method="post">
+        <form action="/relatorio_boletos" method="post">
             <h3>Boletos</h3>
             <select name="mes" id="mes">
                 <option value="01">Janeiro</option>
@@ -236,42 +237,9 @@
                 <option value="2033">2033</option>
                 <option value="2034">2034</option>
             </select>
-            <select name="mecanico" id="">
-                <option value="">Mecanicos</option>
-            </select>
             <button type="submit">Exportar</button>
         </form>
-        <form action="/fechamento_mensal" method="post">
-            <h3>Gastos departamentos</h3>
-            <select name="mes" id="mes">
-                <option value="01">Janeiro</option>
-                <option value="02">Fevereiro</option>
-                <option value="03">Março</option>
-                <option value="04">Abril</option>
-                <option value="05">Maio</option>
-                <option value="06">Junho</option>
-                <option value="07">Julho</option>
-                <option value="08">Agosto</option>
-                <option value="09">Setembro</option>
-                <option value="10">Outubro</option>
-                <option value="11">Novembro</option>
-                <option value="12">Dezembro</option>
-            </select>
-            <select name="ano" id="ano">
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-                <option value="2029">2029</option>
-                <option value="2030">2030</option>
-                <option value="2031">2031</option>
-                <option value="2032">2032</option>
-                <option value="2033">2033</option>
-                <option value="2034">2034</option>
-            </select>
-            <button type="submit">Exportar</button>
-        </form>
+
     </summary>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

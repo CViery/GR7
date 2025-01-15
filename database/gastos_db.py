@@ -205,6 +205,34 @@ class GastosDataBase:
             # Log de erro para falha na consulta
             logging.error(f"Erro ao buscar boletos: {e}")
             return f"Erro: {e}"
+        
+    def get_boletos_mes(self, mes, ano):
+        """
+        Recupera todos os boletos cadastrados no banco de dados, ordenados pela data de vencimento.
+
+        Returns:
+            list: Lista de boletos, ou uma mensagem de erro se ocorrer algum problema na consulta.
+        """
+        try:
+            # Log para indicar início da consulta
+            logging.info("Iniciando consulta para recuperar todos os boletos.")
+
+            # Consulta SQL para recuperar os boletos
+            query = 'SELECT * FROM boletos WHERE mes_vencimento = ? AND ano_vencimento = ? ORDER BY data_vencimento ASC'
+            self.cursor.execute(query, (mes, ano))
+
+            # Recuperando os resultados
+            result = self.cursor.fetchall()
+
+            # Log para indicar o número de registros encontrados
+            logging.info(f"{len(result)} boletos encontrados.")
+
+            return result
+
+        except Exception as e:
+            # Log de erro para falha na consulta
+            logging.error(f"Erro ao buscar boletos: {e}")
+            return f"Erro: {e}"
 
     def get_boletos_por_nota(self, num_nota):
         """
@@ -1353,3 +1381,63 @@ class GastosDataBasePortal():
         self.cursor.execute(query)
         response = self.cursor.fetchall()
         return response
+
+    def get_all_notas_mes(self, mes, ano):
+        """
+        Obtém todas as notas do mês e ano especificados, ordenadas pela data de emissão.
+
+        Parameters:
+            mes (int): Mês das notas a serem buscadas.
+            ano (int): Ano das notas a serem buscadas.
+
+        Returns:
+            list: Lista de tuplas com os dados das notas filtradas por mês e ano.
+        """
+        try:
+            # Log para indicar que a busca está sendo iniciada
+            logging.info(f"Iniciando a busca de notas para o mês {mes} e ano {ano}.")
+
+            # Consulta SQL para obter todas as notas para o mês e ano fornecidos
+            query = 'SELECT * FROM notas_portal WHERE mes_emissao = ? AND ano_emissao = ? ORDER BY data_emissao ASC;'
+            self.cursor.execute(query, (mes, ano))
+
+            # Obtendo os resultados
+            result = self.cursor.fetchall()
+
+            # Log para indicar que a busca foi concluída
+            logging.info(f"{len(result)} notas encontradas para o mês {mes} e ano {ano}.")
+
+            return result
+
+        except Exception as e:
+            # Log detalhado do erro
+            logging.error(f"Erro ao buscar as notas para o mês {mes} e ano {ano}: {e}")
+            return f"Erro: {e}"
+        
+    def get_boletos_mes(self, mes, ano):
+        """
+        Recupera todos os boletos cadastrados no banco de dados, ordenados pela data de vencimento.
+
+        Returns:
+            list: Lista de boletos, ou uma mensagem de erro se ocorrer algum problema na consulta.
+        """
+        try:
+            # Log para indicar início da consulta
+            logging.info("Iniciando consulta para recuperar todos os boletos.")
+
+            # Consulta SQL para recuperar os boletos
+            query = 'SELECT * FROM boletos_portal WHERE mes_vencimento = ? AND ano_vencimento = ? ORDER BY data_vencimento ASC'
+            self.cursor.execute(query, (mes, ano))
+
+            # Recuperando os resultados
+            result = self.cursor.fetchall()
+
+            # Log para indicar o número de registros encontrados
+            logging.info(f"{len(result)} boletos encontrados.")
+
+            return result
+
+        except Exception as e:
+            # Log de erro para falha na consulta
+            logging.error(f"Erro ao buscar boletos: {e}")
+            return f"Erro: {e}"
