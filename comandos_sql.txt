@@ -1,0 +1,16 @@
+comando para apagar duplicadas
+
+SELECT
+    ROW_NUMBER() OVER (PARTITION BY num_nota ORDER BY num_nota) AS row_num,
+    *
+FROM [dbo].[notas_portal]
+WHERE num_nota = '346652';
+WITH CTE AS (
+    SELECT
+        ROW_NUMBER() OVER (PARTITION BY num_nota ORDER BY num_nota) AS row_num,
+        *
+    FROM [dbo].[notas_portal]
+    WHERE num_nota = '346652'
+)
+DELETE FROM CTE
+WHERE row_num > 1;

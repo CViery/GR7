@@ -45,7 +45,7 @@
     }
 
     th, td {
-      padding: 10px;
+      padding: 5px;
       text-align: left;
       border: 1px solid #ddd;
     }
@@ -82,11 +82,15 @@
       font-size: 0.9rem;
       margin-top: 30px;
     }
+    img{
+      width: 90%;
+      height: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Relatório de Serviços</h1>
+  <img src="{{url_for('static', filename= 'imgs/logogr7.jpg')}}" alt="logo" class="logos">
 
   <h2>Filtros por Mecânico</h2>
   <div class="table-container">
@@ -101,7 +105,7 @@
       <tbody>
         {% for filtro  in dados_filtros  %}
           <tr>
-            <td>{{filtro.mecanico}}</td>
+            <td><strong>{{filtro.mecanico}}</strong></td>
             <td>{{filtro.quantidade}}</td>
             <td>R$ {{filtro.valor}}</td>
           </tr>
@@ -110,8 +114,8 @@
           <td><strong>Total</strong></td>
           {% for faturamento  in faturamento_servico  %}
           {%if faturamento[0] == 'filtro' %}
-          <td> <strong>{{ faturamento[1] }}</strong></td>
           <td><strong>{{ faturamento[2] }}</strong></td>
+          <td> <strong>{{ faturamento[1] }}</strong></td>
           {% endif %}
           
           
@@ -132,13 +136,23 @@
         </tr>
       </thead>
       <tbody>
+        {% for dados in dados_revitalizacao  %}
+        <tr>
+          <td><strong>{{dados.mecanico}}</strong></td>
+          <td>{{dados.quantidade}}</td>
+          <td>R$ {{dados.valor}}</td>
+        </tr>
+        {% endfor %}
         
-        <tr><td>Jucimar</td><td>3</td><td>R$ 482,18</td></tr>
-        <tr><td>Pedro</td><td>0</td><td>R$ 0,00</td></tr>
-        <tr><td>Leandro</td><td>0</td><td>R$ 0,00</td></tr>
-        <tr><td>Vagner</td><td>0</td><td>R$ 0,00</td></tr>
-        <tr><td>Vando</td><td>1</td><td>R$ 287,06</td></tr>
-        <tr><td><strong>Total</strong></td><td><strong>4</strong></td><td><strong>R$ 769,24</strong></td></tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          {% for faturamento  in faturamento_servico  %}
+          {%if faturamento[0] == 'revitalizacao' %}
+          <td><strong>{{ faturamento[2] }}</strong></td>
+          <td> <strong>{{ faturamento[1] }}</strong></td>
+          {% endif %}
+          {% endfor %}
+        </tr>
       </tbody>
     </table>
   </div>
@@ -158,30 +172,30 @@
           {% for faturamento in faturamento_servico %}
           <tr>
               {%if faturamento[0] == 'revitalizacao' %}
-              <td>REVITALIZAÇÃO</td>
+              <td><strong>REVITALIZAÇÃO</strong></td>
               <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
               {% endif %}
               {%if faturamento[0] == 'aditivo' %}
                   {%if empresa == 'gr7'%}
-                      <td>ADITIVO</td>
+                      <td><strong>ADITIVO</strong></td>
                       <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
 
                   {%elif empresa == 'portal'%}
-                      <td>AR CONDICIONADO</td>
+                      <td><strong>AR CONDICIONADO</strong></td>
                       <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
                   {%endif%}
               {% endif %}
               {%if faturamento[0] == 'fluido_sangria' %}
                   {%if empresa == 'gr7'%}
-                  <td>FLUIDO E SANGRIA</td>
+                  <td><strong>FLUIDO E SANGRIA</strong></td>
                   <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
 
                   {%elif empresa == 'portal'%}
-                      <td>LAVAGEM</td>
+                      <td><strong>LAVAGEM</strong></td>
                       <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
 
@@ -189,12 +203,12 @@
                   {% endif %}
               {%if faturamento[0] == 'palheta' %}
                   {%if empresa == 'gr7'%}
-                      <td>PALHETA</td>
+                      <td><strong>PALHETA</strong></td>
                       <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
 
               {%elif empresa == 'portal'%}
-                  <td>ALTERNADOR/MOTOR DE ARRANQUE</td>
+                  <td><strong>ALTERNADOR/MOTOR DE ARRANQUE</strong></td>
                   <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
 
@@ -202,34 +216,34 @@
               {% endif %}
               {%if faturamento[0] == 'limpeza_freios' %}
                   {%if empresa == 'gr7'%}
-                  <td>LIMPEZA DE FREIOS</td>
+                  <td><strong>LIMPEZA DE FREIOS</strong></td>
                   <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
 
                   {%elif empresa == 'portal'%}
-                  <td>FUNILARIA</td>
+                  <td><strong>FUNILARIA</strong></td>
                   <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
 
-              {%endif%}
+                {%endif%}
               {% endif %}
               {%if faturamento[0] == 'detergente_parabrisa' %}
-              <td>DETERGENTE PARABRISA</td>
+              <td><strong>DETERGENTE PARABRISA</strong></td>
               <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
               {% endif %}
               {%if faturamento[0] == 'filtro' %}
-              <td>FILTRO</td>
+              <td><strong>FILTRO</strong></td>
               <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
               {% endif %}
               {%if faturamento[0] == 'pneus' %}
-              <td>PNEUS</td>
+              <td><strong>PNEUS</strong></td>
               <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
               {% endif %}
               {%if faturamento[0] == 'bateria' %}
-              <td>BATERIA</td>
+              <td><strong>BATERIA</strong></td>
               <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
               {% endif %}
@@ -243,6 +257,8 @@
   <div class="summary">
     <p><strong>Faturamento Bruto:</strong> R$ {{valor_faturamento_total}}</p>
     <p><strong>Valor Líquido:</strong> R$ {{valor_faturamento_meta}}</p>
+    <p><strong>Passagem de Veiculos</strong> {{passagens}}</p>
+    <p><strong>Tickte Medio</strong> {{ticket}}</p>
   </div>
 
   <footer>© 2024 Relatório de Serviços. Todos os direitos reservados.</footer>

@@ -693,6 +693,46 @@ class Database:
             # Logando o erro de exceção
             logging.error(f"Erro ao executar a consulta para o filtro com mes={mes}, ano={ano}, mecanico={mecanico}. Detalhes do erro: {e}")
             return []  # Retorna uma lista vazia em caso de erro
+
+
+    def relatorio_revitalizacao(self, mes, ano, mecanico):
+        """
+        Retorna os filtros e o filtro do mecânico para um determinado mês, ano e mecânico.
+
+        Args:
+            mes (str): Mês de referência para a consulta.
+            ano (str): Ano de referência para a consulta.
+            mecanico (str): Nome do mecânico para o filtro.
+
+        Returns:
+            list: Lista de resultados contendo o filtro e filtro_mecanico ou uma lista vazia se não encontrado.
+        """
+        try:
+            # Logando o início da consulta
+            logging.info(f"Iniciando consulta para relatório de revitalizacoes: mes={mes}, ano={ano}, mecanico={mecanico}")
+            
+            query = '''
+                SELECT revitalizacao, mecanico 
+                FROM faturamento 
+                WHERE mes_faturamento = ? 
+                AND ano_faturamento = ? 
+                AND mecanico = ?
+            '''
+            self.cursor.execute(query, (mes, ano, mecanico))
+            result = self.cursor.fetchall()
+
+            # Verificando se o resultado é vazio
+            if result:
+                logging.info(f"Consulta bem-sucedida. {len(result)} resultados encontrados.")
+                return result
+            else:
+                logging.warning(f"Nenhum resultado encontrado para o mecânico {mecanico} no mês {mes} e ano {ano}.")
+                return []  # Retorna uma lista vazia se não encontrar resultados
+
+        except Exception as e:
+            # Logando o erro de exceção
+            logging.error(f"Erro ao executar a consulta para a revitalizacao com mes={mes}, ano={ano}, mecanico={mecanico}. Detalhes do erro: {e}")
+            return []  # Retorna uma lista vazia em caso de erro
         
     
     def buscar_faturamento(self, num_os):
@@ -781,6 +821,90 @@ class Database:
             print(f"Ordem de serviço {num_os} atualizada com sucesso.")
         except Exception as e:
             print(f"Erro ao atualizar ordem de serviço {num_os}: {e}")
+    
+    def detalhes_filtros(self, mes, ano, mecanico):
+        try:
+            # Adicionando prints para verificar os valores recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ? AND filtro_mecanico = ?'
+            
+            # Verificando a query antes da execução
+            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
+            
+            self.cursor.execute(query, (mes, ano, mecanico))
+            
+            # Verificando o resultado obtido
+            result = self.cursor.fetchall()
+            print(f"Resultado da consulta: {result}")
+            
+            return result
+        except Exception as e:
+            # Adicionando print para verificar erros
+            print(f"Erro ao executar a consulta: {e}")
+            raise
+
+    def detalhes_revitalizacao(self, mes, ano, mecanico):
+        try:
+            # Adicionando prints para verificar os valores recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ? AND mecanico = ?'
+            
+            # Verificando a query antes da execução
+            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
+            
+            self.cursor.execute(query, (mes, ano, mecanico))
+            
+            # Verificando o resultado obtido
+            result = self.cursor.fetchall()
+            print(f"Resultado da consulta: {result}")
+            
+            return result
+        except Exception as e:
+            # Adicionando print para verificar erros
+            print(f"Erro ao executar a consulta: {e}")
+            raise
+
+    def ordens(self, mes, ano):
+        try:
+            # Adicionando prints para verificar os valores recebidos
+            print(f"Mes: {mes}, Ano: {ano}")
+            
+            query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            
+            # Verificando a query antes da execução
+            print(f"Executando query: {query} com os parâmetros ({mes}, {ano})")
+            
+            self.cursor.execute(query, (mes, ano))
+            
+            # Verificando o resultado obtido
+            result = self.cursor.fetchall()
+            print(f"Resultado da consulta: {result}")
+            
+            return result
+        except Exception as e:
+            # Adicionando print para verificar erros
+            print(f"Erro ao executar a consulta: {e}")
+            raise
+
+    def faturamento_ordens(self, mes, ano):
+        try:
+            logging.info(f"Consulta de faturamento iniciada para o mês {mes}/{ano}.")
+            
+            query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            
+            if result:
+                logging.info(f"Foram encontrados {len(result)} registros para o mês {mes}/{ano}.")
+            else:
+                logging.warning(f"Nenhum registro encontrado para o mês {mes}/{ano}.")
+            
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao consultar faturamento para o mês {mes}/{ano}: {e}")
+            return []
         
 class DatabasePortal:
     def __init__(self):
@@ -1016,3 +1140,165 @@ class DatabasePortal:
             return result
         except Exception as e:
             print(e)
+    
+    def relatorio_filtro(self, mes, ano, mecanico):
+        """
+        Retorna os filtros e o filtro do mecânico para um determinado mês, ano e mecânico.
+
+        Args:
+            mes (str): Mês de referência para a consulta.
+            ano (str): Ano de referência para a consulta.
+            mecanico (str): Nome do mecânico para o filtro.
+
+        Returns:
+            list: Lista de resultados contendo o filtro e filtro_mecanico ou uma lista vazia se não encontrado.
+        """
+        try:
+            # Logando o início da consulta
+            logging.info(f"Iniciando consulta para relatório de filtro: mes={mes}, ano={ano}, mecanico={mecanico}")
+            
+            query = '''
+                SELECT filtro, filtro_mecanico 
+                FROM faturamento_portal 
+                WHERE mes_faturamento = ? 
+                AND ano_faturamento = ? 
+                AND filtro_mecanico = ?
+            '''
+            self.cursor.execute(query, (mes, ano, mecanico))
+            result = self.cursor.fetchall()
+
+            # Verificando se o resultado é vazio
+            if result:
+                logging.info(f"Consulta bem-sucedida. {len(result)} resultados encontrados.")
+                return result
+            else:
+                logging.warning(f"Nenhum resultado encontrado para o mecânico {mecanico} no mês {mes} e ano {ano}.")
+                return []  # Retorna uma lista vazia se não encontrar resultados
+
+        except Exception as e:
+            # Logando o erro de exceção
+            logging.error(f"Erro ao executar a consulta para o filtro com mes={mes}, ano={ano}, mecanico={mecanico}. Detalhes do erro: {e}")
+            return []  # Retorna uma lista vazia em caso de erro
+        
+    def relatorio_revitalizacao(self, mes, ano, mecanico):
+        """
+        Retorna os filtros e o filtro do mecânico para um determinado mês, ano e mecânico.
+
+        Args:
+            mes (str): Mês de referência para a consulta.
+            ano (str): Ano de referência para a consulta.
+            mecanico (str): Nome do mecânico para o filtro.
+
+        Returns:
+            list: Lista de resultados contendo o filtro e filtro_mecanico ou uma lista vazia se não encontrado.
+        """
+        try:
+            # Logando o início da consulta
+            logging.info(f"Iniciando consulta para relatório de revitalizacoes: mes={mes}, ano={ano}, mecanico={mecanico}")
+            
+            query = '''
+                SELECT revitalizacao, mecanico 
+                FROM faturamento_portal 
+                WHERE mes_faturamento = ? 
+                AND ano_faturamento = ? 
+                AND mecanico = ?
+            '''
+            self.cursor.execute(query, (mes, ano, mecanico))
+            result = self.cursor.fetchall()
+
+            # Verificando se o resultado é vazio
+            if result:
+                logging.info(f"Consulta bem-sucedida. {len(result)} resultados encontrados.")
+                return result
+            else:
+                logging.warning(f"Nenhum resultado encontrado para o mecânico {mecanico} no mês {mes} e ano {ano}.")
+                return []  # Retorna uma lista vazia se não encontrar resultados
+
+        except Exception as e:
+            # Logando o erro de exceção
+            logging.error(f"Erro ao executar a consulta para a revitalizacao com mes={mes}, ano={ano}, mecanico={mecanico}. Detalhes do erro: {e}")
+            return []  # Retorna uma lista vazia em caso de erro
+        
+    def detalhes_filtros(self, mes, ano, mecanico):
+        try:
+            # Adicionando prints para verificar os valores recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ? AND filtro_mecanico = ?'
+            
+            # Verificando a query antes da execução
+            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
+            
+            self.cursor.execute(query, (mes, ano, mecanico))
+            
+            # Verificando o resultado obtido
+            result = self.cursor.fetchall()
+            print(f"Resultado da consulta: {result}")
+            
+            return result
+        except Exception as e:
+            # Adicionando print para verificar erros
+            print(f"Erro ao executar a consulta: {e}")
+            raise
+
+    def detalhes_revitalizacao(self, mes, ano, mecanico):
+        try:
+            # Adicionando prints para verificar os valores recebidos
+            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
+            query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ? AND mecanico = ?'
+            
+            # Verificando a query antes da execução
+            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
+            
+            self.cursor.execute(query, (mes, ano, mecanico))
+            
+            # Verificando o resultado obtido
+            result = self.cursor.fetchall()
+            print(f"Resultado da consulta: {result}")
+            
+            return result
+        except Exception as e:
+            # Adicionando print para verificar erros
+            print(f"Erro ao executar a consulta: {e}")
+            raise
+
+    def ordens(self, mes, ano):
+        try:
+            # Adicionando prints para verificar os valores recebidos
+            print(f"Mes: {mes}, Ano: {ano}")
+            
+            query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            
+            # Verificando a query antes da execução
+            print(f"Executando query: {query} com os parâmetros ({mes}, {ano})")
+            
+            self.cursor.execute(query, (mes, ano))
+            
+            # Verificando o resultado obtido
+            result = self.cursor.fetchall()
+            print(f"Resultado da consulta: {result}")
+            
+            return result
+        except Exception as e:
+            # Adicionando print para verificar erros
+            print(f"Erro ao executar a consulta: {e}")
+            raise
+
+    def faturamento_ordens(self, mes, ano):
+        try:
+            logging.info(f"Consulta de faturamento iniciada para o mês {mes}/{ano}.")
+            
+            query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            self.cursor.execute(query, (mes, ano))
+            result = self.cursor.fetchall()
+            
+            if result:
+                logging.info(f"Foram encontrados {len(result)} registros para o mês {mes}/{ano}.")
+            else:
+                logging.warning(f"Nenhum registro encontrado para o mês {mes}/{ano}.")
+            
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao consultar faturamento para o mês {mes}/{ano}: {e}")
+            return []

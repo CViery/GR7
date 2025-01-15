@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Faturamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        /* Estilo da tabela para layout horizontal */
+        .table-container {
+            overflow-x: auto;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        /* Estilo para os itens do cabeçalho e dados */
+        .header-item, .data-item {
+            width: 150px;
+            word-wrap: break-word;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Faturamento - <span class="highlight">{{ empresa }}</span></h1>
+    <p>Mês: <span class="highlight">{{ mes }}</span> | Ano: <span class="highlight">{{ ano }}</span> | Mecânico: <span class="highlight">{{ mecanico }}</span></p>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="header-item">Placa</th>
+                    <th class="header-item">Data de Faturamento</th>
+                    <th class="header-item">Número da OS</th>
+                    <th class="header-item">Companhia</th>
+                    <th class="header-item">Total da OS</th>
+                    <th class="header-item">Valor Filtro</th>
+                    <th class="header-item">Observações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in dados %}
+                <tr>
+                    <td class="data-item">{{ item.placa }}</td>
+                    <td class="data-item">{{ item.data_faturamento }}</td>
+                    <td class="data-item">{{ item.numero_os }}</td>
+                    <td class="data-item">{{ item.companhia }}</td>
+                    <td class="data-item">{{ item.total_os }}</td>
+                    <td class="data-item">{{ item.valor_filtro }}</td>
+                    <td class="data-item">{{ item.obs }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

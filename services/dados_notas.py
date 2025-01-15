@@ -348,7 +348,56 @@ class DadosGastos:
         return dados
         # Exibir os dados
         
-
+    def buscar_notas(self, mes, ano):
+        print(mes)
+        print(ano)
+        notas = self.db.get_all_notas_mes(mes, ano)
+        
+        output = []
+        if notas:
+            for nota in notas:
+                data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
+                data_formatada = data_objeto.strftime("%d/%m/%Y")
+                valor_nota = nota[12]
+                valor = self.formatar_moeda(valor_nota)
+                nfe = {
+                    'pago_por': nota[0],
+                    'emitido_para': nota[1],
+                    'status': nota[2],
+                    'boleto': nota[3],
+                    'numero_nota': nota[4],
+                    'fornecedor': nota[6],
+                    'data_emissao': data_formatada,
+                    'valor': valor,
+                    'duplicata': nota[5],
+                    'tipo_despesa': nota[13],
+                    'obs': nota[14]
+                }
+                output.append(nfe)
+            return output
+        else:
+            notas = []
+            return notas
+        
+    def buscar_boletos(self, mes, ano):
+        dados = self.db.get_boletos_mes(mes, ano)
+        boletos = []
+        for dado in dados:
+            
+            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_formatada = data_objeto.strftime("%d/%m/%Y")
+            valor_boleto = dado[7]
+            valor = self.formatar_moeda(valor_boleto)
+            boleto = {
+                'num_nota': dado[0],
+                'notas': dado[1],
+                'fornecedor': dado[2],
+                'data_vencimento': data_formatada,
+                'valor': valor
+            }
+            boletos.append(boleto)
+            
+        return boletos
 
 
 class DadosGastosPortal():
@@ -673,3 +722,54 @@ class DadosGastosPortal():
             
         return dados
         # Exibir os dados
+
+    def buscar_notas(self, mes, ano):
+        print(mes)
+        print(ano)
+        notas = self.db.get_all_notas_mes(mes, ano)
+        
+        output = []
+        if notas:
+            for nota in notas:
+                data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
+                data_formatada = data_objeto.strftime("%d/%m/%Y")
+                valor_nota = nota[12]
+                valor = self.formatar_moeda(valor_nota)
+                nfe = {
+                    'pago_por': nota[0],
+                    'emitido_para': nota[1],
+                    'status': nota[2],
+                    'boleto': nota[3],
+                    'numero_nota': nota[4],
+                    'fornecedor': nota[6],
+                    'data_emissao': data_formatada,
+                    'valor': valor,
+                    'duplicata': nota[5],
+                    'tipo_despesa': nota[13],
+                    'obs': nota[14]
+                }
+                output.append(nfe)
+            return output
+        else:
+            notas = []
+            return notas
+        
+    def buscar_boletos(self, mes, ano):
+        dados = self.db.get_boletos_mes(mes, ano)
+        boletos = []
+        for dado in dados:
+            
+            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_formatada = data_objeto.strftime("%d/%m/%Y")
+            valor_boleto = dado[7]
+            valor = self.formatar_moeda(valor_boleto)
+            boleto = {
+                'num_nota': dado[0],
+                'notas': dado[1],
+                'fornecedor': dado[2],
+                'data_vencimento': data_formatada,
+                'valor': valor
+            }
+            boletos.append(boleto)
+            
+        return boletos

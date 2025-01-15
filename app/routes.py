@@ -7,7 +7,9 @@ from database import gastos_db
 from xhtml2pdf import pisa
 from io import BytesIO
 import json
-
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
+from openpyxl.drawing.image import Image
 
 PERMISSAO_TOTAL_ADMIN = 0
 PERMISSAO_GR7_USER = 1
@@ -1580,21 +1582,46 @@ class Routes:
 
     @app.route('/relatorios')
     def page_relatorios():
-        return render_template('relatorios.html')
+        if session['empresa'] == 'gr7':
+            db = faturamento.Faturamento()
+            db_utils = utills.Utills()
+            departamentos = db_utils.despesas()
+            mecanicos = db.funcionarios()
+            context = {
+                'departamentos': departamentos,
+                'mecanicos': mecanicos
+            } 
+        elif session['empresa'] == 'portal':
+            db = faturamento.FaturamentoPortal()
+            db_utils = utills.Utills()
+            departamentos = db_utils.despesas()
+            mecanicos = db.funcionarios()
+            context = {
+                'departamentos': departamentos,
+                'mecanicos': mecanicos
+            }
+        return render_template('relatorios.html', **context)
 
 
 
 
     @app.route('/fechamento_mensal', methods=['GET', 'POST'])
     def gerar_pdf():
+        if session['empresa'] == 'gr7':
+            db = faturamento.Faturamento()
+            services = utills.Utills()
+            empresa = session['empresa']
+        elif session['empresa'] == 'portal':
+            db = faturamento.FaturamentoPortal()
+            services = utills.Utills_portal()
+            empresa = session['empresa']
         mes = request.form.get('mes')
         ano = request.form.get('ano')
         print(f'mes selecionado {mes}')
         print(f'Ano selecionado {ano}')
         # Dados para o template
-        db = faturamento.Faturamento()
-        services = utills.Utills()
-        empresa = 'gr7'
+        
+        
         valor_faturamento_total = db.faturamento_total_mes(mes, ano)
         valor_faturamento_meta = db.faturamento_meta_mes(mes, ano)
         faturamento_mecanicos = db.faturamento_mecanico(mes, ano)
@@ -1605,21 +1632,23 @@ class Routes:
         passagens = services.passagens(mes, ano)
         valor_meta_int = db.faturamento_meta_mes_int(mes, ano)
         mecanicos = db.faturamento_mecanico(mes, ano)
-        dados_filtros = db.filtros_mecanico(mes, ano) 
+        dados_filtros = db.filtros_mecanico(mes, ano)
+        dados_revitalizacao = db.revitalizacao_mecanico(mes,ano)
         context = {
             'valor_faturamento_total': valor_faturamento_total,
             'valor_faturamento_meta': valor_faturamento_meta,
             'faturamento_mecanicos': faturamento_mecanicos,
             'faturamento_companhia': faturamento_cias,
             'faturamento_servico': faturamento_servico,
-            'empresa': 'empresa',
+            'empresa': empresa,
             'valor_dinheiro': valor_dinheiro,
             'ticket': ticket,
             'passagens': passagens,
             'valor_meta_int': valor_meta_int,
             'mes_escolhido': mes,
             'ano_escolhido': ano,
-            'dados_filtros': dados_filtros
+            'dados_filtros': dados_filtros,
+            'dados_revitalizacao': dados_revitalizacao
         }
         
         # Renderiza o template HTML
@@ -1713,3 +1742,496 @@ class Routes:
                 except Exception as e:
                     return f"Erro ao buscar ordem de serviço: {e}", 500
         return "Acesso negado", 403
+    
+
+    @app.route('/fechamento_filtros', methods=['GET', 'POST'])
+    def gerar_relatorio_filtros():
+        # Obtendo os valores do formulário
+        if session['empresa'] == 'gr7':
+            db = faturamento.Faturamento()
+            services = utills.Utills()
+            empresa = session['empresa']
+        elif session['empresa'] == 'portal':
+            db = faturamento.FaturamentoPortal()
+            services = utills.Utills_portal()
+            empresa = session['empresa']
+
+        mes = request.form.get('mes')
+        ano = request.form.get('ano')
+        mecanico = request.form.get('mecanico')
+        
+        print(f'Mês selecionado: {mes}')
+        print(f'Ano selecionado: {ano}')
+        print(f'Mecânico selecionado: {mecanico}')
+
+
+        # Buscando os dados de acordo com os filtros
+        dados = db.ordens_filtro_e_higienizacao(mes, ano, mecanico)
+        
+        # Definindo o nome da empresa
+        empresa = session['empresa']
+
+        # Contexto que será passado para o template
+        context = {
+            'empresa': empresa,
+            'mecanico': mecanico,
+            'mes': mes,
+            'ano': ano,
+            'dados': dados
+        }
+
+        # Renderizando o template HTML
+        html = render_template('relatorio_filtros.html', **context)
+
+        # Criando um buffer de memória para o PDF
+        pdf_buffer = BytesIO()
+
+        # Gerando o PDF a partir do HTML
+        pisa_status = pisa.CreatePDF(
+            html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
+        )
+
+        # Verificando se ocorreu algum erro na geração do PDF
+        if pisa_status.err:
+            return "Erro ao gerar o PDF", 500
+
+        # Criando um nome seguro para o arquivo
+        name_arquivo = f"Relatorio_{mes}_{ano}_{mecanico}".replace(" ", "_").replace("/", "-")
+
+        # Movendo o ponteiro do buffer para o início
+        pdf_buffer.seek(0)
+
+        # Retornando o PDF como resposta Flask
+        response = Response(
+            pdf_buffer,
+            content_type='application/pdf'
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{name_arquivo}.pdf"'
+
+        return response
+
+    @app.route('/fechamento_revitalizacao', methods=['GET', 'POST'])
+    def gerar_relatorio_revitalizacao():
+        # Obtendo os valores do formulário
+        if session['empresa'] == 'gr7':
+            db = faturamento.Faturamento()
+            empresa = session['empresa']
+        elif session['empresa'] == 'portal':
+            db = faturamento.FaturamentoPortal()
+            empresa = session['empresa']
+
+
+
+        mes = request.form.get('mes')
+        ano = request.form.get('ano')
+        mecanico = request.form.get('mecanico')
+        
+        print(f'Mês selecionado: {mes}')
+        print(f'Ano selecionado: {ano}')
+        print(f'Mecânico selecionado: {mecanico}')
+
+        # Inicializando os objetos para acessar os dados
+
+        # Buscando os dados de acordo com os filtros
+        dados = db.ordens_revitalizacao(mes, ano, mecanico)
+        
+        # Definindo o nome da empresa
+        empresa = session['empresa']
+
+        # Contexto que será passado para o template
+        context = {
+            'empresa': empresa,
+            'mecanico': mecanico,
+            'mes': mes,
+            'ano': ano,
+            'dados': dados
+        }
+
+        # Renderizando o template HTML
+        html = render_template('relatorio_revitalizacao.html', **context)
+
+        # Criando um buffer de memória para o PDF
+        pdf_buffer = BytesIO()
+
+        # Gerando o PDF a partir do HTML
+        pisa_status = pisa.CreatePDF(
+            html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
+        )
+
+        # Verificando se ocorreu algum erro na geração do PDF
+        if pisa_status.err:
+            return "Erro ao gerar o PDF", 500
+
+        # Criando um nome seguro para o arquivo
+        name_arquivo = f"Relatorio_{mes}_{ano}_{mecanico}".replace(" ", "_").replace("/", "-")
+
+        # Movendo o ponteiro do buffer para o início
+        pdf_buffer.seek(0)
+
+        # Retornando o PDF como resposta Flask
+        response = Response(
+            pdf_buffer,
+            content_type='application/pdf'
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{name_arquivo}.pdf"'
+
+        return response
+    
+    @app.route('/fechamento_dinheiro', methods=['GET', 'POST'])
+    def gerar_relatorio_dinheiro():
+        # Obtendo os valores do formulário
+        mes = request.form.get('mes')
+        ano = request.form.get('ano')
+        mecanico = request.form.get('mecanico')
+        
+        print(f'Mês selecionado: {mes}')
+        print(f'Ano selecionado: {ano}')
+        print(f'Mecânico selecionado: {mecanico}')
+
+        # Inicializando os objetos para acessar os dados
+        if session['empresa'] == 'gr7':
+            db = faturamento.Faturamento()
+            empresa = session['empresa']
+        elif session['empresa'] == 'portal':
+            db = faturamento.FaturamentoPortal()
+            empresa = session['empresa']
+
+        # Buscando os dados de acordo com os filtros
+        dados = db.ordens_dinheiro_relat(mes, ano)
+        
+        # Definindo o nome da empresa
+        empresa = 'GR7'
+
+        # Contexto que será passado para o template
+        context = {
+            'empresa': empresa,
+            'mecanico': mecanico,
+            'mes': mes,
+            'ano': ano,
+            'dados': dados
+        }
+
+        # Renderizando o template HTML
+        html = render_template('relatorio_dinheiro.html', **context)
+
+        # Criando um buffer de memória para o PDF
+        pdf_buffer = BytesIO()
+
+        # Gerando o PDF a partir do HTML
+        pisa_status = pisa.CreatePDF(
+            html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
+        )
+
+        # Verificando se ocorreu algum erro na geração do PDF
+        if pisa_status.err:
+            return "Erro ao gerar o PDF", 500
+
+        # Criando um nome seguro para o arquivo
+        name_arquivo = f"Relatorio_{mes}_{ano}_{mecanico}".replace(" ", "_").replace("/", "-")
+
+        # Movendo o ponteiro do buffer para o início
+        pdf_buffer.seek(0)
+
+        # Retornando o PDF como resposta Flask
+        response = Response(
+            pdf_buffer,
+            content_type='application/pdf'
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{name_arquivo}.pdf"'
+
+        return response
+
+    @app.route('/baixar_os', methods=['GET', 'POST'])
+    def gerar_relatorio_ordens():
+        # Obtendo os valores do formulário
+        mes = request.form.get('mes')
+        ano = request.form.get('ano')
+
+        print(f'Mês selecionado: {mes}')
+        print(f'Ano selecionado: {ano}')
+
+        # Inicializando os objetos para acessar os dados
+        if session['empresa'] == 'gr7':
+            db = faturamento.Faturamento()
+            empresa = session['empresa']
+        elif session['empresa'] == 'portal':
+            db = faturamento.FaturamentoPortal()
+            empresa = session['empresa']
+        
+
+        # Buscando os dados de acordo com os filtros
+        dados = db.faturamentos_ordens(mes, ano)
+
+        # Criando o arquivo Excel
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = f"Relatório ordens - {empresa}"
+
+        # Adicionando cabeçalhos
+        colunas = [
+            'Placa', 'Modelo Veículo', 'Data Orçamento', 'Data Faturamento', 'Dias Serviço', 
+            'Número OS', 'Companhia', 'Valor Peças', 'Valor Serviços', 'Total OS', 
+            'Valor Revitalização', 'Valor Aditivo', 'Quantidade Litros', 'Valor Fluido Sangria',
+            'Valor Palheta', 'Valor Limpeza Freios', 'Valor Pastilha Para-brisa', 
+            'Valor Filtro', 'Valor Pneu', 'Valor Bateria', 'Modelo Bateria', 
+            'Litros Óleo Motor', 'Valor Litro Óleo', 'Marca e Tipo Óleo', 'Mecânico Serviço', 
+            'Serviço Filtro', 'Valor P Meta', 'Valor em Dinheiro', 'Valor Serviço Freios', 
+            'Valor Serviço Suspensão', 'Valor Serviço Injeção/Ignição', 
+            'Valor Serviço Cabeçote Motor Arrefecimento', 'Valor Outros Serviços', 
+            'Valor Serviços Óleos', 'Valor Serviço Transmissão', 'Observações'
+        ]
+        sheet.append(colunas)
+
+        # Adicionando os dados
+        for ordem_servico in dados:
+            linha = [
+                ordem_servico['placa'],
+                ordem_servico['modelo_veiculo'],
+                ordem_servico['data_orcamento'],
+                ordem_servico['data_faturamento'],
+                ordem_servico['dias_servico'],
+                ordem_servico['numero_os'],
+                ordem_servico['companhia'],
+                ordem_servico['valor_pecas'],
+                ordem_servico['valor_servicos'],
+                ordem_servico['total_os'],
+                ordem_servico['valor_revitalizacao'],
+                ordem_servico['valor_aditivo'],
+                ordem_servico['quantidade_litros'],
+                ordem_servico['valor_fluido_sangria'],
+                ordem_servico['valor_palheta'],
+                ordem_servico['valor_limpeza_freios'],
+                ordem_servico['valor_pastilha_parabrisa'],
+                ordem_servico['valor_filtro'],
+                ordem_servico['valor_pneu'],
+                ordem_servico['valor_bateria'],
+                ordem_servico['modelo_bateria'],
+                ordem_servico['lts_oleo_motor'],
+                ordem_servico['valor_lt_oleo'],
+                ordem_servico['marca_e_tipo_oleo'],
+                ordem_servico['mecanico_servico'],
+                ordem_servico['servico_filtro'],
+                ordem_servico['valor_p_meta'],
+                ordem_servico['valor_em_dinheiro'],
+                ordem_servico['valor_servico_freios'],
+                ordem_servico['valor_servico_suspensao'],
+                ordem_servico['valor_servico_injecao_ignicao'],
+                ordem_servico['valor_servico_cabecote_motor_arr'],
+                ordem_servico['valor_outros_servicos'],
+                ordem_servico['valor_servicos_oleos'],
+                ordem_servico['valor_servico_transmissao'],
+                ordem_servico['obs']
+            ]
+            sheet.append(linha)
+
+        # Criando um buffer de memória para o Excel
+        excel_buffer = BytesIO()
+        workbook.save(excel_buffer)
+        excel_buffer.seek(0)
+
+        # Criando um nome seguro para o arquivo
+        nome_arquivo = f"Relatorio_{mes}_{ano}_".replace(" ", "_").replace("/", "-")
+
+        # Retornando o Excel como resposta Flask
+        response = Response(
+            excel_buffer,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{nome_arquivo}.xlsx"'
+
+        return response
+    
+
+    @app.route('/relatorio_notas', methods=['GET', 'POST'])
+    def gerar_relatorio_notas():
+        # Obtendo os valores do formulário
+        mes = request.form.get('mes')
+        ano = request.form.get('ano')
+        tipo_despesa = request.form.get('tipo_despesa')
+
+        print(f'Mês selecionado: {mes}')
+        print(f'Ano selecionado: {ano}')
+        print(f'Tipo de Despesa: {tipo_despesa}')
+
+        # Inicializando os objetos para acessar os dados
+        if session['empresa'] == 'gr7':
+            db = dados_notas.DadosGastos()
+            nome_empresa = "GR7 Centro Automotivo"
+        elif session['empresa'] == 'portal':
+            db = dados_notas.DadosGastosPortal()
+            nome_empresa = "Portal do Morumbi Centro Automotivo"
+        
+
+        # Buscando os dados de acordo com os filtros
+        dados = db.buscar_notas(mes, ano)
+
+        # Criando o arquivo Excel
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = "Relatório Notas Fiscais"
+
+        # Adicionando o "header" com nome da empresa e data/hora de geração
+        data_hora_geracao = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        # Nome da empresa (primeira linha)
+        sheet.merge_cells(start_row=1, start_column=1, end_row=1, end_column=11)
+        cell_empresa = sheet.cell(row=1, column=1)
+        cell_empresa.value = nome_empresa
+        cell_empresa.font = Font(bold=True, size=14)
+        cell_empresa.alignment = Alignment(horizontal="center")
+
+        # Data e hora de geração (segunda linha)
+        sheet.merge_cells(start_row=2, start_column=1, end_row=2, end_column=11)
+        cell_data_hora = sheet.cell(row=2, column=1)
+        cell_data_hora.value = f"Relatório gerado em: {data_hora_geracao}"
+        cell_data_hora.font = Font(italic=True, size=10)
+        cell_data_hora.alignment = Alignment(horizontal="center")
+
+        # Adicionando cabeçalhos personalizados (começam na terceira linha)
+        colunas = [
+            'Pago Por', 'Emitido Para', 'Status', 'Boleto', 'Número Nota', 
+            'Fornecedor', 'Data Emissão', 'Valor', 'Duplicata', 'Tipo Despesa', 'Observações'
+        ]
+
+        # Estilizando o cabeçalho
+        header_fill = PatternFill(start_color="FFD700", end_color="FFD700", fill_type="solid")
+        header_font = Font(bold=True, color="000000", size=12)
+        header_alignment = Alignment(horizontal="center", vertical="center")
+
+        for col_num, column_title in enumerate(colunas, 1):
+            cell = sheet.cell(row=3, column=col_num)
+            cell.value = column_title
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = header_alignment
+
+        # Ajustando largura das colunas
+        for col_num, column_title in enumerate(colunas, 1):
+            sheet.column_dimensions[sheet.cell(row=3, column=col_num).column_letter].width = 20
+
+        # Adicionando os dados (a partir da linha 4)
+        for row_num, nota in enumerate(dados, 4):  # Começa na linha 4
+            linha = [
+                nota['pago_por'],
+                nota['emitido_para'],
+                nota['status'],
+                nota['boleto'],
+                nota['numero_nota'],
+                nota['fornecedor'],
+                nota['data_emissao'],
+                nota['valor'],
+                nota['duplicata'],
+                nota['tipo_despesa'],
+                nota['obs']
+            ]
+            for col_num, cell_value in enumerate(linha, 1):
+                sheet.cell(row=row_num, column=col_num).value = cell_value
+
+        # Criando um buffer de memória para o Excel
+        excel_buffer = BytesIO()
+        workbook.save(excel_buffer)
+        excel_buffer.seek(0)
+
+        # Criando um nome seguro para o arquivo
+        nome_arquivo = f"Relatorio_Notas_{mes}_{ano}".replace(" ", "_").replace("/", "-")
+
+        # Retornando o Excel como resposta Flask
+        response = Response(
+            excel_buffer,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{nome_arquivo}.xlsx"'
+
+        return response
+
+
+    @app.route('/relatorio_boletos', methods=['GET', 'POST'])
+    def gerar_relatorio_boletos():
+        # Obtendo os valores do formulário
+        mes = request.form.get('mes')
+        ano = request.form.get('ano')
+
+        print(f'Mês selecionado: {mes}')
+        print(f'Ano selecionado: {ano}')
+
+        # Inicializando os objetos para acessar os dados
+        if session['empresa'] == 'gr7':
+            db = dados_notas.DadosGastos()
+            nome_empresa = "GR7 Centro Automotivo"
+        elif session['empresa'] == 'portal':
+            db = dados_notas.DadosGastosPortal()
+            nome_empresa = "Portal do Morumbi Centro Automotivo"
+
+        # Buscando os dados de acordo com os filtros
+        boletos = db.buscar_boletos(mes, ano)
+
+        # Criando o arquivo Excel
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = "Relatório de boletos"
+
+        # Adicionando o "header" com nome da empresa e data/hora de geração
+        
+        data_hora_geracao = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        # Nome da empresa (primeira linha)
+        sheet.merge_cells(start_row=1, start_column=1, end_row=1, end_column=5)
+        cell_empresa = sheet.cell(row=1, column=1)
+        cell_empresa.value = nome_empresa
+        cell_empresa.font = Font(bold=True, size=14)
+        cell_empresa.alignment = Alignment(horizontal="center")
+
+        # Data e hora de geração (segunda linha)
+        sheet.merge_cells(start_row=2, start_column=1, end_row=2, end_column=5)
+        cell_data_hora = sheet.cell(row=2, column=1)
+        cell_data_hora.value = f"Relatório gerado em: {data_hora_geracao}"
+        cell_data_hora.font = Font(italic=True, size=10)
+        cell_data_hora.alignment = Alignment(horizontal="center")
+
+        # Adicionando cabeçalhos personalizados (começam na terceira linha)
+        colunas = ['Número Nota', 'Notas', 'Fornecedor', 'Data Vencimento', 'Valor']
+
+        # Estilizando o cabeçalho
+        header_fill = PatternFill(start_color="FFD700", end_color="FFD700", fill_type="solid")
+        header_font = Font(bold=True, color="000000", size=12)
+        header_alignment = Alignment(horizontal="center", vertical="center")
+
+        for col_num, column_title in enumerate(colunas, 1):
+            cell = sheet.cell(row=3, column=col_num)
+            cell.value = column_title
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = header_alignment
+
+        # Ajustando largura das colunas
+        for col_num, column_title in enumerate(colunas, 1):
+            sheet.column_dimensions[sheet.cell(row=3, column=col_num).column_letter].width = 20
+
+        # Adicionando os dados (a partir da linha 4)
+        for row_num, boleto in enumerate(boletos, 4):  # Começa na linha 4
+            linha = [
+                boleto['num_nota'],
+                boleto['notas'],
+                boleto['fornecedor'],
+                boleto['data_vencimento'],
+                boleto['valor']
+            ]
+            for col_num, cell_value in enumerate(linha, 1):
+                sheet.cell(row=row_num, column=col_num).value = cell_value
+
+        # Criando um buffer de memória para o Excel
+        excel_buffer = BytesIO()
+        workbook.save(excel_buffer)
+        excel_buffer.seek(0)
+
+        # Criando um nome seguro para o arquivo
+        nome_arquivo = f"Relatorio_Boletos_{mes}_{ano}".replace(" ", "_").replace("/", "-")
+
+        # Retornando o Excel como resposta Flask
+        response = Response(
+            excel_buffer,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{nome_arquivo}.xlsx"'
+
+        return response
