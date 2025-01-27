@@ -33,9 +33,9 @@ class Database:
                     modelo_bateria, quantidade_oleo, valor_oleo, tipo_marca_oleo, valor_meta, mecanico, 
                     filtro_mecanico, valor_dinheiro, freios, suspensao, 
                     injecao_ignicao,cabecote_motor_arrefecimento, outros, 
-                    oleos, transmissao, usuario, observacoes
+                    oleos, transmissao, usuario, observacoes, terceiros
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
             '''
 
@@ -51,7 +51,7 @@ class Database:
                 dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'], dados['valor_em_dinheiro'], 
                 dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], 
                 dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'], dados['valor_servicos_oleos'], 
-                dados['valor_servico_transmissao'], dados['usuario'], dados['obs']
+                dados['valor_servico_transmissao'], dados['usuario'], dados['obs'], dados['valor_terceiros']
             ))
 
             # Confirma a transação

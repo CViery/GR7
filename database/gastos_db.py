@@ -1038,7 +1038,7 @@ class GastosDataBasePortal():
             query = '''
                 INSERT INTO notas_portal (pago_por, emitido_para, status, boleto, num_nota, duplicata, fornecedor, 
                                 data_emissao, dia_emissao, mes_emissao, ano_emissao, vencimentos, valor, 
-                                despesa, observacoes, usuario, id, sub_categoria) 
+                                despesa, observacoes, usuario, id, sub_categorias) 
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             '''
             
