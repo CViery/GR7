@@ -111,7 +111,7 @@
                 <input type="text" id="palheta" name="palheta" class="styled-input" required>
                 {%elif empresa == 'portal' %}
                 <label for="alternador">Alternador/Motor de arranque:</label>
-                <input type="text" id="alternador" name="palheta" class="styled-input" required>
+                <input type="text" id="alternador" name="palheta" class="styled-input" onchange="calculateValorMeta()" required>
                 {%endif%}
             </div>
             <div class="input-group">
@@ -135,7 +135,12 @@
                 <label for="pneus">Pneus:</label>
                 <input type="text" id="pneus" name="pneus" class="styled-input" onchange="calculateValorMeta()" required>
             </div>
-
+            <div class="input-group">
+                {%if empresa == 'gr7'%}
+                <label for="Terceiros">Terceiros:</label>
+                <input type="text" id="terceiros" name="terceiros" class="styled-input" onchange=" calculateValorMeta()" required>
+                {%endif%}
+            </div>
             <div class="input-group">
                 <label for="bateria">Bateria:</label>
                 <input type="text" id="bateria" name="bateria" class="styled-input"
@@ -434,29 +439,29 @@
         const valorTotalElement = document.getElementById('valor_total');
         const bateriaElement = document.getElementById('bateria');
         const pneusElement = document.getElementById('pneus');
-        
         const valorMetaElement = document.getElementById('valor_meta');
-
+    
         // Verificar se todos os elementos necessários estão presentes
         if (valorTotalElement && bateriaElement && pneusElement && valorMetaElement) {
             // Obter os valores dos campos e substituir as vírgulas por pontos
             const valorTotal = parseFloat(valorTotalElement.value.replace(',', '.')) || 0;
             const valorBateria = parseFloat(bateriaElement.value.replace(',', '.')) || 0;
-            
             const valorPneus = parseFloat(pneusElement.value.replace(',', '.')) || 0;
-
-            // Verificar se o elemento 'funilaria' existe
+    
+            // Verificar e obter os valores de elementos opcionais
             const funilariaElement = document.getElementById('funilaria');
-            const ar_condicionadoElement = document.getElementById('ar_condicionado')
+            const arCondicionadoElement = document.getElementById('ar_condicionado');
+            const terceirosElement = document.getElementById('terceiros');
+            const alternadorElement = document.getElementById('alternador');
+    
             const valorFunilaria = funilariaElement ? parseFloat(funilariaElement.value.replace(',', '.')) || 0 : 0;
-            const valorAr = ar_condicionadoElement ? parseFloat(ar_condicionadoElement.value.replace(',', '.')) || 0 : 0;
-            console.log(valorAr)
-            console.log(ar_condicionadoElement)
+            const valorAr = arCondicionadoElement ? parseFloat(arCondicionadoElement.value.replace(',', '.')) || 0 : 0;
+            const valorTerceiros = terceirosElement ? parseFloat(terceirosElement.value.replace(',', '.')) || 0 : 0;
             
+            const valorAlternado = alternadorElement ? parseFloat(alternadorElement.value.replace(',', '.')) || 0 : 0;
             // Calcular o valor da meta
-            const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria - valorAr;
-            console.log(valorMeta);
-
+            const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria - valorAr - valorTerceiros - valorAlternado;
+    
             // Atualizar o campo de valor meta com o resultado formatado
             valorMetaElement.value = valorMeta.toFixed(2);
         } else {
@@ -467,6 +472,7 @@
             if (!valorMetaElement) console.error('Elemento com ID "valor_meta" não encontrado.');
         }
     }
+    
     const calcularOleo =()=>{
         let quantidade = document.getElementById('quantidade_oleo').value
         let valor_unitario = document.getElementById('valor_oleo').value

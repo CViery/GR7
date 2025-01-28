@@ -37,7 +37,7 @@ class Faturamento:
                 'oleos', 'transmissao', 'placa', 'modelo_veiculo', 'data_orcamento',
                 'dias', 'num_os', 'cia', 'conversao_pneustore', 'valor_total',
                 'quantidade_aditivo', 'modelo_bateria', 'quantidade_oleo',
-                'tipo_marca_oleo', 'mecanico', 'filtro_mecanico', 'valor_meta'
+                'tipo_marca_oleo', 'mecanico', 'filtro_mecanico', 'valor_meta', 'terceiros'
             ]
 
             for field in required_fields:
@@ -92,7 +92,8 @@ class Faturamento:
                 'valor_servicos_oleos': process_value(dados['oleos']),
                 'valor_servico_transmissao': process_value(dados['transmissao']),
                 'usuario': usuario,
-                'obs': dados.get('obs', '')  # Caso o campo 'obs' seja opcional
+                'obs': dados.get('obs', ''),  # Caso o campo 'obs' seja opcional
+                'valor_terceiros': process_value(dados['terceiros'])
             }
             print(ordem_servico)
             # Verifica se a ordem de serviço já existe
