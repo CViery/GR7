@@ -14,6 +14,7 @@ from openpyxl.drawing.image import Image
 PERMISSAO_TOTAL_ADMIN = 0
 PERMISSAO_GR7_USER = 1
 PERMISSAO_PORTAL_ADMIN = 2
+SEM_PERMISSAO = 3
 
 class Routes:
     def __init__(self):
