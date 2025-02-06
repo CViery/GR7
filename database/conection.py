@@ -905,6 +905,168 @@ class Database:
         except Exception as e:
             logging.error(f"Erro ao consultar faturamento para o mês {mes}/{ano}: {e}")
             return []
+
+    def faturamento_loja_ano(self, loja, ano):
+        """
+        Retorna o faturamento mensal de uma loja para um determinado ano.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+            ano (str): Ano de referência.
+
+        Returns:
+            dict: Dicionário com os meses como chaves e o faturamento como valores.
+        """
+        try:
+            logging.info(f"Consultando faturamento da loja {loja} para o ano {ano}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "faturamento" if loja == "GR7" else "faturamento_portal"
+            
+            query = f'''
+                SELECT mes_faturamento, SUM(valor_meta) as faturamento
+                FROM {tabela}
+                WHERE ano_faturamento = ?
+                GROUP BY mes_faturamento
+                ORDER BY mes_faturamento ASC;
+            '''
+            self.cursor.execute(query, (ano,))
+            result = self.cursor.fetchall()
+            
+            # Organiza os dados em um dicionário
+            faturamento = {mes: 0 for mes in range(1, 13)}  # Inicializa todos os meses com 0
+            for row in result:
+                mes = int(row.mes_faturamento)
+                faturamento[mes] = float(row.faturamento)
+            
+            logging.info(f"Faturamento da loja {loja} para o ano {ano}: {faturamento}")
+            
+            return faturamento
+        except Exception as e:
+            logging.error(f"Erro ao consultar faturamento da loja {loja} para o ano {ano}: {e}")
+            return {}
+    
+    def funcionarios_por_loja(self, loja):
+        """
+        Retorna a lista de funcionários de uma loja específica.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+
+        Returns:
+            list: Lista de nomes dos funcionários.
+        """
+        try:
+            logging.info(f"Consultando funcionários da loja {loja}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "funcionarios" if loja == "GR7" else "funcionarios_portal"
+            
+            query = f'SELECT nome FROM {tabela} ORDER BY nome ASC;'
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            
+            funcionarios = [row.nome for row in result]
+           
+            logging.info(f"Funcionários da loja {loja}: {funcionarios}")
+            return funcionarios
+        except Exception as e:
+            logging.error(f"Erro ao consultar funcionários da loja {loja}: {e}")
+            return []
+    
+    def desempenho_funcionario_ano(self, loja, mecanico, ano):
+        """
+        Retorna o desempenho de um funcionário em um determinado ano, separado por serviços.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+            mecanico (str): Nome do mecânico.
+            ano (str): Ano de referência.
+
+        Returns:
+            dict: Dicionário com os serviços como chaves e os valores/quantidades como valores.
+        """
+        try:
+            logging.info(f"Consultando desempenho do funcionário {mecanico} da loja {loja} para o ano {ano}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "faturamento" if loja == "GR7" else "faturamento_portal"
+            
+            query = f'''
+                SELECT 
+                    SUM(revitalizacao) as revitalizacao,
+                    SUM(filtro) as filtro,
+                    SUM(limpeza_freios) as limpeza_freios
+                FROM {tabela}
+                WHERE mecanico = ? AND ano_faturamento = ?;
+            '''
+            self.cursor.execute(query, (mecanico, ano))
+            result = self.cursor.fetchone()
+            
+            if result:
+                desempenho = {
+                    "revitalizacao": float(result.revitalizacao or 0),
+                    "filtro": float(result.filtro or 0),
+                    "limpeza_freios": float(result.limpeza_freios or 0)
+                }
+                logging.info(f"Desempenho do funcionário {mecanico}: {desempenho}")
+                
+                return desempenho
+            else:
+                logging.warning(f"Nenhum desempenho encontrado para o funcionário {mecanico}.")
+                return {}
+        except Exception as e:
+            logging.error(f"Erro ao consultar desempenho do funcionário {mecanico}: {e}")
+            return {}
+        
+    def detalhes_servicos_funcionario(self, loja, mecanico, ano):
+        """
+        Retorna os detalhes dos serviços realizados por um funcionário em um determinado ano.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+            mecanico (str): Nome do mecânico.
+            ano (str): Ano de referência.
+
+        Returns:
+            dict: Dicionário com os serviços como chaves e os valores/quantidades como valores.
+        """
+        try:
+            logging.info(f"Consultando detalhes dos serviços do funcionário {mecanico} da loja {loja} para o ano {ano}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "faturamento" if loja == "GR7" else "faturamento_portal"
+            
+            query = f'''
+                SELECT 
+                    mes_faturamento,
+                    SUM(revitalizacao) as revitalizacao,
+                    SUM(filtro) as filtro,
+                    SUM(limpeza_freios) as limpeza_freios
+                FROM {tabela}
+                WHERE mecanico = ? AND ano_faturamento = ?
+                GROUP BY mes_faturamento
+                ORDER BY mes_faturamento ASC;
+            '''
+            self.cursor.execute(query, (mecanico, ano))
+            result = self.cursor.fetchall()
+            
+            detalhes = {}
+            for row in result:
+                mes = int(row.mes_faturamento)
+                detalhes[mes] = {
+                    "revitalizacao": float(row.revitalizacao or 0),
+                    "filtro": float(row.filtro or 0),
+                    "limpeza_freios": float(row.limpeza_freios or 0)
+                }
+            
+            logging.info(f"Detalhes dos serviços do funcionário {mecanico}: {detalhes}")
+            
+            return detalhes
+        except Exception as e:
+            logging.error(f"Erro ao consultar detalhes dos serviços do funcionário {mecanico}: {e}")
+            return {}
+        
         
 class DatabasePortal:
     def __init__(self):
@@ -1302,3 +1464,189 @@ class DatabasePortal:
         except Exception as e:
             logging.error(f"Erro ao consultar faturamento para o mês {mes}/{ano}: {e}")
             return []
+    
+    def funcionarios_por_loja(self, loja):
+        """
+        Retorna a lista de funcionários de uma loja específica.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+
+        Returns:
+            list: Lista de nomes dos funcionários.
+        """
+        try:
+            logging.info(f"Consultando funcionários da loja {loja}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "funcionarios" if loja == "GR7" else "funcionarios_portal"
+            
+            query = f'SELECT nome FROM {tabela} ORDER BY nome ASC;'
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            
+            funcionarios = [row.nome for row in result]
+            logging.info(f"Funcionários da loja {loja}: {funcionarios}")
+            return funcionarios
+        except Exception as e:
+            logging.error(f"Erro ao consultar funcionários da loja {loja}: {e}")
+            return []
+    
+
+    def funcionarios_por_loja(self, loja):
+        """
+        Retorna a lista de funcionários de uma loja específica.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+
+        Returns:
+            list: Lista de nomes dos funcionários.
+        """
+        try:
+            logging.info(f"Consultando funcionários da loja {loja}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "funcionarios" if loja == "GR7" else "funcionarios_portal"
+            
+            query = f'SELECT nome FROM {tabela} ORDER BY nome ASC;'
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            
+            funcionarios = [row.nome for row in result]
+            logging.info(f"Funcionários da loja {loja}: {funcionarios}")
+            return funcionarios
+        except Exception as e:
+            logging.error(f"Erro ao consultar funcionários da loja {loja}: {e}")
+            return []
+    
+    def desempenho_funcionario_ano(self, loja, mecanico, ano):
+        """
+        Retorna o desempenho de um funcionário em um determinado ano, separado por serviços.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+            mecanico (str): Nome do mecânico.
+            ano (str): Ano de referência.
+
+        Returns:
+            dict: Dicionário com os serviços como chaves e os valores/quantidades como valores.
+        """
+        try:
+            logging.info(f"Consultando desempenho do funcionário {mecanico} da loja {loja} para o ano {ano}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "faturamento" if loja == "GR7" else "faturamento_portal"
+            
+            query = f'''
+                SELECT 
+                    SUM(revitalizacao) as revitalizacao,
+                    SUM(filtro) as filtro,
+                    SUM(limpeza_freios) as limpeza_freios
+                FROM {tabela}
+                WHERE mecanico = ? AND ano_faturamento = ?;
+            '''
+            self.cursor.execute(query, (mecanico, ano))
+            result = self.cursor.fetchone()
+            
+            if result:
+                desempenho = {
+                    "revitalizacao": float(result.revitalizacao or 0),
+                    "filtro": float(result.filtro or 0),
+                    "limpeza_freios": float(result.limpeza_freios or 0)
+                }
+                logging.info(f"Desempenho do funcionário {mecanico}: {desempenho}")
+                return desempenho
+            else:
+                logging.warning(f"Nenhum desempenho encontrado para o funcionário {mecanico}.")
+                return {}
+        except Exception as e:
+            logging.error(f"Erro ao consultar desempenho do funcionário {mecanico}: {e}")
+            return {}
+    
+    def detalhes_servicos_funcionario(self, loja, mecanico, ano):
+        """
+        Retorna os detalhes dos serviços realizados por um funcionário em um determinado ano.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+            mecanico (str): Nome do mecânico.
+            ano (str): Ano de referência.
+
+        Returns:
+            dict: Dicionário com os serviços como chaves e os valores/quantidades como valores.
+        """
+        try:
+            logging.info(f"Consultando detalhes dos serviços do funcionário {mecanico} da loja {loja} para o ano {ano}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "faturamento" if loja == "GR7" else "faturamento_portal"
+            
+            query = f'''
+                SELECT 
+                    mes_faturamento,
+                    SUM(revitalizacao) as revitalizacao,
+                    SUM(filtro) as filtro,
+                    SUM(limpeza_freios) as limpeza_freios
+                FROM {tabela}
+                WHERE mecanico = ? AND ano_faturamento = ?
+                GROUP BY mes_faturamento
+                ORDER BY mes_faturamento ASC;
+            '''
+            self.cursor.execute(query, (mecanico, ano))
+            result = self.cursor.fetchall()
+            
+            detalhes = {}
+            for row in result:
+                mes = int(row.mes_faturamento)
+                detalhes[mes] = {
+                    "revitalizacao": float(row.revitalizacao or 0),
+                    "filtro": float(row.filtro or 0),
+                    "limpeza_freios": float(row.limpeza_freios or 0)
+                }
+            
+            logging.info(f"Detalhes dos serviços do funcionário {mecanico}: {detalhes}")
+            return detalhes
+        except Exception as e:
+            logging.error(f"Erro ao consultar detalhes dos serviços do funcionário {mecanico}: {e}")
+            return {}
+    
+    def faturamento_loja_ano(self, loja, ano):
+        """
+        Retorna o faturamento mensal de uma loja para um determinado ano.
+
+        Args:
+            loja (str): Nome da loja (GR7 ou Portal).
+            ano (str): Ano de referência.
+
+        Returns:
+            dict: Dicionário com os meses como chaves e o faturamento como valores.
+        """
+        try:
+            logging.info(f"Consultando faturamento da loja {loja} para o ano {ano}.")
+            
+            # Escolhe a tabela correta com base na loja
+            tabela = "faturamento" if loja == "GR7" else "faturamento_portal"
+            
+            query = f'''
+                SELECT mes_faturamento, SUM(valor_meta) as faturamento
+                FROM {tabela}
+                WHERE ano_faturamento = ?
+                GROUP BY mes_faturamento
+                ORDER BY mes_faturamento ASC;
+            '''
+            self.cursor.execute(query, (ano,))
+            result = self.cursor.fetchall()
+            
+            # Organiza os dados em um dicionário
+            faturamento = {mes: 0 for mes in range(1, 13)}  # Inicializa todos os meses com 0
+            for row in result:
+                mes = int(row.mes_faturamento)
+                faturamento[mes] = float(row.faturamento)
+            
+            logging.info(f"Faturamento da loja {loja} para o ano {ano}: {faturamento}")
+            
+            return faturamento
+        except Exception as e:
+            logging.error(f"Erro ao consultar faturamento da loja {loja} para o ano {ano}: {e}")
+            return {}

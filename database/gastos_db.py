@@ -148,16 +148,16 @@ class GastosDataBase:
             # Validando os parâmetros
             if not isinstance(tipo, str) or not tipo:
                 raise ValueError("O parâmetro 'tipo' deve ser uma string não vazia.")
-            if not isinstance(mes, int) or not 1 <= mes <= 12:
+            if not isinstance(mes, str) or not mes:
                 raise ValueError("O parâmetro 'mes' deve ser um valor inteiro entre 1 e 12.")
-            if not isinstance(ano, int) or ano <= 0:
+            if not isinstance(ano, str):
                 raise ValueError("O parâmetro 'ano' deve ser um valor inteiro positivo.")
             
             # Log para indicar início da consulta
             logging.info(f"Iniciando consulta para recuperar valores de {tipo} no mês {mes} e ano {ano}.")
             
             # Query para buscar os valores
-            query = 'SELECT valor FROM notas WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?'
+            query = 'SELECT valor FROM notas WHERE sub_categoria = ? AND mes_emissao = ? AND ano_emissao = ?'
             self.cursor.execute(query, (tipo, mes, ano))
             
             # Recuperando os resultados
@@ -1093,7 +1093,7 @@ class GastosDataBasePortal():
 
     def get_gatos_por_tipo(self, tipo, mes, ano):
         try:
-            query = 'SELECT valor FROM notas_portal WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ? '
+            query = 'SELECT valor FROM notas_portal WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ? '
             self.cursor.execute(query, (tipo, mes, ano))
             result = self.cursor.fetchall()
             return result

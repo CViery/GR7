@@ -8,13 +8,13 @@
 
 }
 main{
-    padding: 20px;
+    padding: 10px;
     background-color: black;
 }
 
 .box-infos{
-    width: 400px;  /* Largura dos botões */
-    height: 400px;  /* Altura dos botões */
+    width: 380px;  /* Largura dos botões */
+    height: 380px;  /* Altura dos botões */
     background-color: white;
     color: black;
     border: 2px solid transparent;
@@ -61,12 +61,12 @@ h5{
     justify-content: space-evenly;
     align-items: center;
     flex-wrap: wrap;
-    gap: 50px;
+    gap: 10px;
   }
 
   .box {
-    height: 130px;
-    width: 180px;
+    height: 100px;
+    width: 150px;
     border-radius: 20px;
     box-shadow: 3px 3px 10px rgba(0, 30, 87, 0.751);
     padding: 20px;
@@ -95,18 +95,20 @@ h5{
   }
   .box:nth-child(5) {
     background-color: #1a4173;
-    width: 300px;
+    
   }
   .box:nth-child(6) {
     background-color: #1a4173;
-    width: 300px;
+    
   }
   .box:nth-child(7) {
     background-color: #1a4173;
+    width: 300px;
     
   }
   .box:nth-child(8) {
     background-color:  #1a4173;
+    width: 300px;
   }
   
   .box img {
