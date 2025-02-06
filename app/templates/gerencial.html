@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Gerencial - {{ empresa }}</title>
+<style>
+    .chart-container {
+        width: 80%;
+        margin: auto;
+    }
+    .loja-selector, .funcionario-list, .ano-selector {
+        margin-bottom: 20px;
+    }
+    .funcionario-list ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .funcionario-list li {
+        cursor: pointer;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+    }
+    .funcionario-list li:hover {
+        background-color: #f0f0f0;
+    }
+    .mini-graficos {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    .grafico-servico {
+        width: 48%;
+        margin-bottom: 20px;
+    }
+    .grafico-servico canvas {
+        width: 100%;
+        height: 150px; /* Altura ainda menor para melhor visualização */
+    }
+    .grafico-servico h4 {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<main>
+    <div class="loja-selector">
+        <label for="loja">Selecione a Loja:</label>
+        <select id="loja">
+            <option value="GR7">GR7</option>
+            <option value="Portal">Portal</option>
+            <option value="comparar">Comparar Lojas</option>
+        </select>
+    </div>
+
+    <div class="ano-selector">
+        <label for="ano">Selecione o Ano:</label>
+        <select id="ano">
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <!-- Adicione mais anos conforme necessário -->
+        </select>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="desempenhoLojaChart"></canvas>
+    </div>
+
+    <div class="funcionario-list">
+        <h3>Funcionários</h3>
+        <ul id="lista-funcionarios">
+            <!-- Lista de funcionários será preenchida dinamicamente -->
+        </ul>
+    </div>
+
+    <div class="mini-graficos" id="graficos-servicos">
+        <!-- Gráficos de serviços serão gerados dinamicamente -->
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctxLoja = document.getElementById('desempenhoLojaChart').getContext('2d');
+    let desempenhoLojaChart;
+    console.log(typeof Chart);
+    
+
+// Função genérica para criar gráficos
+function criarGrafico(ctx, tipo, labels, datasets) {
+    return new Chart(ctx, {
+        type: tipo,
+        data: { labels, datasets },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+// Função assíncrona para buscar dados e atualizar gráficos
+async function carregarDados() {
+    const loja = document.getElementById('loja').value;
+    const ano = document.getElementById('ano').value;
+
+    console.log(`Carregando dados para loja: ${loja}, ano: ${ano}`);
+
+    if (loja === 'comparar') {
+        await compararLojas(ano);
+    } else {
+        await atualizarGraficoLoja(loja, ano);
+        await carregarFuncionarios(loja, ano);
+    }
+}
+
+// Atualiza o gráfico da loja selecionada
+async function atualizarGraficoLoja(loja, ano) {
+    try {
+        const response = await fetch(`/dados-loja/${loja}?ano=${ano}`);
+        const data = await response.json();
+
+        console.log("Dados de faturamento recebidos:", data);
+
+        if (desempenhoLojaChart) desempenhoLojaChart.destroy();
+
+        desempenhoLojaChart = criarGrafico(ctxLoja, 'bar', data.meses, [{
+            label: `Faturamento - ${loja} (${ano})`,
+            data: data.faturamento,
+            backgroundColor: loja === 'GR7' ? 'rgba(54, 162, 235, 0.2)' : 'rgba(255, 99, 132, 0.2)',
+            borderColor: loja === 'GR7' ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]);
+    } catch (error) {
+        console.error("Erro ao buscar dados da loja:", error);
+    }
+}
+
+// Compara o desempenho das duas lojas
+async function compararLojas(ano) {
+    try {
+        const [dataGR7, dataPortal] = await Promise.all([
+            fetch(`/dados-loja/GR7?ano=${ano}`).then(res => res.json()), 
+            fetch(`/dados-loja/Portal?ano=${ano}`).then(res => res.json())
+        ]);
+
+        console.log("Dados GR7:", dataGR7);
+        console.log("Dados Portal:", dataPortal);
+
+        if (desempenhoLojaChart) desempenhoLojaChart.destroy();
+
+        desempenhoLojaChart = criarGrafico(ctxLoja, 'bar', dataGR7.meses, [
+            {
+                label: `Faturamento - GR7 (${ano})`,
+                data: dataGR7.faturamento,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            },
+            {
+                label: `Faturamento - Portal (${ano})`,
+                data: dataPortal.faturamento,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }
+        ]);
+    } catch (error) {
+        console.error("Erro ao comparar lojas:", error);
+    }
+}
+
+// Carrega a lista de funcionários da loja
+async function carregarFuncionarios(loja, ano) {
+    try {
+        const response = await fetch(`/funcionarios-por-loja/${loja}?ano=${ano}`);
+        const data = await response.json();
+
+        console.log("Funcionários recebidos:", data);
+
+        const listaFuncionarios = document.getElementById('lista-funcionarios');
+        listaFuncionarios.innerHTML = ''; // Limpa a lista atual
+
+        data.forEach(funcionario => {
+            const li = document.createElement('li');
+            li.textContent = funcionario.nome;
+            li.onclick = () => mostrarDesempenhoFuncionario(funcionario.id, ano);
+            listaFuncionarios.appendChild(li);
+        });
+    } catch (error) {
+        console.error("Erro ao carregar funcionários:", error);
+    }
+}
+
+// Mostra o desempenho do funcionário
+async function mostrarDesempenhoFuncionario(funcionarioId, ano) {
+    try {
+        const response = await fetch(`/dados-funcionario/${funcionarioId}?ano=${ano}`);
+        const data = await response.json();
+
+        console.log("Dados de desempenho do funcionário:", data);
+
+        const graficosServicos = document.getElementById('graficos-servicos');
+        graficosServicos.innerHTML = ''; // Limpa os gráficos anteriores
+
+        data.servicos.forEach(servico => {
+            console.log(`Criando gráficos para serviço: ${servico.nome}`);
+
+            // Cria um container para o serviço
+            const container = document.createElement('div');
+            container.className = 'grafico-servico';
+            container.innerHTML = `<h4>${servico.nome} (${ano})</h4>`;
+            graficosServicos.appendChild(container);
+
+            // Criando gráficos de valor e quantidade
+            ['Valor Vendido', 'Quantidade Executada'].forEach((tipo, index) => {
+                const canvas = document.createElement('canvas');
+                container.appendChild(canvas);
+                const ctx = canvas.getContext('2d');
+
+                criarGrafico(ctx, 'bar', 
+                    ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"], 
+                    [{
+                        label: tipo,
+                        data: index === 0 ? servico.valor : servico.quantidade,
+                        backgroundColor: index === 0 ? 'rgba(255, 99, 132, 0.2)' : 'rgba(54, 162, 235, 0.2)',
+                        borderColor: index === 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                );
+            });
+        });
+    } catch (error) {
+        console.error("Erro ao carregar desempenho do funcionário:", error);
+    }
+}
+
+// Adiciona listeners para os seletores de loja e ano
+document.getElementById('loja').addEventListener('change', carregarDados);
+document.getElementById('ano').addEventListener('change', carregarDados);
+
+// Inicializa o gráfico da loja GR7 e ano 2024 por padrão
+document.addEventListener("DOMContentLoaded", function () {
+    carregarDados();
+});
+</script>
+{% endblock %}

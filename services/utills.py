@@ -241,7 +241,7 @@ class Utills:
     def porcentagem_gastos_pecas(self, mes, ano):
         try:
             # Obtém os dados de gastos com peças para o mês e ano fornecidos
-            dados_pecas = self.db_gastos.get_gastos_por_tipo('PEÇAS', mes, ano)
+            dados_pecas = self.db_gastos.get_gastos_por_tipo('Peças', mes, ano)
             valores_gastos = [dado[0] for dado in dados_pecas]
             gasto = sum(valores_gastos)
 
@@ -267,18 +267,20 @@ class Utills:
 
     def gastos_pecas(self, mes, ano):
         try:
+            print(mes)
+            print(ano)
             # Obtém os dados de gastos com peças para o mês e ano fornecidos
-            dados_pecas = self.db_gastos.get_gastos_por_tipo('PEÇAS', mes, ano)
-
+            dados_pecas = self.db_gastos.get_gastos_por_tipo('Peças', mes, ano)
+            print(dados_pecas)
             # Extrai os valores de gastos
             valores_gastos = [dado[0] for dado in dados_pecas]
-
+            print(valores_gastos)
             # Calcula o total de gastos
             gasto = sum(valores_gastos)
-
+            print(gasto)
             # Formata o total de gastos como moeda
             valor_total = self.formatar_moeda(gasto)
-
+            print(valor_total)
             return valor_total
 
         except Exception as e:
@@ -390,10 +392,8 @@ class Utills_portal():
             valor_vendido = sum(valores)
             meta = 0
             falta = meta - valor_vendido
-            if falta <= 0:
-                valor_total = 'Primeira meta Atingida'
-            else:
-                valor_total = self.formatar_moeda(falta)
+            valor_total = self.formatar_moeda(meta)
+            
 
             return valor_total
         except Exception as e:
@@ -404,12 +404,10 @@ class Utills_portal():
             valor_meta = self.db.faturamento_mes_meta(mes, ano)
             valores = [valor[0] for valor in valor_meta]
             valor_vendido = sum(valores)
-            meta = 220000.00
+            meta = 0
             falta = meta - valor_vendido
-            if falta <= 0:
-                valor_total = 'Segunda meta Atingida'
-            else:
-                valor_total = self.formatar_moeda(falta)
+
+            valor_total = self.formatar_moeda(meta)
             return valor_total
         except Exception as e:
             print(e)
@@ -477,7 +475,7 @@ class Utills_portal():
 
     def gastos_pecas(self, mes, ano):
 
-        dados_pecas = self.db_gastos.get_gatos_por_tipo('PEÇAS', mes, ano)
+        dados_pecas = self.db_gastos.get_gatos_por_tipo('Peças', mes, ano)
         valores_gastos = [dado[0] for dado in dados_pecas]
         gasto = sum(valores_gastos)
         valor_total = self.formatar_moeda(gasto)

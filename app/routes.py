@@ -3,7 +3,7 @@ from flask import request, redirect, render_template, flash, session, jsonify, m
 from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills, xlxs, rotas
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
-from database import gastos_db
+from database import gastos_db, conection
 from xhtml2pdf import pisa
 from io import BytesIO
 import json
@@ -15,6 +15,23 @@ PERMISSAO_TOTAL_ADMIN = 0
 PERMISSAO_GR7_USER = 1
 PERMISSAO_PORTAL_ADMIN = 2
 SEM_PERMISSAO = 3
+
+# Dados simulados
+lojas = ["Loja 1", "Loja 2"]
+funcionarios = {"Loja 1": ["Carlos", "Ana"], "Loja 2": ["Marcos", "Julia"]}
+
+dados_loja = {
+    "Loja 1": {"meses": ["Jan", "Fev", "Mar"], "faturamento": [10000, 12000, 15000], "servicos": ["Fluido", "Sangria", "Filtro"], "quantidades": [50, 30, 40]},
+    "Loja 2": {"meses": ["Jan", "Fev", "Mar"], "faturamento": [8000, 11000, 14000], "servicos": ["Fluido", "Sangria", "Filtro"], "quantidades": [40, 35, 45]}
+}
+
+dados_funcionario = {
+    "Carlos": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [2000, 2500, 3000]},
+    "Ana": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [1800, 2300, 2800]},
+    "Marcos": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [2200, 2700, 3200]},
+    "Julia": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [1900, 2400, 2900]}
+}
+
 
 class Routes:
     def __init__(self):
@@ -2236,3 +2253,69 @@ class Routes:
         response.headers['Content-Disposition'] = f'attachment; filename="{nome_arquivo}.xlsx"'
 
         return response
+    
+
+
+    # Dados simulados (substitua pelos dados reais do banco)
+
+
+    @app.route('/gerencial')
+    def tela_gerencial():
+        funcionarios = [
+            {'id': 1, 'nome': 'Funcionário 1'},
+            {'id': 2, 'nome': 'Funcionário 2'},
+            # Adicione mais funcionários conforme necessário
+        ]
+        return render_template('gerencial.html', empresa="Oficina", funcionarios=funcionarios)
+
+    @app.route('/dados-loja/<loja>')
+    def dados_loja(loja):
+        ano = request.args.get('ano', default=2025, type=int)
+        
+        print(f"Loja recebida: {loja}")
+        print(f"Ano recebido: {ano}")
+
+        db = conection.Database() if loja == "GR7" else conection.DatabasePortal()
+        
+        print("Conexão com o banco de dados estabelecida.")
+
+        faturamento = db.faturamento_loja_ano(loja, ano)
+        
+        print(f"Faturamento retornado: {faturamento}")
+
+        return jsonify(faturamento)
+
+    
+
+    @app.route('/funcionarios-por-loja/<loja>')
+    def funcionarios_por_loja(loja):
+        print(f"Loja recebida: {loja}")
+
+        db = conection.Database() if loja == "GR7" else conection.DatabasePortal()
+        
+        print("Conexão com o banco de dados estabelecida.")
+
+        funcionarios = db.funcionarios_por_loja(loja)
+        
+        print(f"Funcionários retornados: {funcionarios}")
+
+        return jsonify(funcionarios)
+
+    @app.route('/dados-funcionario/<mecanico>')
+    def dados_funcionario(mecanico):
+        loja = request.args.get('loja', default="GR7", type=str)
+        ano = request.args.get('ano', default=2024, type=int)
+
+        print(f"Mecânico recebido: {mecanico}")
+        print(f"Loja recebida: {loja}")
+        print(f"Ano recebido: {ano}")
+
+        db = conection.Database() if loja == "GR7" else conection.DatabasePortal()
+        
+        print("Conexão com o banco de dados estabelecida.")
+
+        desempenho = db.desempenho_funcionario_ano(loja, mecanico, ano)
+        
+        print(f"Desempenho retornado: {desempenho}")
+
+        return jsonify(desempenho)
