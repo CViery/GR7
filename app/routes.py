@@ -517,8 +517,9 @@ class Routes:
                     ]
                     anos = ['2024', '2025', '2026',
                             '2027', '2028', '2029', '2030']
-
+                    print('aqui')
                     if request.method == 'POST':
+                        print('aqui')
                         if 'mes' in request.form and 'ano' in request.form:
                             # Processar formulário de filtro de despesas
                             mes_dados = request.form['mes']
@@ -537,7 +538,6 @@ class Routes:
 
                             ano_dados = now.strftime('%Y')
                             dados_tipos = db.dados_gastos(mes_dados, ano_dados)
-                            print(dados_tipos)
                             valor_gasto = db.valor_gastos(mes_dados, ano_dados)
                             mes_select = get_mes_nome(mes_dados)
                             ano_select = ano_dados
@@ -576,7 +576,6 @@ class Routes:
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
                         mes_select = get_mes_nome(mes)
                         ano_select = ano
-
                         return render_template('gastos.html', anos=anos, meses=meses, tipo_despesa=dados_tipos, empresa=empresa, boletos=boletos, valor_gastos=valor_gasto, valor_a_pagar=valor_a_pagar,mes_escolhido = mes_select, ano_escolhido = ano_select, dia=dia)
                 elif session['permission'] == 'NORMAL':
                     empresa = session['empresa']
