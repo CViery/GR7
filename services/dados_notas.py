@@ -287,43 +287,43 @@ class DadosGastos:
     
     def dados_gastos(self, mes, ano):
         #Dados das despesas e subcategorias
-        print("Obtendo despesas...")
+        #print("Obtendo despesas...")
         despesas = self.db.get_despesas()
-        print(f"Despesas obtidas: {despesas}")
+        #print(f"Despesas obtidas: {despesas}")
 
-        print("Obtendo subcategorias...")
+        #print("Obtendo subcategorias...")
         sub_categorias = self.db.get_all_subcategorias()
-        print(f"Subcategorias obtidas: {sub_categorias}")
+        #print(f"Subcategorias obtidas: {sub_categorias}")
 
         # Função para somar valores de um período específico
         def somar_valores_por_subcategoria(subcategoria, mes=None, ano=None):
-            print(f"Calculando valores para subcategoria: {subcategoria}, mês: {mes}, ano: {ano}")
+            #print(f"Calculando valores para subcategoria: {subcategoria}, mês: {mes}, ano: {ano}")
             notas = self.db.notas_por_subcategoria(subcategoria, mes, ano)
-            print(f"Notas obtidas para subcategoria {subcategoria}: {notas}")
+            #print(f"Notas obtidas para subcategoria {subcategoria}: {notas}")
             if notas is None:
-                print(f"Nenhuma nota encontrada para subcategoria {subcategoria}")
+                #print(f"Nenhuma nota encontrada para subcategoria {subcategoria}")
                 return
             valores = [dado[12] for dado in notas]
             soma = sum(valores)
-            print(f"Soma dos valores para subcategoria {subcategoria}: {soma}")
+            #print(f"Soma dos valores para subcategoria {subcategoria}: {soma}")
             return soma
 
         def somar_valores_por_categoria(categoria, mes=None, ano=None):
-            print(f"Calculando valores para categoria: {categoria[0]}, mês: {mes}, ano: {ano}")
+            #print(f"Calculando valores para categoria: {categoria[0]}, mês: {mes}, ano: {ano}")
             notas = self.db.notas_por_categoria(categoria[0], mes, ano)
-            print(f"Notas obtidas para categoria {categoria[0]}: {notas}")
+            #print(f"Notas obtidas para categoria {categoria[0]}: {notas}")
             if notas is None:
-                print(f"Nenhuma nota encontrada para categoria {categoria[0]}")
+                #print(f"Nenhuma nota encontrada para categoria {categoria[0]}")
                 return 0
             valores = [dado[12] for dado in notas]
             soma = sum(valores)
-            print(f"Soma dos valores para categoria {categoria[0]}: {soma}")
+            #print(f"Soma dos valores para categoria {categoria[0]}: {soma}")
             return soma
 
         # Construir os dados finais com soma dos valores
         dados = []
         for despesa in despesas:
-            print(f"Processando despesa: {despesa}")
+            #print(f"Processando despesa: {despesa}")
             subs = []
             valor = somar_valores_por_categoria(despesa, mes, ano)
             for sub in sub_categorias:
@@ -716,16 +716,13 @@ class DadosGastosPortal():
                 "valor": self.formatar_moeda(valor)
             })
         
-        import pprint
-        pprint.pprint(dados)
+        
         
             
         return dados
         # Exibir os dados
 
     def buscar_notas(self, mes, ano):
-        print(mes)
-        print(ano)
         notas = self.db.get_all_notas_mes(mes, ano)
         
         output = []

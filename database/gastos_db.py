@@ -1357,7 +1357,7 @@ class GastosDataBasePortal():
 
     def notas_por_subcategoria(self, subcategorias, mes, ano):
         try:
-            query  = 'SELECT * FROM notas_portal WHERE subcategoria = ? AND mes_emissao = ? AND ano_emissao = ?'
+            query  = 'SELECT * FROM notas_portal WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ?'
             parametros = (subcategorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
@@ -1371,7 +1371,6 @@ class GastosDataBasePortal():
             parametros = (categorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
-            print(f'Notas Categoria {categorias}: {response}')
             return response
         except Exception as e:
             ...
