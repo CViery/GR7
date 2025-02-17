@@ -102,22 +102,33 @@ function criarGrafico(ctx, tipo, labels, datasets) {
     });
 }
 
-// Função assíncrona para buscar dados e atualizar gráficos
 async function carregarDados() {
-    const loja = document.getElementById('loja').value;
-    const ano = document.getElementById('ano').value;
+    try {
+        console.log("Função carregarDados() foi chamada.");
+        const loja = document.getElementById('loja').value;
+        const ano = document.getElementById('ano').value;
 
-    console.log(`Carregando dados para loja: ${loja}, ano: ${ano}`);
+        console.log(`Carregando dados para loja: ${loja}, ano: ${ano}`);
 
-    if (loja === 'comparar') {
-        await compararLojas(ano);
-    } else {
-        await atualizarGraficoLoja(loja, ano);
-        await carregarFuncionarios(loja, ano);
+        if (!loja || !ano) {
+            console.warn("Loja ou ano não foram selecionados.");
+            return;
+        }
+
+        if (loja === 'comparar') {
+            await compararLojas(ano);
+        } else {
+            const dados = await atualizarGraficoLoja(loja, ano);
+            console.log("Dados recebidos para o gráfico:", dados);
+
+            await carregarFuncionarios(loja, ano);
+        }
+    } catch (erro) {
+        console.error("Erro ao carregar dados:", erro);
     }
 }
 
-// Atualiza o gráfico da loja selecionada
+
 async function atualizarGraficoLoja(loja, ano) {
     try {
         const response = await fetch(`/dados-loja/${loja}?ano=${ano}`);
@@ -125,11 +136,25 @@ async function atualizarGraficoLoja(loja, ano) {
 
         console.log("Dados de faturamento recebidos:", data);
 
+        if (!data || Object.keys(data).length === 0) {
+            console.warn("Nenhum dado recebido para o gráfico.");
+            return;
+        }
+
+        // Converte os dados recebidos no formato correto
+        const meses = Object.keys(data).map(mes => parseInt(mes)); // Transforma em números
+        const faturamento = Object.values(data); // Valores de faturamento
+
+        console.log("Meses:", meses);
+        console.log("Faturamento:", faturamento);
+
+        // Destroi o gráfico anterior, se existir
         if (desempenhoLojaChart) desempenhoLojaChart.destroy();
 
-        desempenhoLojaChart = criarGrafico(ctxLoja, 'bar', data.meses, [{
+        // Cria um novo gráfico
+        desempenhoLojaChart = criarGrafico(ctxLoja, 'bar', meses, [{
             label: `Faturamento - ${loja} (${ano})`,
-            data: data.faturamento,
+            data: faturamento,
             backgroundColor: loja === 'GR7' ? 'rgba(54, 162, 235, 0.2)' : 'rgba(255, 99, 132, 0.2)',
             borderColor: loja === 'GR7' ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)',
             borderWidth: 1
@@ -138,6 +163,7 @@ async function atualizarGraficoLoja(loja, ano) {
         console.error("Erro ao buscar dados da loja:", error);
     }
 }
+
 
 // Compara o desempenho das duas lojas
 async function compararLojas(ano) {
@@ -149,20 +175,24 @@ async function compararLojas(ano) {
 
         console.log("Dados GR7:", dataGR7);
         console.log("Dados Portal:", dataPortal);
+        const mesesPortal = Object.keys(dataPortal).map(mes => parseInt(mes)); // Transforma em números
+        const faturamentoPortal = Object.values(dataPortal); // Valores de faturamento
+        const mesesGr7 = Object.keys(dataGR7).map(mes => parseInt(mes)); // Transforma em números
+        const faturamentoGr7 = Object.values(dataGR7); // Valores de faturamento
 
         if (desempenhoLojaChart) desempenhoLojaChart.destroy();
 
-        desempenhoLojaChart = criarGrafico(ctxLoja, 'bar', dataGR7.meses, [
+        desempenhoLojaChart = criarGrafico(ctxLoja, 'bar', mesesGr7, [
             {
                 label: `Faturamento - GR7 (${ano})`,
-                data: dataGR7.faturamento,
+                data: faturamentoGr7,
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
             },
             {
                 label: `Faturamento - Portal (${ano})`,
-                data: dataPortal.faturamento,
+                data: faturamentoPortal,
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1
@@ -242,9 +272,9 @@ async function mostrarDesempenhoFuncionario(funcionarioId, ano) {
 document.getElementById('loja').addEventListener('change', carregarDados);
 document.getElementById('ano').addEventListener('change', carregarDados);
 
-// Inicializa o gráfico da loja GR7 e ano 2024 por padrão
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("Evento DOMContentLoaded disparado!"); // Se não aparecer, o script pode estar mal referenciado
     carregarDados();
-});
+})
 </script>
 {% endblock %}

@@ -78,7 +78,7 @@ class GastosDataBase:
             logging.info(f"Recebendo boleto: {boleto}")
             
             # Preparar a query de inserção
-            query = 'INSERT INTO boletos (num_nota, notas, fornecedor, vencimento, dia_vencimento, mes_vencimento, ano_vencimento, valor) VALUES (?,?,?,?,?,?,?,?)'
+            query = 'INSERT INTO boletos (num_nota, notas, fornecedor, data_vencimento, dia_vencimento, mes_vencimento, ano_vencimento, valor) VALUES (?,?,?,?,?,?,?,?)'
             valores = (boleto['num_nota'], boleto['notas'], boleto['fornecedor'], boleto['vencimento'],
                     boleto['dia_vencimento'], boleto['mes_vencimento'], boleto['ano_vencimento'], boleto['valor'])
             

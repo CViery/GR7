@@ -123,6 +123,26 @@
                     </li>
                   </div>
               </li>
+
+              {% if usuario == 'GILBERTO' or usuario == 'CRISTIAN' %}
+              <li class="menu-item sub-menu">
+                <a href="/gerencial">
+                  <span class="menu-icon">
+                    <i class="bi bi-file-pdf"></i>
+                  </span>
+                  <span class="menu-title">Gerencial</span>
+                </a>
+                <div class="sub-menu-list">
+                  <ul>
+                    <li class="menu-item">
+                      <a href="#">
+                        <span class="menu-title">INICIO</span>
+                      </a>
+                    </li>
+                  </div>
+              </li>
+              {% endif %}
+              
               <li class="menu-item sub-menu">
                 <a href="/cadastros">
                   <span class="menu-icon">
