@@ -17,21 +17,24 @@ class DadosGastos:
 
     def boletos_do_dia(self, dia, mes, ano):
         dados = self.db.get_boleto_by_day(dia, mes, ano)
+        print(dia)
+        print(mes)
+        print(ano)
         valores = []
         boletos = []
         for dado in dados:
-            valor = f'R$ {dado[7]:.2f}'
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            valor = f'R$ {dado[8]:.2f}'
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data = data_objeto.strftime("%d/%m/%Y")
             boleto = {
-                'numero_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'numero_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'vencimento': data,
                 'valor': valor
             }
 
-            valores.append(dado[7])
+            valores.append(dado[8])
             boletos.append(boleto)
         return boletos
 
@@ -39,7 +42,7 @@ class DadosGastos:
         dados = self.db.get_boleto_by_day(dia, mes, ano)
         valores = []
         for dado in dados:
-            valores.append(dado[7])
+            valores.append(dado[8])
         a_pagar = sum(valores)
         valor_a_pagar = self.formatar_moeda(a_pagar)
         return valor_a_pagar
@@ -67,22 +70,22 @@ class DadosGastos:
         output = []
         for nota in notas:
            
-            data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
+            data_objeto = datetime.strptime(nota[8], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = nota[12]
+            valor_nota = nota[13]
             valor = self.formatar_moeda(valor_nota)
             nfe = {
-                'pago_por': nota[0],
-                'emitido_para': nota[1],
-                'status': nota[2],
-                'boleto': nota[3],
-                'numero_nota': nota[4],
-                'fornecedor': nota[6],
+                'pago_por': nota[1],
+                'emitido_para': nota[2],
+                'status': nota[3],
+                'boleto': nota[4],
+                'numero_nota': nota[5],
+                'fornecedor': nota[7],
                 'data_emissao': data_formatada,
                 'valor': valor,
-                'duplicata': nota[5],
-                'tipo_despesa': nota[13],
-                'obs': nota[14]
+                'duplicata': nota[6],
+                'tipo_despesa': nota[14],
+                'obs': nota[15]
             }
             output.append(nfe)
         return output
@@ -95,22 +98,22 @@ class DadosGastos:
         output = []
         if notas:
             for nota in notas:
-                data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
+                data_objeto = datetime.strptime(nota[8], "%Y-%m-%d")
                 data_formatada = data_objeto.strftime("%d/%m/%Y")
-                valor_nota = nota[12]
+                valor_nota = nota[13]
                 valor = self.formatar_moeda(valor_nota)
                 nfe = {
-                    'pago_por': nota[0],
-                    'emitido_para': nota[1],
-                    'status': nota[2],
-                    'boleto': nota[3],
-                    'numero_nota': nota[4],
-                    'fornecedor': nota[6],
+                    'pago_por': nota[1],
+                    'emitido_para': nota[2],
+                    'status': nota[3],
+                    'boleto': nota[4],
+                    'numero_nota': nota[5],
+                    'fornecedor': nota[7],
                     'data_emissao': data_formatada,
                     'valor': valor,
-                    'duplicata': nota[5],
-                    'tipo_despesa': nota[13],
-                    'obs': nota[14]
+                    'duplicata': nota[6],
+                    'tipo_despesa': nota[14],
+                    'obs': nota[15]
                 }
                 output.append(nfe)
             return output
@@ -120,7 +123,7 @@ class DadosGastos:
 
     def valor_nota(self):
         notas = self.db.get_all_notas()
-        output = [nota[12] for nota in notas]
+        output = [nota[13] for nota in notas]
         soma = sum(output)
         result = self.formatar_moeda(soma)
         return result
@@ -131,22 +134,22 @@ class DadosGastos:
         print(obs)
         notas = []
         for dados in resultado:
-            data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dados[8], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = dados[12]
+            valor_nota = dados[13]
             valor = self.formatar_moeda(valor_nota)
             nfe = {
-                'pago_por': dados[0],
-                'emitido_para': dados[1],
-                'status': dados[2],
-                'boleto': dados[3],
-                'numero_nota': dados[4],
-                'fornecedor': dados[6],
+                'pago_por': dados[1],
+                'emitido_para': dados[2],
+                'status': dados[3],
+                'boleto': dados[4],
+                'numero_nota': dados[5],
+                'fornecedor': dados[7],
                 'data_emissao': data_formatada,
                 'valor': valor,
-                'duplicata': dados[5],
-                'tipo_despesa': dados[13],
-                'obs': dados[14]
+                'duplicata': dados[6],
+                'tipo_despesa': dados[14],
+                'obs': dados[15]
             }
             notas.append(nfe)
         return notas
@@ -154,7 +157,7 @@ class DadosGastos:
     def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None, obs=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa,obs)
-        valores = [dados[12] for dados in resultado]
+        valores = [dados[13] for dados in resultado]
         soma = sum(valores)
         result = self.formatar_moeda(soma)
         return result
@@ -163,15 +166,15 @@ class DadosGastos:
         dados = self.db.get_nota_por_numero(num_nota)
        
         if dados:
-            data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dados[8], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = dados[12]
+            valor_nota = dados[13]
             valor = self.formatar_moeda(valor_nota)
             nfe = {
-                'fornecedor': dados[6],
+                'fornecedor': dados[7],
                 'data_emissao': data_formatada,
                 'valor': valor,
-                'obs': dados[14]
+                'obs': dados[15]
             }
             return nfe
 
@@ -180,14 +183,14 @@ class DadosGastos:
         boletos = []
         for dado in dados:
             
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_boleto = dado[7]
+            valor_boleto = dado[8]
             valor = self.formatar_moeda(valor_boleto)
             boleto = {
-                'num_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'num_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'data_vencimento': data_formatada,
                 'valor': valor
             }
@@ -199,14 +202,14 @@ class DadosGastos:
         dados = self.db.get_boletos_por_nota(num_nota)
         boletos = []
         for dado in dados:
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_boleto = dado[7]
+            valor_boleto = dado[8]
             valor = self.formatar_moeda(valor_boleto)
             boleto = {
-                'num_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'num_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'data_vencimento': data_formatada,
                 'valor': valor
             }
@@ -228,14 +231,14 @@ class DadosGastos:
         boletos = []
         for dado in dados:
             
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_boleto = dado[7]
+            valor_boleto = dado[8]
             valor = self.formatar_moeda(valor_boleto)
             boleto = {
-                'num_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'num_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'data_vencimento': data_formatada,
                 'valor': valor
             }
@@ -273,14 +276,14 @@ class DadosGastos:
     def filtrar_boletos_valor(self, data_inicio=None, data_fim=None, fornecedor=None):
         dados = self.db.obter_boletos_filtrados(
             data_inicio, data_fim, fornecedor)
-        boletos = [dado[7] for dado in dados]
+        boletos = [dado[8] for dado in dados]
         soma = sum(boletos)
         result = self.formatar_moeda(soma)
         return result
 
     def valor_boleto(self):
         dados = self.db.get_boletos()
-        boletos = [dado[7] for dado in dados]
+        boletos = [dado[8] for dado in dados]
         soma = sum(boletos)
         result = f'R$ {soma:.2f}'
         return result
@@ -301,33 +304,34 @@ class DadosGastos:
             notas = self.db.notas_por_subcategoria(subcategoria, mes, ano)
             #print(f"Notas obtidas para subcategoria {subcategoria}: {notas}")
             if notas is None:
-                #print(f"Nenhuma nota encontrada para subcategoria {subcategoria}")
+                print(f"Nenhuma nota encontrada para subcategoria {subcategoria}")
                 return
-            valores = [dado[12] for dado in notas]
+            valores = [dado[13] for dado in notas]
             soma = sum(valores)
             #print(f"Soma dos valores para subcategoria {subcategoria}: {soma}")
             return soma
 
         def somar_valores_por_categoria(categoria, mes=None, ano=None):
-            #print(f"Calculando valores para categoria: {categoria[0]}, mês: {mes}, ano: {ano}")
-            notas = self.db.notas_por_categoria(categoria[0], mes, ano)
-            #print(f"Notas obtidas para categoria {categoria[0]}: {notas}")
+            print(f"Calculando valores para categoria: {categoria[1]}, mês: {mes}, ano: {ano}")
+            notas = self.db.notas_por_categoria(categoria[1], mes, ano)
+            print(f"Notas obtidas para categoria {categoria[1]}: {notas}")
             if notas is None:
-                #print(f"Nenhuma nota encontrada para categoria {categoria[0]}")
+                print(f"Nenhuma nota encontrada para categoria {categoria[1]}")
                 return 0
-            valores = [dado[12] for dado in notas]
+            valores = [dado[13] for dado in notas]
             soma = sum(valores)
-            #print(f"Soma dos valores para categoria {categoria[0]}: {soma}")
+            print(f"Soma dos valores para categoria {categoria[1]}: {soma}")
             return soma
 
         # Construir os dados finais com soma dos valores
         dados = []
         for despesa in despesas:
-            #print(f"Processando despesa: {despesa}")
+            print(f"Processando despesa: {despesa}")
             subs = []
             valor = somar_valores_por_categoria(despesa, mes, ano)
             for sub in sub_categorias:
-                if sub[2] == despesa[0]:  # Ajuste para verificar o nome da despesa
+                print(f'Sub: {sub}')
+                if sub[2] == despesa[1]:  # Ajuste para verificar o nome da despesa
                     # Calcular valores da subcategoria
                     valor_mes = somar_valores_por_subcategoria(sub[3], mes=mes, ano=ano)
                     subs.append({
@@ -336,7 +340,7 @@ class DadosGastos:
                         "valor_mes": self.formatar_moeda(valor_mes),
                     })
             dados.append({
-                "despesa": despesa[0],
+                "despesa": despesa[1],
                 "subs": subs,
                 "valor": self.formatar_moeda(valor)
             })
@@ -384,14 +388,14 @@ class DadosGastos:
         boletos = []
         for dado in dados:
             
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_boleto = dado[7]
+            valor_boleto = dado[8]
             valor = self.formatar_moeda(valor_boleto)
             boleto = {
-                'num_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'num_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'data_vencimento': data_formatada,
                 'valor': valor
             }
@@ -416,18 +420,18 @@ class DadosGastosPortal():
         valores = []
         boletos = []
         for dado in dados:
-            valor = self.formatar_moeda(dado[7])
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            valor = self.formatar_moeda(dado[8])
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data = data_objeto.strftime("%d/%m/%Y")
             boleto = {
-                'numero_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'numero_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'vencimento': data,
                 'valor': valor
             }
 
-            valores.append(dado[7])
+            valores.append(dado[8])
             boletos.append(boleto)
         return boletos
 
@@ -435,7 +439,7 @@ class DadosGastosPortal():
         dados = self.db.get_boleto_by_day(dia, mes, ano)
         valores = []
         for dado in dados:
-            valores.append(dado[7])
+            valores.append(dado[8])
         a_pagar = sum(valores)
         valor_a_pagar = self.formatar_moeda(a_pagar)
         return valor_a_pagar
@@ -462,21 +466,21 @@ class DadosGastosPortal():
         notas = self.db.get_all_notas()
         output = []
         for nota in notas:
-            data_objeto = datetime.strptime(nota[7], "%Y-%m-%d")
+            data_objeto = datetime.strptime(nota[8], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = nota[12]
+            valor_nota = nota[13]
             valor = self.formatar_moeda(valor_nota)
             nfe = {
-                'pago_por': nota[0],
-                'emitido_para': nota[1],
-                'status': nota[2],
-                'boleto': nota[3],
-                'numero_nota': nota[4],
-                'fornecedor': nota[6],
+                'pago_por': nota[1],
+                'emitido_para': nota[2],
+                'status': nota[3],
+                'boleto': nota[4],
+                'numero_nota': nota[5],
+                'fornecedor': nota[7],
                 'data_emissao': data_formatada,
                 'valor': valor,
-                'duplicata': nota[5],
-                'tipo_despesa': nota[13],
+                'duplicata': nota[9],
+                'tipo_despesa': nota[14],
                 'obs': nota[14]
             }
             output.append(nfe)
@@ -499,7 +503,7 @@ class DadosGastosPortal():
 
     def valor_nota(self):
         notas = self.db.get_all_notas()
-        output = [nota[12] for nota in notas]
+        output = [nota[13] for nota in notas]
         soma = sum(output)
         result = self.formatar_moeda(soma)
         return result
@@ -509,21 +513,21 @@ class DadosGastosPortal():
             data_inicio, data_fim, fornecedor, despesa)
         notas = []
         for dados in resultado:
-            data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dados[8], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = dados[12]
+            valor_nota = dados[13]
             valor = self.formatar_moeda(valor_nota)
             nfe = {
-                'pago_por': dados[0],
-                'emitido_para': dados[1],
-                'status': dados[2],
-                'boleto': dados[3],
-                'numero_nota': dados[4],
-                'fornecedor': dados[6],
+                'pago_por': dados[1],
+                'emitido_para': dados[2],
+                'status': dados[3],
+                'boleto': dados[4],
+                'numero_nota': dados[5],
+                'fornecedor': dados[7],
                 'data_emissao': data_formatada,
                 'valor': valor,
-                'duplicata': dados[5],
-                'tipo_despesa': dados[13]
+                'duplicata': dados[6],
+                'tipo_despesa': dados[14]
             }
             notas.append(nfe)
         return notas
@@ -531,7 +535,7 @@ class DadosGastosPortal():
     def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa)
-        valores = [dados[12] for dados in resultado]
+        valores = [dados[13] for dados in resultado]
         soma = sum(valores)
         result = self.formatar_moeda(soma)
         return result
@@ -539,12 +543,12 @@ class DadosGastosPortal():
     def nota_por_numero(self, num_nota):
         dados = self.db.get_nota_por_numero(num_nota)
         if dados:
-            data_objeto = datetime.strptime(dados[7], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dados[8], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_nota = dados[12]
+            valor_nota = dados[13]
             valor = self.formatar_moeda(valor_nota)
             nfe = {
-                'fornecedor': dados[6],
+                'fornecedor': dados[7],
                 'data_emissao': data_formatada,
                 'valor': valor
             }
@@ -554,14 +558,14 @@ class DadosGastosPortal():
         dados = self.db.get_boletos()
         boletos = []
         for dado in dados:
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_boleto = dado[7]
+            valor_boleto = dado[8]
             valor = self.formatar_moeda(valor_boleto)
             boleto = {
-                'num_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'num_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'data_vencimento': data_formatada,
                 'valor': valor
             }
@@ -571,7 +575,7 @@ class DadosGastosPortal():
 
     def valor_boleto(self):
         dados = self.db.get_boletos()
-        boletos = [dado[7] for dado in dados]
+        boletos = [dado[8] for dado in dados]
         soma = sum(boletos)
         result = self.formatar_moeda(soma)
         return result
@@ -582,14 +586,14 @@ class DadosGastosPortal():
         boletos = []
         for dado in dados:
            
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_boleto = dado[7]
+            valor_boleto = dado[8]
             valor = self.formatar_moeda(valor_boleto)
             boleto = {
-                'num_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'num_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'data_vencimento': data_formatada,
                 'valor': valor
             }
@@ -600,7 +604,7 @@ class DadosGastosPortal():
     def filtrar_boletos_valor(self, data_inicio=None, data_fim=None, fornecedor=None):
         dados = self.db.obter_boletos_filtrados(
             data_inicio, data_fim, fornecedor)
-        boletos = [dado[7] for dado in dados]
+        boletos = [dado[8] for dado in dados]
         soma = sum(boletos)
         result = self.formatar_moeda(soma)
         return result
@@ -661,7 +665,7 @@ class DadosGastosPortal():
         return valor_total
     
     def dados_gastos(self, mes, ano):
-        # Dados das despesas e subcategorias
+        #Dados das despesas e subcategorias
         #print("Obtendo despesas...")
         despesas = self.db.get_despesas()
         #print(f"Despesas obtidas: {despesas}")
@@ -676,23 +680,23 @@ class DadosGastosPortal():
             notas = self.db.notas_por_subcategoria(subcategoria, mes, ano)
             #print(f"Notas obtidas para subcategoria {subcategoria}: {notas}")
             if notas is None:
-                #print(f"Nenhuma nota encontrada para subcategoria {subcategoria}")
+                print(f"Nenhuma nota encontrada para subcategoria {subcategoria}")
                 return
-            valores = [dado[12] for dado in notas]
+            valores = [dado[13] for dado in notas]
             soma = sum(valores)
             #print(f"Soma dos valores para subcategoria {subcategoria}: {soma}")
             return soma
 
         def somar_valores_por_categoria(categoria, mes=None, ano=None):
-            #print(f"Calculando valores para categoria: {categoria[0]}, mês: {mes}, ano: {ano}")
-            notas = self.db.notas_por_categoria(categoria[0], mes, ano)
-            #print(f"Notas obtidas para categoria {categoria[0]}: {notas}")
+            print(f"Calculando valores para categoria: {categoria[1]}, mês: {mes}, ano: {ano}")
+            notas = self.db.notas_por_categoria(categoria[1], mes, ano)
+            print(f"Notas obtidas para categoria {categoria[1]}: {notas}")
             if notas is None:
-                #print(f"Nenhuma nota encontrada para categoria {categoria[0]}")
+                print(f"Nenhuma nota encontrada para categoria {categoria[1]}")
                 return 0
-            valores = [dado[12] for dado in notas]
+            valores = [dado[13] for dado in notas]
             soma = sum(valores)
-           #print(f"Soma dos valores para categoria {categoria[0]}: {soma}")
+            print(f"Soma dos valores para categoria {categoria[1]}: {soma}")
             return soma
 
         # Construir os dados finais com soma dos valores
@@ -702,7 +706,8 @@ class DadosGastosPortal():
             subs = []
             valor = somar_valores_por_categoria(despesa, mes, ano)
             for sub in sub_categorias:
-                if sub[2] == despesa[0]:  # Ajuste para verificar o nome da despesa
+                #print(f'Sub: {sub}')
+                if sub[2] == despesa[1]:  # Ajuste para verificar o nome da despesa
                     # Calcular valores da subcategoria
                     valor_mes = somar_valores_por_subcategoria(sub[3], mes=mes, ano=ano)
                     subs.append({
@@ -711,12 +716,13 @@ class DadosGastosPortal():
                         "valor_mes": self.formatar_moeda(valor_mes),
                     })
             dados.append({
-                "despesa": despesa[0],
+                "despesa": despesa[1],
                 "subs": subs,
                 "valor": self.formatar_moeda(valor)
             })
         
-        
+        import pprint
+        pprint.pprint(dados)
         
             
         return dados
@@ -756,14 +762,14 @@ class DadosGastosPortal():
         boletos = []
         for dado in dados:
             
-            data_objeto = datetime.strptime(dado[3], "%Y-%m-%d")
+            data_objeto = datetime.strptime(dado[4], "%Y-%m-%d")
             data_formatada = data_objeto.strftime("%d/%m/%Y")
-            valor_boleto = dado[7]
+            valor_boleto = dado[8]
             valor = self.formatar_moeda(valor_boleto)
             boleto = {
-                'num_nota': dado[0],
-                'notas': dado[1],
-                'fornecedor': dado[2],
+                'num_nota': dado[1],
+                'notas': dado[2],
+                'fornecedor': dado[3],
                 'data_vencimento': data_formatada,
                 'valor': valor
             }

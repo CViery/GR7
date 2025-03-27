@@ -157,7 +157,7 @@
     </table>
   </div>
 
-  <h2>Outros Serviços</h2>
+  <h2>Total de Serviços</h2>
   <div class="table-container">
     <table>
       <thead>
@@ -173,79 +173,79 @@
           <tr>
               {%if faturamento[0] == 'revitalizacao' %}
               <td><strong>REVITALIZAÇÃO</strong></td>
-              <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
+              <td>{{ faturamento[1] }}</td>
               {% endif %}
               {%if faturamento[0] == 'aditivo' %}
                   {%if empresa == 'gr7'%}
                       <td><strong>ADITIVO</strong></td>
-                      <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
+                      <td>{{ faturamento[1] }}</td>
 
                   {%elif empresa == 'portal'%}
                       <td><strong>AR CONDICIONADO</strong></td>
-                      <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
+                      <td>{{ faturamento[1] }}</td>
                   {%endif%}
               {% endif %}
               {%if faturamento[0] == 'fluido_sangria' %}
                   {%if empresa == 'gr7'%}
                   <td><strong>FLUIDO E SANGRIA</strong></td>
-                  <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
+                  <td>{{ faturamento[1] }}</td>
 
                   {%elif empresa == 'portal'%}
                       <td><strong>LAVAGEM</strong></td>
-                      <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
+                      <td>{{ faturamento[1] }}</td>
 
                   {%endif%}
                   {% endif %}
               {%if faturamento[0] == 'palheta' %}
                   {%if empresa == 'gr7'%}
                       <td><strong>PALHETA</strong></td>
-                      <td>{{ faturamento[1] }}</td>
                       <td>{{ faturamento[2] }}</td>
+                      <td>{{ faturamento[1] }}</td>
 
               {%elif empresa == 'portal'%}
                   <td><strong>ALTERNADOR/MOTOR DE ARRANQUE</strong></td>
-                  <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
+                  <td>{{ faturamento[1] }}</td>
 
               {%endif%}
               {% endif %}
               {%if faturamento[0] == 'limpeza_freios' %}
                   {%if empresa == 'gr7'%}
                   <td><strong>LIMPEZA DE FREIOS</strong></td>
-                  <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
+                  <td>{{ faturamento[1] }}</td>
 
                   {%elif empresa == 'portal'%}
                   <td><strong>FUNILARIA</strong></td>
-                  <td>{{ faturamento[1] }}</td>
                   <td>{{ faturamento[2] }}</td>
+                  <td>{{ faturamento[1] }}</td>
 
                 {%endif%}
               {% endif %}
               {%if faturamento[0] == 'detergente_parabrisa' %}
               <td><strong>DETERGENTE PARABRISA</strong></td>
-              <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
+              <td>{{ faturamento[1] }}</td>
               {% endif %}
               {%if faturamento[0] == 'filtro' %}
               <td><strong>FILTRO</strong></td>
-              <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
+              <td>{{ faturamento[1] }}</td>
               {% endif %}
               {%if faturamento[0] == 'pneus' %}
               <td><strong>PNEUS</strong></td>
-              <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
+              <td>{{ faturamento[1] }}</td>
               {% endif %}
               {%if faturamento[0] == 'bateria' %}
               <td><strong>BATERIA</strong></td>
-              <td>{{ faturamento[1] }}</td>
               <td>{{ faturamento[2] }}</td>
+              <td>{{ faturamento[1] }}</td>
               {% endif %}
           </tr>
           

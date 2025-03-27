@@ -24,7 +24,7 @@ def render_gr7_admin(usuario):
         'ticket': utils.ticket(mes_dados, ano_dados),
         'passagens': utils.passagens(mes_dados, ano_dados)
     }
-
+    print(dados_faturamento)
     return render_template('index.html', empresa=session['empresa'], user=usuario, **dados_faturamento)
 
 

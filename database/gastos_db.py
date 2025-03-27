@@ -34,8 +34,8 @@ class GastosDataBase:
             query = '''
                 INSERT INTO notas (pago_por, emitido_para, status, boleto, num_nota, duplicata, fornecedor, 
                                 data_emissao, dia_emissao, mes_emissao, ano_emissao, vencimentos, valor, 
-                                despesa, observacoes, usuario, id, sub_categoria) 
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                                despesa, observacoes, usuario, sub_categorias) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             '''
             
             # Log para exibir os valores que serão inseridos
@@ -43,7 +43,7 @@ class GastosDataBase:
                 nota['pago_por'], nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], 
                 nota['duplicata'], nota['fornecedor'], nota['data_emissao'], nota['dia_emissao'], 
                 nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], 
-                nota['despesa'], nota['obs'], nota['usuario'], novo_id, nota['sub']
+                nota['despesa'], nota['obs'], nota['usuario'], nota['sub']
             )
             logging.info(f"Valores a serem inseridos: {valores}")
             
@@ -157,7 +157,7 @@ class GastosDataBase:
             logging.info(f"Iniciando consulta para recuperar valores de {tipo} no mês {mes} e ano {ano}.")
             
             # Query para buscar os valores
-            query = 'SELECT valor FROM notas WHERE sub_categoria = ? AND mes_emissao = ? AND ano_emissao = ?'
+            query = 'SELECT valor FROM notas WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ?'
             self.cursor.execute(query, (tipo, mes, ano))
             
             # Recuperando os resultados
@@ -959,7 +959,7 @@ class GastosDataBase:
         """
         try:
             # Preparação da query SQL
-            query = 'SELECT * FROM sub_categorias WHERE categoria = ?'
+            query = 'SELECT * FROM sub_categorias WHERE despesa = ?'
 
             # Log da operação
             logging.info(f"Buscando subcategorias para a despesa: {despesa}")
@@ -982,7 +982,7 @@ class GastosDataBase:
 
     def notas_por_subcategoria(self, subcategorias, mes, ano):
         try:
-            query  = 'SELECT * FROM notas WHERE sub_categoria = ? AND mes_emissao = ? AND ano_emissao = ?'
+            query  = 'SELECT * FROM notas WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ?'
             parametros = (subcategorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
@@ -1038,8 +1038,8 @@ class GastosDataBasePortal():
             query = '''
                 INSERT INTO notas_portal (pago_por, emitido_para, status, boleto, num_nota, duplicata, fornecedor, 
                                 data_emissao, dia_emissao, mes_emissao, ano_emissao, vencimentos, valor, 
-                                despesa, observacoes, usuario, id, sub_categorias) 
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                                despesa, observacoes, usuario, sub_categorias) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             '''
             
             # Log para exibir os valores que serão inseridos
@@ -1047,7 +1047,7 @@ class GastosDataBasePortal():
                 nota['pago_por'], nota['emitido_para'], nota['status'], nota['boleto'], nota['nota'], 
                 nota['duplicata'], nota['fornecedor'], nota['data_emissao'], nota['dia_emissao'], 
                 nota['mes_emissao'], nota['ano_emissao'], nota['vencimentos'], nota['valor'], 
-                nota['despesa'], nota['obs'], nota['usuario'], novo_id, nota['sub']
+                nota['despesa'], nota['obs'], nota['usuario'], nota['sub']
             )
             logging.info(f"Valores a serem inseridos: {valores}")
             
@@ -1361,6 +1361,7 @@ class GastosDataBasePortal():
             parametros = (subcategorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
+            print(response)
             return response
         except Exception as e:
             ...

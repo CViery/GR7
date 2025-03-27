@@ -361,28 +361,7 @@
                 <button class="button_for" type="submit">Filtrar</button>
             </div>
         </form>
-        <form action="/exportar_relatorio/{{ mes_escolhido }}/{{ ano_escolhido }}" method="post">
-            <div class="flex-row">
-                <div class="select">
-                    <select name="mes" required>
-                        <option value="">Selecione o mês</option>
-                        {% for mes in meses %}
-                        <option value="{{ mes[0] }}">{{ mes[1] }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="select">
-                    <select name="ano" required>
-                        <option value="">Selecione o ano</option>
-                        {% for ano in anos %}
-                        <option value="{{ ano }}">{{ ano }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button class="button_for" type="submit">Exportar</button>
-            </div>
-        </form>
-        <a href="/exportar_relatorio/{}/{}">Exportar</a>
+
         <div class="container_dados">
             <div class="flex-item">
                 <h5 class="description-value">Faturamento Bruto</h5>
@@ -441,7 +420,8 @@
                             <thead>
                                 <tr>
                                     <th>Mecânico</th>
-                                    <th>Valor</th>
+                                    <th>Valor Serviços</th>
+                                    <th>Valor Peças</th>
                                     <th>Quantidade Serv</th>
                                     <th>Filtros</th>
                                     <th>Revitalização</th>
@@ -453,8 +433,9 @@
                                     <td>{{ faturamento[0] }}</td>
                                     <td>{{ faturamento[1] }}</td>
                                     <td>{{ faturamento[2] }}</td>
-                                    <td>{{ faturamento[3] }}</td>
-                                    <td>{{ faturamento[4] }} -- {{ faturamento[5] }}</td>
+                                    <td>{{faturamento[3]}}</td>
+                                    <td>{{ faturamento[4] }} -- {{faturamento[5]}}</td>
+                                    <td>{{ faturamento[6] }} -- {{ faturamento[7] }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -500,7 +481,7 @@
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        Faturamento de Serviços Específicos
+                        Faturamento Total de Serviços
                     </button>
                 </h2>
                 <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
