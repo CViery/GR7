@@ -465,8 +465,9 @@ class Routes:
                     if 'dia' in request.form:
                         # Processar formulário de filtro de boletos
                         data = request.form['dia']
+                        print(data)
                         dia = data[8:]
-                        mes = data[5:7]
+                        mes = data[6]
                         ano = data[:4]
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
@@ -475,7 +476,9 @@ class Routes:
                         # Usar data atual se não houver filtro específico para boletos
                         now = datetime.now()
                         dia = now.strftime('%d')
+                        
                         mes = now.strftime('%m')
+                        
                         ano = now.strftime('%Y')
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
@@ -545,7 +548,7 @@ class Routes:
                         if 'dia' in request.form:
                             # Processar formulário de filtro de boletos
                             data = request.form['dia']
-                            dia = data[8:]
+                            dia = data[7:]
                             mes = data[5:7]
                             ano = data[:4]
                             boletos = db.boletos_do_dia(dia, mes, ano)
@@ -931,7 +934,6 @@ class Routes:
                                 mes_dados = now.strftime('%m')
                                 ano_dados = now.strftime('%Y')
                                 session['mes_atual'] = mes_dados
-                                print(mes_dados)
                                 session['ano_atual'] = ano_dados
                                 valor_faturamento_total = db.faturamento_total_mes(
                                     mes_dados, ano_dados)
@@ -1109,7 +1111,7 @@ class Routes:
                     else:
                         # Caso seja uma requisição GET, usar a data atual
                         now = datetime.now()
-                        mes_dados = now.strftime('%m')
+                        mes_dados = now.strftime('%m') 
                         ano_dados = now.strftime('%Y')
                         
                         valor_faturamento_total = db.faturamento_total_mes(
@@ -1143,15 +1145,15 @@ class Routes:
                 elif session['permission'] == 'NORMAL':
                     def get_mes_nome(mes_codigo):
                         match mes_codigo:
-                            case "01": return 'Janeiro'
-                            case "02": return "Fevereiro"
-                            case "03": return "Março"
-                            case "04": return "Abril"
-                            case "05": return "Maio"
-                            case "06": return "Junho"
-                            case "07": return "Julho"
-                            case "08": return "Agosto"
-                            case "09": return "Setembro"
+                            case "1": return 'Janeiro'
+                            case "2": return "Fevereiro"
+                            case "3": return "Março"
+                            case "4": return "Abril"
+                            case "5": return "Maio"
+                            case "6": return "Junho"
+                            case "7": return "Julho"
+                            case "8": return "Agosto"
+                            case "9": return "Setembro"
                             case "10": return "Outubro"
                             case "11": return "Novembro"
                             case "12": return "Dezembro"
@@ -1161,10 +1163,10 @@ class Routes:
                     # Certifique-se de passar a conexão com o banco de dados
 
                     meses = [
-                        ('01', 'Janeiro'), ('02', 'Fevereiro'), ('03',
-                                                                 'Março'), ('04', 'Abril'), ('05', 'Maio'),
-                        ('06', 'Junho'), ('07', 'Julho'), ('08',
-                                                           'Agosto'), ('09', 'Setembro'), ('10', 'Outubro'),
+                        ('1', 'Janeiro'), ('2', 'Fevereiro'), ('3',
+                                                                 'Março'), ('4', 'Abril'), ('5', 'Maio'),
+                        ('6', 'Junho'), ('7', 'Julho'), ('8',
+                                                           'Agosto'), ('9', 'Setembro'), ('10', 'Outubro'),
                         ('11', 'Novembro'), ('12', 'Dezembro')
                     ]
 
@@ -1243,7 +1245,8 @@ class Routes:
                     else:
                         # Caso seja uma requisição GET, usar a data atual
                         now = datetime.now()
-                        mes_dados = now.strftime('%m')
+                        mes_dados = now.strftime('%m') 
+                        
                         ano_dados = now.strftime('%Y')
                         valor_faturamento_total = db.faturamento_total_mes(
                             mes_dados, ano_dados)
@@ -1440,6 +1443,7 @@ class Routes:
         if 'usuario' in session:
             if session['empresa'] == 'gr7':
                 mes = session.get('mes_atual')
+                print(mes)
                 ano = session.get('ano_atual')
                 empresa = session['empresa']
                 # Certifique-se de passar a conexão com o banco de dados
@@ -1449,6 +1453,7 @@ class Routes:
                 
 
                 faturamentos = db.faturamento_dinheiro_ordens(mes,ano)
+                print(f'routes: {faturamentos}')
                 valor = db.faturamento_dinheiro(mes,ano)
                 if faturamentos is None:
                     faturamentos = []
@@ -1707,6 +1712,7 @@ class Routes:
             # Substitua com sua lógica para buscar subcategorias no banco de dados
             db = gastos_db.GastosDataBase()
             dados = db.get_subcategorias(despesa)
+            print(dados)
             subcategorias = dados
             subcategorias = [sub[3] for sub in subcategorias]
             print(subcategorias)

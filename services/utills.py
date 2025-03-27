@@ -17,7 +17,7 @@ class Utills:
         try:
             # Obtém os dados de faturamento de peças para o mês e ano fornecidos
             dados = self.db.faturamento_pecas(mes, ano)
-
+            print(dados)
             # Extrai os valores dos dados
             valores = [valor[0] for valor in dados]
 
@@ -38,7 +38,7 @@ class Utills:
         try:
             # Obtém os dados de faturamento de serviços para o mês e ano fornecidos
             dados = self.db.faturamento_servicos(mes, ano)
-
+            print(dados)
             # Extrai os valores dos dados
             valores = [valor[0] for valor in dados]
 
@@ -180,7 +180,7 @@ class Utills:
             dados = self.db_gastos.get_despesas()
 
             # Adiciona cada despesa à lista
-            despesas = [dado[0] for dado in dados]
+            despesas = [dado[1] for dado in dados]
 
             return despesas
 
@@ -198,7 +198,7 @@ class Utills:
             dados = self.db_gastos.get_fornecedores()
 
             # Adiciona cada fornecedor à lista (considerando o segundo elemento de cada tupla)
-            fornecedores = [dado[1] for dado in dados]
+            fornecedores = [dado[2] for dado in dados]
 
             return fornecedores
 
@@ -254,9 +254,9 @@ class Utills:
             if faturamento == 0:
                 return '0.00 %'
 
-            calculo = (gasto / faturamento) * 100
-            dados = f'{calculo:.2f} %'
-
+            calculo = faturamento - gasto
+            dados = self.formatar_moeda(calculo)
+            print(dados)
             return dados
 
         except Exception as e:
@@ -267,20 +267,18 @@ class Utills:
 
     def gastos_pecas(self, mes, ano):
         try:
-            print(mes)
-            print(ano)
             # Obtém os dados de gastos com peças para o mês e ano fornecidos
             dados_pecas = self.db_gastos.get_gastos_por_tipo('Peças', mes, ano)
-            print(dados_pecas)
+            #print(dados_pecas)
             # Extrai os valores de gastos
             valores_gastos = [dado[0] for dado in dados_pecas]
-            print(valores_gastos)
+            #print(valores_gastos)
             # Calcula o total de gastos
             gasto = sum(valores_gastos)
-            print(gasto)
+            #print(gasto)
             # Formata o total de gastos como moeda
             valor_total = self.formatar_moeda(gasto)
-            print(valor_total)
+            #print(valor_total)
             return valor_total
 
         except Exception as e:
@@ -316,7 +314,7 @@ class Utills:
             dados = self.db_gastos.get_recebedor()
 
             # Extrai a lista de recebedores
-            lista = [dado[0] for dado in dados]
+            lista = [dado[1] for dado in dados]
 
             return lista
 
@@ -417,7 +415,7 @@ class Utills_portal():
             despesas = []
             dados = self.db_gastos.get_despesas()
             for dado in dados:
-                despesas.append(dado[0])
+                despesas.append(dado[1])
             return despesas
         except Exception as e:
             print(e)
@@ -427,7 +425,7 @@ class Utills_portal():
             fornecedores = []
             dados = self.db_gastos.get_fornecedores()
             for dado in dados:
-                fornecedores.append(dado[1])
+                fornecedores.append(dado[2])
             return fornecedores
         except Exception as e:
             print(e)
@@ -490,7 +488,7 @@ class Utills_portal():
 
     def emitido_para(self):
         dados = self.db_gastos.get_recebedor()
-        lista = [dado[0] for dado in dados]
+        lista = [dado[1] for dado in dados]
         return lista
 
     def cadastrar_fornecedor(self, dados):

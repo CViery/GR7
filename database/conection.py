@@ -6,7 +6,7 @@ import logging
 logging.basicConfig(filename='app.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 class Database:
     def __init__(self):
-        conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7server.database.windows.net,1433;Database=admingr7;Uid=cristian;Pwd=viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+        conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7-server.database.windows.net,1433;Database=gr7admin;Uid=CloudSA1dd1b5e5;Pwd=Viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
         self.conn = pyodbc.connect(conn_str)
         self.cursor = self.conn.cursor()
         
@@ -23,7 +23,7 @@ class Database:
         """
         try:
             # Query com os nomes das colunas explicitamente definidos
-            print(dados)
+            
             query = '''
                 INSERT INTO faturamento (
                     placa, modelo_veiculo, data_orcamento, data_faturamento, mes_faturamento, ano_faturamento, 
@@ -174,6 +174,47 @@ class Database:
             logging.error(f"Erro ao buscar faturamento para o mecânico '{mecanico}' em {mes}/{ano}: {e}")
             raise
 
+    def faturamento_por_mecanico_peças(self, mecanico, mes, ano):
+        """
+        Consulta o faturamento de serviços realizados por um mecânico em um determinado mês e ano.
+
+        Args:
+            mecanico (str): Nome do mecânico.
+            mes (str): Mês do faturamento.
+            ano (str): Ano do faturamento.
+
+        Returns:
+            list: Lista de resultados da consulta, contendo os serviços faturados.
+        """
+        try:
+            # Garantindo que os parâmetros são strings
+            mecanico = str(mecanico)
+            mes = str(mes)
+            ano = str(ano)
+            
+            logging.info(f"Iniciando consulta de faturamento para o mecânico '{mecanico}' em {mes}/{ano}.")
+            
+            # Montando a query SQL
+            query = '''
+                SELECT pecas 
+                FROM faturamento 
+                WHERE mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?
+            '''
+            
+            # Executando a query
+            self.cursor.execute(query, (mecanico, mes, ano))
+            result = self.cursor.fetchall()
+            
+            if result:
+                logging.info(f"Consulta concluída com sucesso. {len(result)} registro(s) encontrado(s) para o mecânico '{mecanico}' em {mes}/{ano}.")
+            else:
+                logging.warning(f"Nenhum registro encontrado para o mecânico '{mecanico}' em {mes}/{ano}.")
+            
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao buscar faturamento para o mecânico '{mecanico}' em {mes}/{ano}: {e}")
+            raise
+
     def get_mecanicos(self):
         """
         Retorna a lista de nomes dos mecânicos cadastrados, ordenada alfabeticamente.
@@ -187,7 +228,7 @@ class Database:
             query = 'SELECT nome FROM funcionarios ORDER BY nome ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
-            
+            print(result)
             if result:
                 logging.info(f"Consulta concluída com sucesso. {len(result)} mecânico(s) encontrado(s).")
             else:
@@ -386,7 +427,7 @@ class Database:
 
             # Logando o número de registros encontrados
             logging.info(f"{len(result)} registro(s) de faturamento encontrado(s).")
-
+            
             return result
         except Exception as e:
             logging.error(f"Erro ao buscar registros de faturamento: {e}")
@@ -1070,18 +1111,68 @@ class Database:
         
 class DatabasePortal:
     def __init__(self):
-        conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7server.database.windows.net,1433;Database=admingr7;Uid=cristian;Pwd=viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+        conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7-server.database.windows.net,1433;Database=gr7admin;Uid=CloudSA1dd1b5e5;Pwd=Viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
         self.conn = pyodbc.connect(conn_str)
         self.cursor = self.conn.cursor()
 
     def cadastrar_faturamento(self, dados):
+        """
+        Método para cadastrar dados de faturamento no banco de dados.
+
+        Parâmetros:
+            dados (dict): Dicionário contendo os dados necessários para o cadastro.
+
+        Retorno:
+            dict: Resultado da operação, com status e mensagem.
+        """
         try:
-            query = 'INSERT INTO faturamento_portal VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-            self.cursor.execute(query, (dados['placa'], dados['modelo_veiculo'], dados['data_orcamento'], dados['data_faturamento'], dados['mes_faturamento'], dados['ano_faturamento'], dados['dias_servico'], dados['numero_os'], dados['companhia'], dados['conversao_ps'], dados['valor_pecas'], dados['valor_servicos'], dados['total_os'], dados['valor_revitalizacao'], dados['valor_aditivo'], dados['quantidade_litros'], dados['valor_fluido_sangria'], dados['valor_palheta'], dados['valor_limpeza_freios'], dados['valor_pastilha_parabrisa'],
-                                dados['valor_filtro'], dados['valor_pneu'], dados['valor_bateria'], dados['modelo_bateria'], dados['lts_oleo_motor'], dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'],  dados['valor_em_dinheiro'], dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'], dados['valor_servicos_oleos'], dados['valor_servico_transmissao'], dados['usuario'], dados['obs']))
+            # Query com os nomes das colunas explicitamente definidos
+            
+            query = '''
+                INSERT INTO faturamento_portal (
+                    placa, modelo_veiculo, data_orcamento, data_faturamento, mes_faturamento, ano_faturamento, 
+                    dias, num_os, cia, conversao_pneustore, pecas, servicos, valor_os, 
+                    revitalizacao, aditivo, quantidade_aditivo, fluido_sangria, palheta, 
+                    limpeza_freios, detergente_parabrisa, filtro, pneus, bateria, 
+                    modelo_bateria, quantidade_oleo, valor_oleo, tipo_marca_oleo, valor_meta, mecanico, 
+                    filtro_mecanico, valor_dinheiro, freios, suspensao, 
+                    injecao_ignicao,cabecote_motor_arrefecimento, outros, 
+                    oleos, transmissao, usuario, observacoes, terceiros
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                )
+            '''
+
+            # Executa a query com os dados fornecidos
+            self.cursor.execute(query, (
+                dados['placa'], dados['modelo_veiculo'], dados['data_orcamento'], dados['data_faturamento'], 
+                dados['mes_faturamento'], dados['ano_faturamento'], dados['dias_servico'], dados['numero_os'], 
+                dados['companhia'], dados['conversao_ps'], dados['valor_pecas'], dados['valor_servicos'], 
+                dados['total_os'], dados['valor_revitalizacao'], dados['valor_aditivo'], dados['quantidade_litros'], 
+                dados['valor_fluido_sangria'], dados['valor_palheta'], dados['valor_limpeza_freios'], 
+                dados['valor_pastilha_parabrisa'], dados['valor_filtro'], dados['valor_pneu'], dados['valor_bateria'], 
+                dados['modelo_bateria'], dados['lts_oleo_motor'], dados['valor_lt_oleo'], dados['marca_e_tipo_oleo'], 
+                dados['valor_p_meta'], dados['mecanico_servico'], dados['servico_filtro'], dados['valor_em_dinheiro'], 
+                dados['valor_servico_freios'], dados['valor_servico_suspensao'], dados['valor_servico_injecao_ignicao'], 
+                dados['valor_servico_cabecote_motor_arr'], dados['valor_outros_servicos'], dados['valor_servicos_oleos'], 
+                dados['valor_servico_transmissao'], dados['usuario'], dados['obs'], 0
+            ))
+
+            # Confirma a transação
             self.conn.commit()
+
+            return {"status": "success", "message": "Faturamento cadastrado com sucesso."}
+
         except Exception as e:
-            print(e)
+            # Reverte a transação em caso de erro
+            self.conn.rollback()
+
+            # Loga o erro detalhado
+            logging.error("Erro ao cadastrar faturamento: %s", e)
+
+            # Retorna uma mensagem de erro
+            return {"status": "error", "message": str(e)}
+
 
     def faturamento_mes(self, mes, ano):
         try:
@@ -1106,7 +1197,9 @@ class DatabasePortal:
         try:
             # Garantir que os parâmetros são strings
             mecanico = str(mecanico)
+            print(f'DB: {mecanico}')
             mes = str(mes)
+            print(f'Mes: {mes}')
             ano = str(ano)
 
             # Debugging
@@ -1174,7 +1267,7 @@ class DatabasePortal:
 
     def get_cias(self):
         try:
-            query = 'SELECT * FROM companhias_portal ORDER BY CAST(cia AS NVARCHAR(MAX)) ASC;'
+            query = 'SELECT * FROM companhias ORDER BY CAST(cia AS NVARCHAR(MAX)) ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -1192,8 +1285,7 @@ class DatabasePortal:
 
     def faturamento_serv(self, serv, mes, ano):
         try:
-            query = f'SELECT {
-                serv} FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
+            query = f'SELECT {serv} FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
             self.cursor.execute(query, (mes, ano))
             result = self.cursor.fetchall()
 
@@ -1203,7 +1295,7 @@ class DatabasePortal:
 
     def buscar_serv(self):
         try:
-            query = 'SELECT * FROM servicos_portal'
+            query = 'SELECT * FROM servicos'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -1650,3 +1742,90 @@ class DatabasePortal:
         except Exception as e:
             logging.error(f"Erro ao consultar faturamento da loja {loja} para o ano {ano}: {e}")
             return {}
+    
+    def faturamento_por_mecanico_peças(self, mecanico, mes, ano):
+        """
+        Consulta o faturamento de serviços realizados por um mecânico em um determinado mês e ano.
+
+        Args:
+            mecanico (str): Nome do mecânico.
+            mes (str): Mês do faturamento.
+            ano (str): Ano do faturamento.
+
+        Returns:
+            list: Lista de resultados da consulta, contendo os serviços faturados.
+        """
+        try:
+            # Garantindo que os parâmetros são strings
+            mecanico = str(mecanico)
+            mes = str(mes)
+            ano = str(ano)
+            
+            logging.info(f"Iniciando consulta de faturamento para o mecânico '{mecanico}' em {mes}/{ano}.")
+            
+            # Montando a query SQL
+            query = '''
+                SELECT pecas 
+                FROM faturamento_portal
+                WHERE mecanico = ? AND mes_faturamento = ? AND ano_faturamento = ?
+            '''
+            
+            # Executando a query
+            self.cursor.execute(query, (mecanico, mes, ano))
+            result = self.cursor.fetchall()
+            
+            if result:
+                logging.info(f"Consulta concluída com sucesso. {len(result)} registro(s) encontrado(s) para o mecânico '{mecanico}' em {mes}/{ano}.")
+            else:
+                logging.warning(f"Nenhum registro encontrado para o mecânico '{mecanico}' em {mes}/{ano}.")
+            
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao buscar faturamento para o mecânico '{mecanico}' em {mes}/{ano}: {e}")
+            raise
+    
+    def valor_filtro(self, mes, ano, mecanico):
+        """
+        Retorna o valor do filtro para um determinado mês, ano e mecânico, se encontrado.
+
+        Args:
+            mes (str): Mês de referência para a consulta.
+            ano (str): Ano de referência para a consulta.
+            mecanico (str): Nome do mecânico para o filtro.
+
+        Returns:
+            str or None: Valor do filtro ou None se não encontrado ou se o mecânico for 'BATERIA_DOMICILIO'.
+        """
+        try:
+            # Verificando se o mecânico não é 'BATERIA_DOMICILIO'
+            if mecanico != 'BATERIA_DOMICILIO':
+                query = '''
+                    SELECT filtro 
+                    FROM faturamento_portal
+                    WHERE mes_faturamento = ? 
+                    AND ano_faturamento = ? 
+                    AND filtro_mecanico = ?
+                '''
+                # Logando o início da consulta
+                logging.info(f"Iniciando consulta para filtro: mes={mes}, ano={ano}, mecanico={mecanico}")
+                
+                # Executando a consulta no banco de dados
+                self.cursor.execute(query, (mes, ano, mecanico))
+                result = self.cursor.fetchone()
+
+                # Verificando o resultado
+                if result:
+                    logging.info(f"Filtro encontrado para o mecânico {mecanico}: {result[0]}")
+                    return result[0]  # Retorna o valor do filtro
+                else:
+                    logging.warning(f"Nenhum filtro encontrado para o mecânico {mecanico} no mês {mes} e ano {ano}.")
+                    return None  # Retorna None caso não encontre resultado
+
+            # Caso o mecânico seja 'BATERIA_DOMICILIO', retorna None
+            logging.info("Mecânico é 'BATERIA_DOMICILIO', retornando None.")
+            return None
+
+        except Exception as e:
+            # Logando o erro de exceção
+            logging.error(f"Erro ao executar a consulta para filtro com mes={mes}, ano={ano}, mecanico={mecanico}. Detalhes do erro: {e}")
+            return Non
