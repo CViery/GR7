@@ -467,7 +467,7 @@ class Routes:
                         data = request.form['dia']
                         print(data)
                         dia = data[8:]
-                        mes = data[6]
+                        mes = data[5:7]
                         ano = data[:4]
                         boletos = db.boletos_do_dia(dia, mes, ano)
                         valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
