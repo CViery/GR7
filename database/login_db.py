@@ -13,6 +13,7 @@ class Login:
                 ('FERNANDO', '1234', 'NORMAL', 3),
                 ('ANA MARIA', '1234', 'NORMAL', 2),
                 ('SERGIO', '1234', 'NORMAL', 2),
+                ('BRUNO', '1234', 'ADMIN', 2)
             ]
             for person in users:
                 if person[0] == user:
