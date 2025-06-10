@@ -237,7 +237,7 @@ class Faturamento:
             mecanicos = self.db.get_mecanicos()
             
             for mecanico in mecanicos:
-                print(mecanico)
+                
                 # Faturamento de serviço por mecânico
                 dados = self.db.faturamento_por_mecanico(mecanico[0], mes, ano) or []
                 valores = [dado[0] for dado in dados]
@@ -372,7 +372,7 @@ class Faturamento:
                     'valor_servico_transmissao': self.formatar_moeda(ordem_servico[38]),
                     'obs':ordem_servico[40]
                 }
-                print(os)
+                
                 faturamentos.append(os)
             return faturamentos
         except Exception as e:
@@ -630,18 +630,18 @@ class Faturamento:
     def ordens_filtro_e_higienizacao(self, mes, ano, mecanico):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+           
             
             dados = self.db.detalhes_filtros(mes, ano, mecanico)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
             
             faturamentos = []
             
             for ordem_servico in dados:
                 # Verificando os dados de cada ordem de serviço
-                print(f"Processando ordem de serviço: {ordem_servico}")
+                
                 
                 data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                 
@@ -674,12 +674,13 @@ class Faturamento:
                     }
                     
                     # Verificando o objeto os antes de adicionar
-                print(f"Ordem de serviço preparada para adicionar: {os}")
+                
+
                     
                 faturamentos.append(os)
             
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+            
             
             return faturamentos
         except Exception as e:
@@ -689,19 +690,19 @@ class Faturamento:
     def ordens_revitalizacao(self, mes, ano, mecanico):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
             
             dados = self.db.detalhes_revitalizacao(mes, ano, mecanico)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
             
             faturamentos = []
             
             for ordem_servico in dados:
                 if ordem_servico[14] > 0:
                     # Verificando os dados de cada ordem de serviço
-                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
                     
                     data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                     
@@ -734,12 +735,12 @@ class Faturamento:
                         }
                         
                         # Verificando o objeto os antes de adicionar
-                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                   
                         
                     faturamentos.append(os)
                 
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+            
             
             return faturamentos
         except Exception as e:
@@ -749,19 +750,19 @@ class Faturamento:
     def ordens_dinheiro_relat(self, mes, ano):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}")
+            
             
             dados = self.db.ordens(mes, ano)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
             
             faturamentos = []
             
             for ordem_servico in dados:
                 if ordem_servico[31] > 0:
                     # Verificando os dados de cada ordem de serviço
-                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
                     
                     data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                     
@@ -795,12 +796,12 @@ class Faturamento:
                         }
                         
                         # Verificando o objeto os antes de adicionar
-                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                   
                         
                     faturamentos.append(os)
                 
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+            
             
             return faturamentos
         except Exception as e:
@@ -1149,7 +1150,7 @@ class FaturamentoPortal():
 
     def filtrar_os(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         try:
-            print(num_os)
+            
             # Obtém as ordens de serviço filtradas do banco de dados
             faturamento = self.db.obter_ordens_filtradas(
                 data_inicio, data_fim, placa, mecanico, num_os, cia)
@@ -1378,7 +1379,8 @@ class FaturamentoPortal():
                     'quantidade': quantidade
                 })
 
-            print(dados)  # Mostra os resultados finais
+            
+            
             return dados  # Retorna os dados processados
 
         except Exception as e:
@@ -1410,7 +1412,7 @@ class FaturamentoPortal():
                     'quantidade': quantidade
                 })
 
-            print(dados)  # Mostra os resultados finais
+            
             return dados  # Retorna os dados processados
 
         except Exception as e:
@@ -1421,18 +1423,18 @@ class FaturamentoPortal():
     def ordens_filtro_e_higienizacao(self, mes, ano, mecanico):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
             
             dados = self.db.detalhes_filtros(mes, ano, mecanico)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
             
             faturamentos = []
             
             for ordem_servico in dados:
                 # Verificando os dados de cada ordem de serviço
-                print(f"Processando ordem de serviço: {ordem_servico}")
+                
                 
                 data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                 
@@ -1465,12 +1467,12 @@ class FaturamentoPortal():
                     }
                     
                     # Verificando o objeto os antes de adicionar
-                print(f"Ordem de serviço preparada para adicionar: {os}")
+                
                     
                 faturamentos.append(os)
             
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+            
             
             return faturamentos
         except Exception as e:
@@ -1480,19 +1482,19 @@ class FaturamentoPortal():
     def ordens_revitalizacao(self, mes, ano, mecanico):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
             
             dados = self.db.detalhes_revitalizacao(mes, ano, mecanico)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+           
             
             faturamentos = []
             
             for ordem_servico in dados:
                 if ordem_servico[14] > 0:
                     # Verificando os dados de cada ordem de serviço
-                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
                     
                     data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                     
@@ -1525,12 +1527,12 @@ class FaturamentoPortal():
                         }
                         
                         # Verificando o objeto os antes de adicionar
-                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                    
                         
                     faturamentos.append(os)
                 
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+            
             
             return faturamentos
         except Exception as e:
@@ -1541,19 +1543,19 @@ class FaturamentoPortal():
     def ordens_dinheiro_relat(self, mes, ano):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}")
+            
             
             dados = self.db.ordens(mes, ano)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
             
             faturamentos = []
             
             for ordem_servico in dados:
                 if ordem_servico[31] > 0:
                     # Verificando os dados de cada ordem de serviço
-                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
                     
                     data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                     
@@ -1587,12 +1589,12 @@ class FaturamentoPortal():
                         }
                         
                         # Verificando o objeto os antes de adicionar
-                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                    
                         
                     faturamentos.append(os)
                 
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+            
             
             return faturamentos
         except Exception as e:
@@ -1887,7 +1889,7 @@ class FaturamentoMorumbi:
             mecanicos = self.db.get_mecanicos()
             
             for mecanico in mecanicos:
-                print(mecanico)
+                
                 # Faturamento de serviço por mecânico
                 dados = self.db.faturamento_por_mecanico(mecanico[0], mes, ano) or []
                 valores = [dado[0] for dado in dados]
@@ -2022,7 +2024,7 @@ class FaturamentoMorumbi:
                     'valor_servico_transmissao': self.formatar_moeda(ordem_servico[38]),
                     'obs':ordem_servico[40]
                 }
-                print(os)
+                
                 faturamentos.append(os)
             return faturamentos
         except Exception as e:
@@ -2280,18 +2282,18 @@ class FaturamentoMorumbi:
     def ordens_filtro_e_higienizacao(self, mes, ano, mecanico):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
             
             dados = self.db.detalhes_filtros(mes, ano, mecanico)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
             
             faturamentos = []
             
             for ordem_servico in dados:
                 # Verificando os dados de cada ordem de serviço
-                print(f"Processando ordem de serviço: {ordem_servico}")
+                
                 
                 data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                 
@@ -2324,12 +2326,12 @@ class FaturamentoMorumbi:
                     }
                     
                     # Verificando o objeto os antes de adicionar
-                print(f"Ordem de serviço preparada para adicionar: {os}")
+                
                     
                 faturamentos.append(os)
             
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+           
             
             return faturamentos
         except Exception as e:
@@ -2339,19 +2341,19 @@ class FaturamentoMorumbi:
     def ordens_revitalizacao(self, mes, ano, mecanico):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
             
             dados = self.db.detalhes_revitalizacao(mes, ano, mecanico)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+           
             
             faturamentos = []
             
             for ordem_servico in dados:
                 if ordem_servico[14] > 0:
                     # Verificando os dados de cada ordem de serviço
-                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
                     
                     data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                     
@@ -2384,12 +2386,12 @@ class FaturamentoMorumbi:
                         }
                         
                         # Verificando o objeto os antes de adicionar
-                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                    
                         
                     faturamentos.append(os)
                 
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+            
             
             return faturamentos
         except Exception as e:
@@ -2399,19 +2401,19 @@ class FaturamentoMorumbi:
     def ordens_dinheiro_relat(self, mes, ano):
         try:
             # Adicionando print para verificar os parâmetros recebidos
-            print(f"Mes: {mes}, Ano: {ano}")
+            
             
             dados = self.db.ordens(mes, ano)
             
             # Verificando os dados obtidos de detalhes_filtros
-            print(f"Dados recebidos de detalhes_filtros: {dados}")
+            
             
             faturamentos = []
             
             for ordem_servico in dados:
                 if ordem_servico[31] > 0:
                     # Verificando os dados de cada ordem de serviço
-                    print(f"Processando ordem de serviço: {ordem_servico}")
+                    
                     
                     data_objeto_orcamento = datetime.strptime(ordem_servico[3], "%Y-%m-%d")
                     
@@ -2445,12 +2447,12 @@ class FaturamentoMorumbi:
                         }
                         
                         # Verificando o objeto os antes de adicionar
-                    print(f"Ordem de serviço preparada para adicionar: {os}")
+                    
                         
                     faturamentos.append(os)
                 
             # Verificando o resultado final
-            print(f"Faturamentos preparados: {faturamentos}")
+           
             
             return faturamentos
         except Exception as e:
