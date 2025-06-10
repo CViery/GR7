@@ -73,7 +73,7 @@
                 <label for="revitalizacao">Revitalização:</label>
                 <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input" required>
             </div>
-            {% if empresa == 'gr7' %}
+            {% if empresa == 'gr7' or 'gr7 morumbi' %}
             <div class="input-group">
                 <label for="aditivo">Aditivo:</label>
                 <input type="text" id="aditivo" name="aditivo" class="styled-input"
@@ -97,7 +97,7 @@
             {% endif %}
            
             <div class="input-group">
-                {%if empresa == 'gr7'%}
+                {%if empresa == 'gr7' or 'gr7 morumbi'%}
                 <label for="fluido_sangria">Fluido/Sangria:</label>
                 <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input" required>
                 {%elif empresa == 'portal'%}
@@ -106,7 +106,7 @@
                 {%endif%}
             </div>
             <div class="input-group">
-                {%if empresa == 'gr7'%}
+                {%if empresa == 'gr7' or 'gr7 morumbi'%}
                 <label for="palheta">Palheta:</label>
                 <input type="text" id="palheta" name="palheta" class="styled-input" required>
                 {%elif empresa == 'portal' %}
@@ -123,7 +123,7 @@
                 <input type="text" id="filtro" name="filtro" class="styled-input" required>
             </div>
             <div class="input-group">
-                {%if empresa == 'gr7'%}
+                {%if empresa == 'gr7' or 'gr7 morumbi'%}
                 <label for="limpeza_freios">Limpeza dos Freios:</label>
                 <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input" required>
                 {%elif empresa == 'portal'%}
@@ -136,7 +136,7 @@
                 <input type="text" id="pneus" name="pneus" class="styled-input" onchange="calculateValorMeta()" required>
             </div>
             <div class="input-group">
-                {%if empresa == 'gr7'%}
+                {%if empresa == 'gr7' or 'gr7 morumbi'%}
                 <label for="Terceiros">Terceiros:</label>
                 <input type="text" id="terceiros" name="terceiros" class="styled-input" onchange=" calculateValorMeta()" required>
                 {%endif%}
