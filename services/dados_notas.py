@@ -17,9 +17,7 @@ class DadosGastos:
 
     def boletos_do_dia(self, dia, mes, ano):
         dados = self.db.get_boleto_by_day(dia, mes, ano)
-        print(dia)
-        print(mes)
-        print(ano)
+        
         valores = []
         boletos = []
         for dado in dados:
@@ -49,7 +47,7 @@ class DadosGastos:
 
     def cadastrar_despesa(self, despesa):
         cadastrar = self.db.set_despesas(despesa)
-        print('cadastrado')
+        
 
     def despesas(self, mes, ano):
         despesas = self.db.get_despesas()
@@ -91,8 +89,7 @@ class DadosGastos:
         return output
     
     def todas_as_notas_mes(self, mes, ano):
-        print(mes)
-        print(ano)
+       
         notas = self.db.get_all_notas_mes(mes, ano)
         
         output = []
@@ -131,7 +128,7 @@ class DadosGastos:
     def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None, obs=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa, obs)
-        print(obs)
+        
         notas = []
         for dados in resultado:
             data_objeto = datetime.strptime(dados[8], "%Y-%m-%d")
@@ -487,6 +484,37 @@ class DadosGastosPortal():
             output.append(nfe)
         return output
 
+    def todas_as_notas_mes(self, mes, ano):
+        print(mes)
+        print(ano)
+        notas = self.db.get_all_notas_mes(mes, ano)
+        
+        output = []
+        if notas:
+            for nota in notas:
+                data_objeto = datetime.strptime(nota[8], "%Y-%m-%d")
+                data_formatada = data_objeto.strftime("%d/%m/%Y")
+                valor_nota = nota[13]
+                valor = self.formatar_moeda(valor_nota)
+                nfe = {
+                    'pago_por': nota[1],
+                    'emitido_para': nota[2],
+                    'status': nota[3],
+                    'boleto': nota[4],
+                    'numero_nota': nota[5],
+                    'fornecedor': nota[7],
+                    'data_emissao': data_formatada,
+                    'valor': valor,
+                    'duplicata': nota[6],
+                    'tipo_despesa': nota[14],
+                    'obs': nota[15]
+                }
+                output.append(nfe)
+            return output
+        else:
+            notas = []
+            return notas
+
     def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa)
@@ -509,7 +537,7 @@ class DadosGastosPortal():
         result = self.formatar_moeda(soma)
         return result
 
-    def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+    def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None, obs=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa)
         notas = []
@@ -533,7 +561,7 @@ class DadosGastosPortal():
             notas.append(nfe)
         return notas
 
-    def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None):
+    def filtrar_notas_valor(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None, obs=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa)
         valores = [dados[13] for dados in resultado]
@@ -667,13 +695,13 @@ class DadosGastosPortal():
     
     def dados_gastos(self, mes, ano):
         #Dados das despesas e subcategorias
-        #print("Obtendo despesas...")
+        
         despesas = self.db.get_despesas()
-        #print(f"Despesas obtidas: {despesas}")
+        
 
-        #print("Obtendo subcategorias...")
+       
         sub_categorias = self.db.get_all_subcategorias()
-        #print(f"Subcategorias obtidas: {sub_categorias}")
+       
 
         # Função para somar valores de um período específico
         def somar_valores_por_subcategoria(subcategoria, mes=None, ano=None):
@@ -689,15 +717,15 @@ class DadosGastosPortal():
             return soma
 
         def somar_valores_por_categoria(categoria, mes=None, ano=None):
-            print(f"Calculando valores para categoria: {categoria[1]}, mês: {mes}, ano: {ano}")
+            
             notas = self.db.notas_por_categoria(categoria[1], mes, ano)
-            print(f"Notas obtidas para categoria {categoria[1]}: {notas}")
+            
             if notas is None:
-                print(f"Nenhuma nota encontrada para categoria {categoria[1]}")
+                
                 return 0
             valores = [dado[13] for dado in notas]
             soma = sum(valores)
-            print(f"Soma dos valores para categoria {categoria[1]}: {soma}")
+           
             return soma
 
         # Construir os dados finais com soma dos valores
@@ -823,7 +851,7 @@ class DadosGastosMorumbi:
 
     def cadastrar_despesa(self, despesa):
         cadastrar = self.db.set_despesas(despesa)
-        print('cadastrado')
+        
 
     def despesas(self, mes, ano):
         despesas = self.db.get_despesas()
@@ -865,8 +893,7 @@ class DadosGastosMorumbi:
         return output
     
     def todas_as_notas_mes(self, mes, ano):
-        print(mes)
-        print(ano)
+        
         notas = self.db.get_all_notas_mes(mes, ano)
         
         output = []
@@ -905,7 +932,7 @@ class DadosGastosMorumbi:
     def filtrar_notas(self, data_inicio=None, data_fim=None, fornecedor=None, despesa=None, obs=None):
         resultado = self.db.obter_notas_filtradas(
             data_inicio, data_fim, fornecedor, despesa, obs)
-        print(obs)
+       
         notas = []
         for dados in resultado:
             data_objeto = datetime.strptime(dados[8], "%Y-%m-%d")
@@ -1086,25 +1113,25 @@ class DadosGastosMorumbi:
             return soma
 
         def somar_valores_por_categoria(categoria, mes=None, ano=None):
-            print(f"Calculando valores para categoria: {categoria[1]}, mês: {mes}, ano: {ano}")
+            
             notas = self.db.notas_por_categoria(categoria[1], mes, ano)
-            print(f"Notas obtidas para categoria {categoria[1]}: {notas}")
+            
             if notas is None:
-                print(f"Nenhuma nota encontrada para categoria {categoria[1]}")
+                
                 return 0
             valores = [dado[13] for dado in notas]
             soma = sum(valores)
-            print(f"Soma dos valores para categoria {categoria[1]}: {soma}")
+            
             return soma
 
         # Construir os dados finais com soma dos valores
         dados = []
         for despesa in despesas:
-            print(f"Processando despesa: {despesa}")
+            
             subs = []
             valor = somar_valores_por_categoria(despesa, mes, ano)
             for sub in sub_categorias:
-                print(f'Sub: {sub}')
+               
                 if sub[2] == despesa[1]:  # Ajuste para verificar o nome da despesa
                     # Calcular valores da subcategoria
                     valor_mes = somar_valores_por_subcategoria(sub[3], mes=mes, ano=ano)
@@ -1120,15 +1147,13 @@ class DadosGastosMorumbi:
             })
         
         import pprint
-        pprint.pprint(dados)
         
             
         return dados
         # Exibir os dados
         
     def buscar_notas(self, mes, ano):
-        print(mes)
-        print(ano)
+        
         notas = self.db.get_all_notas_mes(mes, ano)
         
         output = []

@@ -842,7 +842,6 @@ class Routes:
                 db = faturamento.FaturamentoMorumbi()
 
             mes = session.get('mes_atual')
-            print(mes)
             ano = session.get('ano_atual')
             empresa = session['empresa']
                 # Certifique-se de passar a conexão com o banco de dados
@@ -1019,8 +1018,6 @@ class Routes:
             empresa = session['empresa']   
         mes = request.form.get('mes')
         ano = request.form.get('ano')
-        print(f'mes selecionado {mes}')
-        print(f'Ano selecionado {ano}')
         # Dados para o template
         
         
@@ -1117,9 +1114,7 @@ class Routes:
         ano = request.form.get('ano')
         mecanico = request.form.get('mecanico')
         
-        print(f'Mês selecionado: {mes}')
-        print(f'Ano selecionado: {ano}')
-        print(f'Mecânico selecionado: {mecanico}')
+      
 
 
         # Buscando os dados de acordo com os filtros
@@ -1297,9 +1292,7 @@ class Routes:
         mes = request.form.get('mes')
         ano = request.form.get('ano')
 
-        print(f'Mês selecionado: {mes}')
-        print(f'Ano selecionado: {ano}')
-
+        
         # Inicializando os objetos para acessar os dados
         if session['empresa'] == 'gr7':
             db = faturamento.Faturamento()
@@ -1402,9 +1395,7 @@ class Routes:
         ano = request.form.get('ano')
         tipo_despesa = request.form.get('tipo_despesa')
 
-        print(f'Mês selecionado: {mes}')
-        print(f'Ano selecionado: {ano}')
-        print(f'Tipo de Despesa: {tipo_despesa}')
+       
 
         # Inicializando os objetos para acessar os dados
         if session['empresa'] == 'gr7':
@@ -1605,8 +1596,7 @@ class Routes:
     def dados_loja(loja):
         ano = request.args.get('ano', default=2025, type=int)
         
-        print(f"Loja recebida: {loja}")
-        print(f"Ano recebido: {ano}")
+       
         if loja == 'GR7':     
             db = conection.Database() 
         elif loja == 'Portal': 
@@ -1614,27 +1604,28 @@ class Routes:
         elif loja == 'GR7 Morumbi':
             conection. DatabaseMorumbi()
         
-        print("Conexão com o banco de dados estabelecida.")
+        
 
         faturamento = db.faturamento_loja_ano(loja, ano)
         
-        print(f"Faturamento retornado: {faturamento}")
+        
 
         return jsonify(faturamento)
 
     @app.route('/funcionarios-por-loja/<loja>')
     def funcionarios_por_loja(loja):
-        print(f"Loja recebida: {loja}")
+       
         if loja == 'GR7':
             db = conection.Database() 
         elif loja == "Portal": 
             db = conection.DatabasePortal()
         
-        print("Conexão com o banco de dados estabelecida.")
+        
+        
 
         funcionarios = db.funcionarios_por_loja(loja)
         
-        print(f"Funcionários retornados: {funcionarios}")
+        
 
         return jsonify(funcionarios)
 
@@ -1643,9 +1634,6 @@ class Routes:
         loja = request.args.get('loja', default="GR7", type=str)
         ano = request.args.get('ano', default=2024, type=int)
 
-        print(f"Mecânico recebido: {mecanico}")
-        print(f"Loja recebida: {loja}")
-        print(f"Ano recebido: {ano}")
         if loja == 'GR7':
             db = conection.Database() 
         elif loja == "Portal":
@@ -1653,10 +1641,10 @@ class Routes:
         elif loja == "Morumbi":
             db = conection.DatabaseMorumbi()
         
-        print("Conexão com o banco de dados estabelecida.")
+        
 
         desempenho = db.desempenho_funcionario_ano(loja, mecanico, ano)
         
-        print(f"Desempenho retornado: {desempenho}")
+      
 
         return jsonify(desempenho)

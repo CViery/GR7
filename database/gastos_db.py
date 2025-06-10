@@ -57,7 +57,7 @@ class GastosDataBase:
             
             # Mensagem de sucesso
             result = 'Nota Cadastrada'
-            print(result)
+            
             logging.info(result)
             return result
 
@@ -996,7 +996,6 @@ class GastosDataBase:
             parametros = (categorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
-            print(f'Notas Categoria {categorias}: {response}')
             return response
         except Exception as e:
             ...
@@ -1307,7 +1306,7 @@ class GastosDataBasePortal():
             query = 'SELECT valor FROM boletos_portal WHERE num_nota = ? ORDER BY data_vencimento ASC'
             self.cursor.execute(query, (num_nota,))
             result = self.cursor.fetchall()
-            print(result)
+           
             return result
         except Exception as e:
             print(e)
@@ -1361,7 +1360,7 @@ class GastosDataBasePortal():
             parametros = (subcategorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
-            print(response)
+            
             return response
         except Exception as e:
             ...
@@ -1496,7 +1495,7 @@ class GastosDataBaseMorumbi:
             
             # Mensagem de sucesso
             result = 'Nota Cadastrada'
-            print(result)
+            
             logging.info(result)
             return result
 
@@ -2435,7 +2434,7 @@ class GastosDataBaseMorumbi:
             parametros = (categorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
-            print(f'Notas Categoria {categorias}: {response}')
+            
             return response
         except Exception as e:
             ...
