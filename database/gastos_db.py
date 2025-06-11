@@ -1237,7 +1237,7 @@ class GastosDataBasePortal():
 
     def get_fornecedores(self):
         try:
-            query = 'SELECT * FROM fornecedores_portal'
+            query = 'SELECT * FROM fornecedores_portal ORDER BY nome ASC'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
             return result
@@ -2169,7 +2169,7 @@ class GastosDataBaseMorumbi:
         """
         try:
             # Construção da query SQL
-            query = 'SELECT * FROM fornecedores_morumbi ORDER BY nome ASC;'
+            query = 'SELECT * FROM fornecedores ORDER BY nome ASC;'
 
             # Executando a consulta
             logging.info("Buscando todos os fornecedores cadastrados.")
