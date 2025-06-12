@@ -746,6 +746,7 @@ class Routes:
             mecanicos = db.funcionarios()
             response = ''
             empresa = session['empresa']
+            print(empresa)
             return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
         else:
             print('Usuário não está logado')
