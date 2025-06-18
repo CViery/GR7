@@ -287,7 +287,7 @@ class Routes:
     def cadastrar_duplicata():
         if session['empresa'] == 'gr7':
             db = cadastrar_duplicata.Boletos()
-        elif session['empesa'] == 'portal':
+        elif session['empresa'] == 'portal':
             db = cadastrar_duplicata.BoletosPortal()
         elif session['empresa'] == 'gr7 morumbi':
             db = cadastrar_duplicata.Boletos_morumbi()
