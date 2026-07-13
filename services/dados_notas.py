@@ -309,25 +309,19 @@ class DadosGastos:
             return soma
 
         def somar_valores_por_categoria(categoria, mes=None, ano=None):
-            print(f"Calculando valores para categoria: {categoria[1]}, mês: {mes}, ano: {ano}")
             notas = self.db.notas_por_categoria(categoria[1], mes, ano)
-            print(f"Notas obtidas para categoria {categoria[1]}: {notas}")
             if notas is None:
-                print(f"Nenhuma nota encontrada para categoria {categoria[1]}")
                 return 0
             valores = [dado[13] for dado in notas]
             soma = sum(valores)
-            print(f"Soma dos valores para categoria {categoria[1]}: {soma}")
             return soma
 
         # Construir os dados finais com soma dos valores
         dados = []
         for despesa in despesas:
-            print(f"Processando despesa: {despesa}")
             subs = []
             valor = somar_valores_por_categoria(despesa, mes, ano)
             for sub in sub_categorias:
-                print(f'Sub: {sub}')
                 if sub[2] == despesa[1]:  # Ajuste para verificar o nome da despesa
                     # Calcular valores da subcategoria
                     valor_mes = somar_valores_por_subcategoria(sub[3], mes=mes, ano=ano)
@@ -350,8 +344,7 @@ class DadosGastos:
         # Exibir os dados
         
     def buscar_notas(self, mes, ano):
-        print(mes)
-        print(ano)
+        
         notas = self.db.get_all_notas_mes(mes, ano)
         
         output = []
@@ -485,8 +478,6 @@ class DadosGastosPortal():
         return output
 
     def todas_as_notas_mes(self, mes, ano):
-        print(mes)
-        print(ano)
         notas = self.db.get_all_notas_mes(mes, ano)
         
         output = []

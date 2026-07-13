@@ -11,27 +11,24 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.drawing.image import Image
 
+def get_db_empresa():
+    empresa = session.get('empresa')
+
+    if empresa == 'gr7':
+        return faturamento.Faturamento()
+    elif empresa == 'portal':
+        return faturamento.FaturamentoPortal()
+    elif empresa == 'gr7 morumbi':
+        return faturamento.FaturamentoMorumbi()
+
+    return None
+
 PERMISSAO_TOTAL_ADMIN = 0
 PERMISSAO_GR7_USER = 1
 PERMISSAO_PORTAL_ADMIN = 2
 SEM_PERMISSAO = 3
 PERMISSAO_GR7_MORUMBI_ADMIN = 4
 
-# Dados simulados
-lojas = ["Loja 1", "Loja 2"]
-funcionarios = {"Loja 1": ["Carlos", "Ana"], "Loja 2": ["Marcos", "Julia"]}
-
-dados_loja = {
-    "Loja 1": {"meses": ["Jan", "Fev", "Mar"], "faturamento": [10000, 12000, 15000], "servicos": ["Fluido", "Sangria", "Filtro"], "quantidades": [50, 30, 40]},
-    "Loja 2": {"meses": ["Jan", "Fev", "Mar"], "faturamento": [8000, 11000, 14000], "servicos": ["Fluido", "Sangria", "Filtro"], "quantidades": [40, 35, 45]}
-}
-
-dados_funcionario = {
-    "Carlos": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [2000, 2500, 3000]},
-    "Ana": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [1800, 2300, 2800]},
-    "Marcos": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [2200, 2700, 3200]},
-    "Julia": {"meses": ["Jan", "Fev", "Mar"], "desempenho": [1900, 2400, 2900]}
-}
 
 
 class Routes:
@@ -732,52 +729,54 @@ class Routes:
             print(f"Erro ao processar faturamento: {e}")
             return "Erro interno no servidor", 500
 
-    @app.route('/faturamentos/cadastrar', methods=['GET', 'POST'])
-    def cadastrar_faturamento():
-        if 'usuario' in session:
-            if session['empresa'] == 'gr7':
-                db = faturamento.Faturamento()
-            elif session['empresa'] == 'portal':
-                db = faturamento.FaturamentoPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = faturamento.FaturamentoMorumbi()
 
-            cias = db.companhias()
-            mecanicos = db.funcionarios()
-            response = ''
-            empresa = session['empresa']
-            print(empresa)
-            return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
-        else:
-            print('Usuário não está logado')
+
+    @app.route('/faturamentos/cadastrar', methods=['GET'])
+    def cadastrar_faturamento():
+        if 'usuario' not in session:
             return redirect('/')
+
+        db = get_db_empresa()
+
+        if db is None:
+            return redirect('/')
+
+        return render_template(
+            'cadastrar_faturamento.html',
+            empresa=session['empresa'],
+            cias=db.companhias(),
+            mecanicos=db.funcionarios(),
+            response=''
+        )
+
 
     @app.route('/submit_form', methods=['POST'])
     def submit_form():
-        if session['empresa'] == 'gr7':
-            db = faturamento.Faturamento()
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-        elif session['empresa'] == 'gr7 morumbi':
-            db = faturamento.FaturamentoMorumbi()
+        if 'usuario' not in session:
+            return redirect('/')
+
+        db = get_db_empresa()
+
+        if db is None:
+            return redirect('/')
 
         data = request.form.to_dict()
-        USUARIO = session['usuario']
-        cadastrar = db.cadastrar(data, USUARIO)
-        if cadastrar:
-            db = faturamento.Faturamento()
-            cias = db.companhias()
-            empresa = session['empresa']
-            mecanicos = db.funcionarios()
-            response = f"A OS {data['num_os']} Já está cadastrada"
-            return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)
+        usuario = session['usuario']
+
+        ja_existe = db.cadastrar(data, usuario)
+
+        if ja_existe:
+            response = f"A OS {data['num_os']} já está cadastrada"
         else:
-            db = faturamento.Faturamento()
-            cias = db.companhias()
-            empresa = session['empresa']
-            mecanicos = db.funcionarios()
-            response = f"A OS {data['num_os']} CADASTRADA COM SUCESSO"
-            return render_template('cadastrar_faturamento.html', empresa=empresa, cias=cias, mecanicos=mecanicos, response=response)           
+            response = f"A OS {data['num_os']} cadastrada com sucesso"
+
+        return render_template(
+            'cadastrar_faturamento.html',
+            empresa=session['empresa'],
+            cias=db.companhias(),
+            mecanicos=db.funcionarios(),
+            response=response
+        )       
 
     @app.route('/faturamentos/consultar', methods=['GET', 'POST'])
     def consultar_faturamentos():

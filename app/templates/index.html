@@ -1,110 +1,249 @@
 {% extends 'base.html' %}
+
 {% block title %}
-<title>Inicio - {{ empresa }}</title>
-<link rel="stylesheet" href="{{url_for('static', filename= 'css/home.css')}}">
+<title>Dashboard Executivo - {{ empresa }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block main %}
-<main>
-  <h4>GR7 - Centro Automotivo</h4>
+<main class="dashboard">
 
-    <div class='container'>
-        <div class="box-container">
-
-            <div class="caixa">
-                <div class="box box1">
-                    <div class="text">
-                        <h2 class="topic-heading">{{passagens}}</h2>
-                        <h2 class="topic">Passagens</h2>
-                    </div>
-                </div>
-                <div class="box box6">
-                    <div class="text">
-                        <h2 class="topic-heading">{{ticket}}</h2>
-                        <h2 class="topic">Ticket Medio</h2>
-                    </div>
-                </div>
-            </div>
-    
-            
-            <div class="caixa">
-                {% if empresa == 'gr7' %}
-                <div class="box box7">
-                  <div class="text">
-                      <h2>Valor para Atingir:</h2>
-                      <h2 class="topic-heading">{{primeira_meta}}</h2>
-                      <h2 class="topic">Primeira Meta: R$ 180.000,00</h2>
-                  </div>
-              </div>
-                  {% endif %}
-               
-                  {% if empresa == 'gr7' %}
-              <div class="box box8">
-                  <div class="text">
-                      <h2>Valor para Atingir:</h2>
-                      <h2 class="topic-heading">{{segunda_meta}}</h2>
-                      <h2 class="topic">Segunda Meta: R$220.000,00</h2>
-                  </div>
-              </div>
-              {% endif %}
-            </div> 
-        </div>
-        <div class="box-container2">
-    
-            <div class="caixa">
-                <div class="box box3">
-                    <div class="text">
-                        <h2 class="topic-heading">{{faturamento_meta}}</h2>
-                        <h2 class="topic">Faturamento Liquido</h2>
-                    </div>
-                </div>
-    
-                <div class="box box2">
-                    <div class="text">
-                        <h2 class="topic-heading">{{faturamento}}</h2>
-                        <h2 class="topic">Faturamento Bruto:</h2>
-                    </div>
-                </div>
-    
-                    <div class="box box1">
-                        <div class="text">
-                            <h2 class="topic-heading">{{valor_gastos}}</h2>
-                            <h2 class="topic">Total de Gastos no Mês </h2>
-                        </div>
-                    </div>
-            </div>
-            <div class="caixa">
-                <div class="box box5">
-                    <div class="text">
-                        <h2 class="topic-heading">{{faturamento_servicos}}</h2>
-                        <h2 class="topic">Venda de Serviços</h2>
-                    </div>
-                </div>
-
-                <div class="box box4">
-                    <div class="text">
-                        <h2 class="topic-heading">{{faturamento_pecas}}</h2>
-                        <h2 class="topic">Venda de Peças</h2>
-                    </div>
-                </div>
-
-                <div class="box box3">
-                    <div class="text">
-                        <h2 class="topic-heading">{{gastos_pecas}}</h2>
-                        <h2 class="topic">Compra de  Peças</h2>
-                    </div>
-                </div>
-                <div class="box box4">
-                    <div class="text">
-                        <h2 class="topic-heading">{{porcentagem_pecas}}</h2>
-                        <h2 class="topic">Lucro Final</h2>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
+  <section class="dashboard-header">
+    <div>
+      <h1>Dashboard Executivo</h1>
+      <p>GR7 - Centro Automotivo | {{ empresa|upper }}</p>
     </div>
-   
+  </section>
+
+  <!-- Indicadores principais -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <span>Faturamento Bruto</span>
+      <strong>{{ faturamento }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Faturamento Líquido</span>
+      <strong>{{ faturamento_meta }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Ticket Médio</span>
+      <strong>{{ ticket }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Passagens</span>
+      <strong>{{ passagens }}</strong>
+    </div>
+  </section>
+
+  <!-- Metas -->
+  {% if empresa == 'gr7' %}
+<section class="goals-grid">
+
+  <div class="goal-card">
+    <div class="goal-header">
+      <h3>Meta 1</h3>
+      <span>R$ 180.000,00</span>
+    </div>
+
+    <div class="goal-values">
+      <div>
+        <p>Valor atingido</p>
+        <strong>{{ valor_atingido_meta_1|default(faturamento_meta) }}</strong>
+      </div>
+
+      <div>
+        <p>Valor restante</p>
+        <strong>{{ valor_restante_meta_1|default(primeira_meta) }}</strong>
+      </div>
+    </div>
+
+    <div class="progress-area">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ percentual_meta_1|default(0) }}%;"></div>
+      </div>
+      <small>{{ percentual_meta_1|default(0) }}% atingido</small>
+    </div>
+  </div>
+
+  <div class="goal-card">
+    <div class="goal-header">
+      <h3>Meta 2</h3>
+      <span>R$ 220.000,00</span>
+    </div>
+
+    <div class="goal-values">
+      <div>
+        <p>Valor atingido</p>
+        <strong>{{ valor_atingido_meta_2|default(faturamento_meta) }}</strong>
+      </div>
+
+      <div>
+        <p>Valor restante</p>
+        <strong>{{ valor_restante_meta_2|default(segunda_meta) }}</strong>
+      </div>
+    </div>
+
+    <div class="progress-area">
+      <div class="progress-bar">
+        <div class="progress-fill second" style="width: {{ percentual_meta_2|default(0) }}%;"></div>
+      </div>
+      <small>{{ percentual_meta_2|default(0) }}% atingido</small>
+    </div>
+  </div>
+
+</section>
+{% endif %}
+
+  <!-- Gráfico + resumo financeiro -->
+  <section class="main-grid">
+
+    <div class="chart-card">
+      <div class="card-title">
+        <h3>Faturamento Diário do Mês</h3>
+      </div>
+
+      <canvas id="graficoFaturamento"></canvas>
+    </div>
+
+    <div class="finance-card">
+      <h3>Resumo Financeiro</h3>
+
+      <div class="finance-line">
+        <span>Venda de Serviços</span>
+        <strong>{{ faturamento_servicos }}</strong>
+      </div>
+
+      <div class="finance-line">
+        <span>Venda de Peças</span>
+        <strong>{{ faturamento_pecas }}</strong>
+      </div>
+
+      <div class="finance-line">
+        <span>Compra de Peças</span>
+        <strong>{{ gastos_pecas }}</strong>
+      </div>
+
+      <div class="finance-line highlight">
+        <span>Lucro Final</span>
+        <strong>{{ porcentagem_pecas }}</strong>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Rankings -->
+  <section class="ranking-grid">
+
+    <div class="ranking-card">
+      <h3>Top Mecânicos</h3>
+
+      {% for mecanico in top_mecanicos %}
+      <div class="ranking-item">
+        <span>{{ loop.index }}. {{ mecanico.nome }}</span>
+        <strong>{{ mecanico.valor }}</strong>
+      </div>
+      {% else %}
+      <p class="empty">Sem dados disponíveis</p>
+      {% endfor %}
+    </div>
+
+    <div class="ranking-card">
+      <h3>Top Companhias</h3>
+
+      {% for companhia in top_companhias %}
+      <div class="ranking-item">
+        <span>{{ loop.index }}. {{ companhia.nome }}</span>
+        <strong>{{ companhia.valor }}</strong>
+      </div>
+      {% else %}
+      <p class="empty">Sem dados disponíveis</p>
+      {% endfor %}
+    </div>
+
+    <div class="ranking-card">
+      <h3>Top Serviços</h3>
+
+      {% for servico in top_servicos %}
+      <div class="ranking-item">
+        <span>{{ loop.index }}. {{ servico.nome }}</span>
+        <strong>{{ servico.valor }}</strong>
+      </div>
+      {% else %}
+      <p class="empty">Sem dados disponíveis</p>
+      {% endfor %}
+    </div>
+
+  </section>
+
 </main>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const ctx = document.getElementById('graficoFaturamento');
+
+  const diasFaturamento = {{ dias_faturamento|default([])|tojson }};
+  const valoresFaturamento = {{ valores_faturamento|default([])|tojson }};
+
+  console.log("DIAS:", diasFaturamento);
+  console.log("VALORES:", valoresFaturamento);
+
+  if (!ctx) {
+    console.error("Canvas do gráfico não encontrado.");
+    return;
+  }
+
+  if (typeof Chart === "undefined") {
+    console.error("Chart.js não foi carregado.");
+    return;
+  }
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: diasFaturamento,
+      datasets: [
+{
+    label: 'Faturamento Bruto',
+    data: {{ valores_bruto|default([])|tojson }},
+    borderColor: '#2563eb',
+    backgroundColor: 'rgba(37,99,235,.15)',
+    fill: false,
+    tension: .35,
+    borderWidth: 3,
+    pointRadius: 4
+},
+{
+    label: 'Faturamento Líquido',
+    data: {{ valores_liquido|default([])|tojson }},
+    borderColor: '#22c55e',
+    backgroundColor: 'rgba(34,197,94,.15)',
+    fill: false,
+    tension: .35,
+    borderWidth: 3,
+    pointRadius: 4
+}
+]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+    legend: {
+        display: true,
+        position: 'bottom'
+    }
+},
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+});
+</script>
 {% endblock %}

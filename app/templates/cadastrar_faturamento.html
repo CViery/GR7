@@ -1,502 +1,560 @@
 {% extends 'base.html' %}
 {% block title %}
-<title>Inicio - {{ empresa }}</title>
+<title>Cadastro de Faturamento - {{ empresa }}</title>
 {% endblock %}
 
 {% block main %}
-<main>
-    <form action="/submit_form" method="post">
+<main class="billing-page">
+    <form action="/submit_form" method="post" id="faturamentoForm" class="billing-layout">
+        <section class="wizard-panel">
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">GR7 Gestão</span>
+                    <h1>Cadastro de Faturamento</h1>
+                    <p>Preencha os dados por etapas para reduzir erros e deixar o lançamento mais rápido.</p>
+                </div>
+                {% if response %}
+                <div class="system-message">{{response}}</div>
+                {% endif %}
+            </header>
 
-        <fieldset>
-            <legend>Dados do Veículo</legend>
-            <p>{{response}}</p>
-            <div class="input-group">
-                <label for="placa">Placa:</label>
-                <input type="text" id="placa" name="placa" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="modelo_veiculo">Modelo do Veículo:</label>
-                <input type="text" id="modelo_veiculo" name="modelo_veiculo" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="data_orcamento">Data de Orçamento:</label>
-                <input type="date" id="data_orcamento" name="data_orcamento" class="styled-input"
-                    onchange="calculateDias()" required>
-            </div>
-            <div class="input-group">
-                <label for="data_faturamento">Data de Faturamento:</label>
-                <input type="date" id="data_faturamento" name="data_faturamento" class="styled-input"
-                    onchange="calculateDias()" required>
-            </div>
-            <div class="input-group">
-                <label for="dias">Dias (Orçamento - Faturamento):</label>
-                <input type="text" id="dias" name="dias" class="styled-input" readonly>
-            </div>
-            <div class="input-group">
-                <label for="num_os">Número OS:</label>
-                <input type="text" id="num_os" name="num_os" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="cia">CIA:</label>
-                <select id="cia" name="cia" class="styled-input" onchange="showPneuStoreFields()">
-                    {%for cia in cias%}
-                    <option value="{{cia}}">{{cia}}</option>
-                    {%endfor%}
-                </select>
-            </div>
-            <div id="pneu_store_fields" class="input-group" style="display: none;">
-                <label>Conversão Pneu Store:</label><br>
-                <input type="radio" id="pneustore_pneu" name="conversao_pneustore" value="pneustore_pneu">
-                <label for="pneustore_pneu">Pneu Store - Pneu</label><br>
-                <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="pneustore_servico">
-                <label for="pneustore_servico">Pneu Store - Serviço</label><br>
-                <input type="radio" id="pneustore_servico" name="conversao_pneustore" value="" checked>
+            <nav class="wizard-steps" aria-label="Etapas do cadastro">
+                <button type="button" class="step-indicator active" data-step-target="1">
+                    <span>1</span>
+                    <strong>Veículo</strong>
+                </button>
+                <button type="button" class="step-indicator" data-step-target="2">
+                    <span>2</span>
+                    <strong>Faturamento</strong>
+                </button>
+                <button type="button" class="step-indicator" data-step-target="3">
+                    <span>3</span>
+                    <strong>Serviços</strong>
+                </button>
+                <button type="button" class="step-indicator" data-step-target="4">
+                    <span>4</span>
+                    <strong>Finalização</strong>
+                </button>
+            </nav>
 
-            </div>
-        </fieldset>
+            <fieldset class="wizard-step active" data-step="1">
+                <legend>Dados do Veículo</legend>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="placa">Placa</label>
+                        <input type="text" id="placa" name="placa" class="styled-input" required>
+                    </div>
+                    <div class="input-group span-2">
+                        <label for="modelo_veiculo">Modelo do Veículo</label>
+                        <input type="text" id="modelo_veiculo" name="modelo_veiculo" class="styled-input" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="num_os">Número OS</label>
+                        <input type="text" id="num_os" name="num_os" class="styled-input" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="cia">CIA</label>
+                        <select id="cia" name="cia" class="styled-input" onchange="showPneuStoreFields()">
+                            {%for cia in cias%}
+                            <option value="{{cia}}">{{cia}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="data_orcamento">Data de Orçamento</label>
+                        <input type="date" id="data_orcamento" name="data_orcamento" class="styled-input" onchange="calculateDias()" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="data_faturamento">Data de Faturamento</label>
+                        <input type="date" id="data_faturamento" name="data_faturamento" class="styled-input" onchange="calculateDias()" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="dias">Dias Oficina</label>
+                        <input type="text" id="dias" name="dias" class="styled-input" readonly>
+                    </div>
+                    <div id="pneu_store_fields" class="input-group span-3 conditional-field" style="display: none;">
+                        <label>Conversão Pneu Store</label>
+                        <div class="radio-card-group">
+                            <label><input type="radio" id="pneustore_pneu" name="conversao_pneustore" value="pneustore_pneu"> Pneu Store - Pneu</label>
+                            <label><input type="radio" id="pneustore_servico" name="conversao_pneustore" value="pneustore_servico"> Pneu Store - Serviço</label>
+                            <label><input type="radio" id="pneustore_vazio" name="conversao_pneustore" value="" checked> Sem conversão</label>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
 
-        <fieldset>
-            <legend>Peças e Serviços</legend>
-            <div class="input-group">
-                <label for="pecas">Peças:</label>
-                <input type="text" id="pecas" name="pecas" class="styled-input" onchange="calculateValorTotal()" required>
-            </div>
-            <div class="input-group">
-                <label for="servicos">Serviços:</label>
-                <input type="text" id="servicos" name="servicos" class="styled-input" onchange="calculateValorTotal()" required>
-            </div>
-            <div class="input-group">
-                <label for="valor_total">Valor Total (Peças + Serviços):</label>
-                <input type="text" id="valor_total" name="valor_total" class="styled-input" readonly>
-            </div>
-            <div class="input-group">
-                <label for="revitalizacao">Revitalização:</label>
-                <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input" required>
-            </div>
-            {% if empresa == 'gr7' or empresa == 'gr7 morumbi' %}
-            <div class="input-group">
-                <label for="aditivo">Aditivo:</label>
-                <input type="text" id="aditivo" name="aditivo" class="styled-input"
-                    onchange="showAditivoQuantidadeField()" required>
-            </div>
-            <div id="qntde_aditivo" class="input-group">
-                <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
-                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" required>
-            </div>
-            {% elif empresa == 'portal' %}
-            <div class="input-group">
-                <label for="aditivo">Ar Condicionado:</label>
-                <input type="text" id="ar_condicionado" name="ar_condicionado" class="styled-input"
-                    onchange="calculateValorMeta()" required>
-            </div>
-            <div id="qntde_aditivo" class="input-group" style="display: none;">
-                <label for="quantidade_aditivo">Quantidade de Aditivo:</label>
-                <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" value="">
-            </div>
+            <fieldset class="wizard-step" data-step="2">
+                <legend>Faturamento</legend>
+                <div class="form-grid">
+                    <div class="input-group money-field">
+                        <label for="pecas">Peças</label>
+                        <input type="text" id="pecas" name="pecas" class="styled-input money-input" onchange="calculateValorTotal()" required>
+                    </div>
+                    <div class="input-group money-field">
+                        <label for="servicos">Serviços</label>
+                        <input type="text" id="servicos" name="servicos" class="styled-input money-input" onchange="calculateValorTotal()" required>
+                    </div>
+                    <div class="input-group money-field">
+                        <label for="valor_total">Valor Total</label>
+                        <input type="text" id="valor_total" name="valor_total" class="styled-input" readonly>
+                    </div>
+                    <div class="input-group money-field">
+                        <label for="valor_meta">Valor Líquido</label>
+                        <input type="text" id="valor_meta" name="valor_meta" class="styled-input" readonly>
+                    </div>
+                    <div class="input-group money-field">
+                        <label for="valor_dinheiro">Valor em Dinheiro</label>
+                        <input type="text" id="valor_dinheiro" name="valor_dinheiro" class="styled-input money-input" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="quantidade_oleo">Quantidade Óleo</label>
+                        <input type="text" id="quantidade_oleo" name="quantidade_oleo" class="styled-input" required onchange="calcularOleo()">
+                    </div>
+                    <div class="input-group money-field">
+                        <label for="valor_oleo">Valor do Óleo</label>
+                        <input type="text" id="valor_oleo" name="valor_oleo" class="styled-input money-input" required onchange="calcularOleo()">
+                    </div>
+                    <div class="input-group span-2">
+                        <label for="tipo_marca_oleo">Tipo/Marca do Óleo</label>
+                        <select name="tipo_marca_oleo" id="tipo_marca_oleo" class="styled-input">
+                            <option value="">Tipo oleo</option>
+                            <option value="Futura 0W20">Futura 0W20</option>
+                            <option value="Maxon oil 0W20">Maxon oil 0W20</option>
+                            <option value="Total 0W20">Total 0W20</option>
+                            <option value="Acdelco 0W20">Acdelco 0W20</option>
+                            <option value="Acdelco 0W20 dexos">Acdelco 0W20 dexos</option>
+                            <option value="Motorcraft 5W20">Motorcraft 5W20</option>
+                            <option value="Total 0W30">Total 0W30</option>
+                            <option value="Motorcraft 5W20">Motorcraft 5W20</option>
+                            <option value="Futura 5W30">Futura 5W30</option>
+                            <option value="Maxon oil 5W30">Maxon oil 5W30</option>
+                            <option value="Motorcraft 5W30">Motorcraft 5W30</option>
+                            <option value="Total 5W30">Total 5W30</option>
+                            <option value="Acdelco 5W30">Acdelco 5W30</option>
+                            <option value="Acdelco 5W30 dexos">Acdelco 5W30 dexos</option>
+                            <option value="Maxon oil 5W40">Maxon oil 5W40</option>
+                            <option value="Volkswagen 5W40">Volkswagen 5W40</option>
+                            <option value="Petronas 10W30">Petronas 10W30</option>
+                            <option value="imperium oil 10W40">imperium oil 10W40</option>
+                            <option value="Menzoil 10W40">Menzoil 10W40</option>
+                            <option value="Menzoil 15W40">Menzoil 15W40</option>
+                            <option value="Menzoil 20W50">Menzoil 20W50</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="mecanico">Mecânico</label>
+                        <select id="mecanico" name="mecanico" class="styled-input">
+                            <option value="">Mecanicos</option>
+                            {%for mecanico in mecanicos%}
+                            <option value="{{mecanico}}">{{mecanico}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="filtro_mecanico">Filtro Mecânico</label>
+                        <select id="filtro_mecanico" name="filtro_mecanico" class="styled-input">
+                            <option value="">Mecanicos</option>
+                            {%for mecanico in mecanicos%}
+                            <option value="{{mecanico}}">{{mecanico}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
 
-            {% endif %}
-           
-            <div class="input-group">
-                {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
-                <label for="fluido_sangria">Fluido/Sangria:</label>
-                <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input" required>
-                {%elif empresa == 'portal'%}
-                <label for="lavagem">Lavagem</label>
-                <input type="text" id="lavagem" name="fluido_sangria" class="styled-input" required>
-                {%endif%}
-            </div>
-            <div class="input-group">
-                {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
-                <label for="palheta">Palheta:</label>
-                <input type="text" id="palheta" name="palheta" class="styled-input" required>
-                {%elif empresa == 'portal' %}
-                <label for="alternador">Alternador/Motor de arranque:</label>
-                <input type="text" id="alternador" name="palheta" class="styled-input" onchange="calculateValorMeta()" required>
-                {%endif%}
-            </div>
-            <div class="input-group">
-                <label for="detergente_parabrisa">Detergente de Para-brisa:</label>
-                <input type="text" id="detergente_parabrisa" name="detergente_parabrisa" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="filtro">Filtro e higienização:</label>
-                <input type="text" id="filtro" name="filtro" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
-                <label for="limpeza_freios">Limpeza dos Freios:</label>
-                <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input" required>
-                {%elif empresa == 'portal'%}
-                <label for="funilaria">Funilaria</label>
-                <input type="text" id="funilaria" name="funilaria" class="styled-input" onchange="calculateValorMeta()" required>
-                {%endif%}
-            </div>
-            <div class="input-group">
-                <label for="pneus">Pneus:</label>
-                <input type="text" id="pneus" name="pneus" class="styled-input" onchange="calculateValorMeta()" required>
-            </div>
-            <div class="input-group">
-                {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
-                <label for="Terceiros">Terceiros:</label>
-                <input type="text" id="terceiros" name="terceiros" class="styled-input" onchange=" calculateValorMeta()" required>
-                {%endif%}
-            </div>
-            <div class="input-group">
-                <label for="bateria">Bateria:</label>
-                <input type="text" id="bateria" name="bateria" class="styled-input"
-                    onchange="showModeloBateriaField(); calculateValorMeta()" required>
-            </div>
-            <div id="modelo_bateria_field" class="input-group" style="display: none;">
-                <label for="modelo_bateria">Modelo da Bateria:</label>
-                <select id="modelo_bateria" name="modelo_bateria" class="styled-input">
-                    <option value="">escolha o modelo</option>
-                    <option value="H38JD">H38JD</option>
-                    <option value="H50JD">H50JD</option>
-                    <option value="HNP50GD">HNP50GD</option>
-                    <option value="H60DD">H60DD</option>
-                    <option value="H60HD">H60HD</option>
-                    <option value="M40SD">M40SD</option>
-                    <option value="M48FD">M48FD</option>
-                    <option value="M50ED">M50ED</option>
-                    <option value="M50JD">M50JD</option>
-                    <option value="M60AD">M60AD</option>
-                    <option value="M60GD">M60GD</option>
-                    <option value="MA60AD">MA60AD</option>
-                    <option value="MF60AD">MF60AD</option>
-                    <option value="MF72LD">MF72LD</option>
-                    <option value="M75LD">M75LD</option>
-                    <option value="M80RD">M80RD</option>
-                    <option value="ST50HD">ST50HD</option>
-                    <option value="ST60HD">ST60HD</option>
-                    <option value="ST60DD">ST60DD</option>
-                    
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="quantidade_oleo">Quantidade Óleo:</label>
-                <input type="text" id="quantidade_oleo" name="quantidade_oleo" class="styled-input" required onchange="calcularOleo()">
-            </div>
-            <div class="input-group">
-                <label for="valor_oleo">Valor do Óleo:</label>
-                <input type="text" id="valor_oleo" name="valor_oleo" class="styled-input" required onchange="calcularOleo()">
-            </div>
-            <div class="input-group">
-                <label for="tipo_marca_oleo">Tipo/Marca do Óleo:</label>
-                <select name="tipo_marca_oleo" id="tipo_marca_oleo" class="styled-input">
-                    <option value="">Tipo oleo</option>
-                    <option value="Futura 0W20">Futura 0W20</option>
-                    <option value="Maxon oil 0W20">Maxon oil 0W20</option>
-                    <option value="Total 0W20">Total 0W20</option>
-                    <option value="Acdelco 0W20">Acdelco 0W20</option>
-                    <option value="Acdelco 0W20 dexos">Acdelco 0W20 dexos</option>
-                    <option value="Motorcraft 5W20">Motorcraft 5W20</option>
-                    <option value="Total 0W30">Total 0W30</option>
-                    <option value="Motorcraft 5W20">Motorcraft 5W20</option>
-                    <option value="Futura 5W30">Futura 5W30</option>
-                    <option value="Maxon oil 5W30">Maxon oil 5W30</option>
-                    <option value="Motorcraft 5W30">Motorcraft 5W30</option>
-                    <option value="Total 5W30">Total 5W30</option>
-                    <option value="Acdelco 5W30">Acdelco 5W30</option>
-                    <option value="Acdelco 5W30 dexos">Acdelco 5W30 dexos</option>
-                    <option value="Maxon oil 5W40">Maxon oil 5W40</option>
-                    <option value="Volkswagen 5W40">Volkswagen 5W40</option>
-                    <option value="Petronas 10W30">Petronas 10W30</option>
-                    <option value="imperium oil 10W40">imperium oil 10W40</option>
-                    <option value="Menzoil 10W40">Menzoil 10W40</option>
-                    <option value="Menzoil 15W40">Menzoil 15W40</option>
-                    <option value="Menzoil 20W50">Menzoil 20W50</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="mecanico">Mecânico:</label>
-                <select id="mecanico" name="mecanico" class="styled-input">
-                    <option value="">Mecanicos</option>
-                    {%for mecanico in mecanicos%}
-                    <option value="{{mecanico}}">{{mecanico}}</option>
-                    {%endfor%}
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="filtro_mecanico">Filtro Mecânico:</label>
-                <select id="filtro_mecanico" name="filtro_mecanico" class="styled-input">
-                    <option value="">Mecanicos</option>
-                    {%for mecanico in mecanicos%}
-                    <option value="{{mecanico}}">{{mecanico}}</option>
-                    {%endfor%}
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="valor_meta">Valor liquido:</label>
-                <input type="text" id="valor_meta" name="valor_meta" class="styled-input" readonly>
-            </div>
-            <div class="input-group">
-                <label for="valor_dinheiro">Valor em Dinheiro:</label>
-                <input type="text" id="valor_dinheiro" name="valor_dinheiro" class="styled-input" required>
-            </div>
-        </fieldset>
+            <fieldset class="wizard-step" data-step="3">
+                <legend>Serviços Adicionais</legend>
+                <p class="step-hint">Os cards abaixo ficam destacados quando possuem valor. Campos condicionais aparecem automaticamente.</p>
+                <div class="service-grid">
+                    <div class="input-group service-card money-field">
+                        <label for="revitalizacao">Revitalização</label>
+                        <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input money-input" required>
+                    </div>
 
-        <fieldset>
-            <legend>Outros Serviços</legend>
-            <div class="input-group">
-                <label for="freios">Freios:</label>
-                <input type="text" id="freios" name="freios" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="suspensao">Suspensão:</label>
-                <input type="text" id="suspensao" name="suspensao" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="injecao_ignicao">Injeção/Ignição:</label>
-                <input type="text" id="injecao_ignicao" name="injecao_ignicao" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="cabeote_motor_arrefecimento">Cabeçote Motor Arrefecimento:</label>
-                <input type="text" id="cabeote_motor_arrefecimento" name="cabeote_motor_arrefecimento"
-                    class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="outros">Outros:</label>
-                <input type="text" id="outros" name="outros" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="oleos">Óleos:</label>
-                <input type="text" id="oleos" name="oleos" class="styled-input" required>
-            </div>
-            <div class="input-group">
-                <label for="transmissao">Transmissão:</label>
-                <input type="text" id="transmissao" name="transmissao" class="styled-input" required>
-            </div>
-        </fieldset>
-        <fieldset>
-            <legend>Observações</legend>
-            <textarea name="obs" id="obs" cols="90" rows="5"></textarea>
-        </fieldset>
+                    {% if empresa == 'gr7' or empresa == 'gr7 morumbi' %}
+                    <div class="input-group service-card money-field">
+                        <label for="aditivo">Aditivo</label>
+                        <input type="text" id="aditivo" name="aditivo" class="styled-input money-input" onchange="showAditivoQuantidadeField()" required>
+                    </div>
+                    <div id="qntde_aditivo" class="input-group service-card conditional-field">
+                        <label for="quantidade_aditivo">Quantidade de Aditivo</label>
+                        <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" required>
+                    </div>
+                    {% elif empresa == 'portal' %}
+                    <div class="input-group service-card money-field">
+                        <label for="ar_condicionado">Ar Condicionado</label>
+                        <input type="text" id="ar_condicionado" name="ar_condicionado" class="styled-input money-input" onchange="calculateValorMeta()" required>
+                    </div>
+                    <div id="qntde_aditivo" class="input-group service-card conditional-field" style="display: none;">
+                        <label for="quantidade_aditivo">Quantidade de Aditivo</label>
+                        <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" value="">
+                    </div>
+                    {% endif %}
 
-        <div class="input-group">
-            <button type="submit" id="submit-button" class="styled-button" onclick="logButtonClick(event)">Enviar</button>
-        </div>
+                    <div class="input-group service-card money-field">
+                        {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                        <label for="fluido_sangria">Fluido/Sangria</label>
+                        <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input money-input" required>
+                        {%elif empresa == 'portal'%}
+                        <label for="lavagem">Lavagem</label>
+                        <input type="text" id="lavagem" name="fluido_sangria" class="styled-input money-input" required>
+                        {%endif%}
+                    </div>
 
+                    <div class="input-group service-card money-field">
+                        {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                        <label for="palheta">Palheta</label>
+                        <input type="text" id="palheta" name="palheta" class="styled-input money-input" required>
+                        {%elif empresa == 'portal' %}
+                        <label for="alternador">Alternador/Motor de arranque</label>
+                        <input type="text" id="alternador" name="palheta" class="styled-input money-input" onchange="calculateValorMeta()" required>
+                        {%endif%}
+                    </div>
+
+                    <div class="input-group service-card money-field">
+                        <label for="detergente_parabrisa">Detergente de Para-brisa</label>
+                        <input type="text" id="detergente_parabrisa" name="detergente_parabrisa" class="styled-input money-input" required>
+                    </div>
+                    <div class="input-group service-card money-field">
+                        <label for="filtro">Filtro e higienização</label>
+                        <input type="text" id="filtro" name="filtro" class="styled-input money-input" required>
+                    </div>
+                    <div class="input-group service-card money-field">
+                        {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                        <label for="limpeza_freios">Limpeza dos Freios</label>
+                        <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input money-input" required>
+                        {%elif empresa == 'portal'%}
+                        <label for="funilaria">Funilaria</label>
+                        <input type="text" id="funilaria" name="funilaria" class="styled-input money-input" onchange="calculateValorMeta()" required>
+                        {%endif%}
+                    </div>
+                    <div class="input-group service-card money-field">
+                        <label for="pneus">Pneus</label>
+                        <input type="text" id="pneus" name="pneus" class="styled-input money-input" onchange="calculateValorMeta()" required>
+                    </div>
+                    {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                    <div class="input-group service-card money-field">
+                        <label for="terceiros">Terceiros</label>
+                        <input type="text" id="terceiros" name="terceiros" class="styled-input money-input" onchange="calculateValorMeta()" required>
+                    </div>
+                    {%endif%}
+                    <div class="input-group service-card money-field">
+                        <label for="bateria">Bateria</label>
+                        <input type="text" id="bateria" name="bateria" class="styled-input money-input" onchange="showModeloBateriaField(); calculateValorMeta()" required>
+                    </div>
+                    <div id="modelo_bateria_field" class="input-group service-card conditional-field" style="display: none;">
+                        <label for="modelo_bateria">Modelo da Bateria</label>
+                        <select id="modelo_bateria" name="modelo_bateria" class="styled-input">
+                            <option value="">escolha o modelo</option>
+                            <option value="H38JD">H38JD</option><option value="H50JD">H50JD</option><option value="HNP50GD">HNP50GD</option>
+                            <option value="H60DD">H60DD</option><option value="H60HD">H60HD</option><option value="M40SD">M40SD</option>
+                            <option value="M48FD">M48FD</option><option value="M50ED">M50ED</option><option value="M50JD">M50JD</option>
+                            <option value="M60AD">M60AD</option><option value="M60GD">M60GD</option><option value="MA60AD">MA60AD</option>
+                            <option value="MF60AD">MF60AD</option><option value="MF72LD">MF72LD</option><option value="M75LD">M75LD</option>
+                            <option value="M80RD">M80RD</option><option value="ST50HD">ST50HD</option><option value="ST60HD">ST60HD</option><option value="ST60DD">ST60DD</option>
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="wizard-step" data-step="4">
+                <legend>Outros Serviços e Observações</legend>
+                <div class="form-grid">
+                    <div class="input-group money-field"><label for="freios">Freios</label><input type="text" id="freios" name="freios" class="styled-input money-input" required></div>
+                    <div class="input-group money-field"><label for="suspensao">Suspensão</label><input type="text" id="suspensao" name="suspensao" class="styled-input money-input" required></div>
+                    <div class="input-group money-field"><label for="injecao_ignicao">Injeção/Ignição</label><input type="text" id="injecao_ignicao" name="injecao_ignicao" class="styled-input money-input" required></div>
+                    <div class="input-group money-field"><label for="cabeote_motor_arrefecimento">Cabeçote Motor Arrefecimento</label><input type="text" id="cabeote_motor_arrefecimento" name="cabeote_motor_arrefecimento" class="styled-input money-input" required></div>
+                    <div class="input-group money-field"><label for="outros">Outros</label><input type="text" id="outros" name="outros" class="styled-input money-input" required></div>
+                    <div class="input-group money-field"><label for="oleos">Óleos</label><input type="text" id="oleos" name="oleos" class="styled-input money-input" required></div>
+                    <div class="input-group money-field"><label for="transmissao">Transmissão</label><input type="text" id="transmissao" name="transmissao" class="styled-input money-input" required></div>
+                    <div class="input-group span-3"><label for="obs">Observações</label><textarea name="obs" id="obs" rows="5" class="styled-input"></textarea></div>
+                </div>
+            </fieldset>
+
+            <div class="wizard-actions">
+                <button type="button" class="secondary-button" id="prevStep" disabled>Voltar</button>
+                <button type="button" class="styled-button" id="nextStep">Próximo</button>
+                <button type="submit" id="submit-button" class="styled-button submit-button" onclick="logButtonClick(event)" style="display:none;">Enviar</button>
+            </div>
+        </section>
+
+        <aside class="summary-card" aria-label="Resumo financeiro">
+            <div class="summary-header">
+                <span>Resumo Financeiro</span>
+                <strong id="summaryStatus">Em preenchimento</strong>
+            </div>
+            <div class="summary-vehicle">
+                <strong id="summaryPlaca">---</strong>
+                <span id="summaryModelo">Modelo não informado</span>
+            </div>
+            <div class="summary-list">
+                <div><span>Peças</span><strong id="summaryPecas">R$ 0,00</strong></div>
+                <div><span>Serviços</span><strong id="summaryServicos">R$ 0,00</strong></div>
+                <div class="total"><span>Total</span><strong id="summaryTotal">R$ 0,00</strong></div>
+                <div><span>Líquido/Meta</span><strong id="summaryMeta">R$ 0,00</strong></div>
+                <div><span>Dinheiro</span><strong id="summaryDinheiro">R$ 0,00</strong></div>
+                <div><span>Óleo</span><strong id="summaryOleo">R$ 0,00</strong></div>
+            </div>
+        </aside>
     </form>
 </main>
 
 <style>
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f0f0f0;
-        padding: 20px;
-    }
-
-    main {
-        max-width: 800px;
-        margin: 0 auto;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    form {
-        display: grid;
-        gap: 20px;
-    }
-
-    fieldset {
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        padding: 10px;
-    }
-
-    legend {
-        font-size: 20px;
-        font-weight: bold;
-        color: #007bff;
-    }
-
-    .input-group {
-        display: grid;
-        gap: 10px;
-    }
-
-    label {
-        font-weight: bold;
-    }
-
-    .styled-input {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
-        transition: border-color 0.3s ease;
-    }
-
-    .styled-input:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    }
-
-    .styled-button {
-        padding: 12px 24px;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 18px;
-        transition: background-color 0.3s ease;
-    }
-
-    .styled-button:hover {
-        background-color: #0056b3;
-    }
-
-    fieldset {
-        margin-bottom: 20px;
-    }
-
-    .input-group {
-        display: inline-block;
-        width: calc(25% - 20px);
-        /* 25% para 4 por linha, ajuste conforme necessário */
-        margin-right: 20px;
-    }
-
-    .button-group {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .styled-input {
-        width: calc(100% - 20px);
-        padding: 5px;
-        margin-top: 5px;
-    }
+    :root { --primary:#2563eb; --primary-dark:#1d4ed8; --bg:#f3f6fb; --card:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e2e8f0; --success:#16a34a; --danger:#dc2626; }
+    body { background: var(--bg); font-family: Inter, Arial, sans-serif; color: var(--text); }
+    .billing-page { width: min(1380px, 96vw); margin: 24px auto; }
+    .billing-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; align-items: start; }
+    .wizard-panel, .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 18px 50px rgba(15, 23, 42, .08); }
+    .wizard-panel { padding: 28px; }
+    .page-header { display:flex; justify-content:space-between; gap:18px; margin-bottom:22px; }
+    .eyebrow { color: var(--primary); font-weight: 800; font-size: 12px; letter-spacing:.08em; text-transform: uppercase; }
+    h1 { margin: 6px 0; font-size: clamp(26px, 3vw, 38px); }
+    .page-header p, .step-hint { color: var(--muted); margin: 0; }
+    .system-message { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; padding:12px 14px; border-radius:14px; height:max-content; }
+    .wizard-steps { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:22px; }
+    .step-indicator { border:1px solid var(--border); background:#fff; border-radius:18px; padding:13px; display:flex; gap:10px; align-items:center; cursor:pointer; color:var(--muted); }
+    .step-indicator span { width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:#e2e8f0; color:#334155; font-weight:800; }
+    .step-indicator.active { border-color: var(--primary); color: var(--primary); background:#eff6ff; }
+    .step-indicator.active span { background: var(--primary); color:#fff; }
+    fieldset { border: 0; padding: 0; margin: 0; }
+    legend { font-size: 22px; font-weight: 800; margin-bottom: 18px; }
+    .wizard-step { display:none; }
+    .wizard-step.active { display:block; }
+    .form-grid, .service-grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:16px; }
+    .service-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .span-2 { grid-column: span 2; } .span-3 { grid-column: span 3; }
+    .input-group { display:flex; flex-direction:column; gap:7px; }
+    label { font-weight:700; font-size: 13px; color:#334155; }
+    .styled-input { width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:14px; padding:12px 13px; font-size:15px; background:#fff; transition:.2s; }
+    textarea.styled-input { resize: vertical; min-height: 120px; }
+    .styled-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(37, 99, 235, .12); }
+    .styled-input[readonly] { background:#f8fafc; color:#475569; }
+    .service-card { padding:14px; border:1px solid var(--border); border-radius:18px; background:#f8fafc; transition:.2s; }
+    .service-card.has-value { border-color:rgba(22,163,74,.45); background:#f0fdf4; }
+    .conditional-field { border-style:dashed; }
+    .radio-card-group { display:flex; flex-wrap:wrap; gap:10px; }
+    .radio-card-group label { padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:#fff; font-weight:600; }
+    .wizard-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; border-top:1px solid var(--border); padding-top:18px; }
+    .styled-button, .secondary-button { border:0; border-radius:14px; padding:13px 22px; font-weight:800; cursor:pointer; }
+    .styled-button { background:var(--primary); color:#fff; } .styled-button:hover { background:var(--primary-dark); }
+    .secondary-button { background:#e2e8f0; color:#334155; } .secondary-button:disabled { opacity:.5; cursor:not-allowed; }
+    .summary-card { position:sticky; top:20px; padding:20px; }
+    .summary-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .summary-header span { font-weight:900; font-size:18px; }
+    .summary-header strong { font-size:12px; color:var(--primary); background:#eff6ff; padding:7px 10px; border-radius:999px; }
+    .summary-vehicle { padding:16px; border-radius:18px; background:linear-gradient(135deg, #0f172a, #1e3a8a); color:#fff; margin-bottom:16px; }
+    .summary-vehicle strong { display:block; font-size:28px; letter-spacing:.06em; }
+    .summary-vehicle span { color:#cbd5e1; font-size:13px; }
+    .summary-list { display:grid; gap:10px; }
+    .summary-list div { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); }
+    .summary-list span { color:var(--muted); }
+    .summary-list .total { border:0; border-radius:16px; background:#eff6ff; padding:14px; color:#1e40af; }
+    .summary-list .total span { color:#1e40af; font-weight:800; }
+    @media (max-width: 1100px) { .billing-layout { grid-template-columns:1fr; } .summary-card { position:static; } .service-grid { grid-template-columns:repeat(2, 1fr); } }
+    @media (max-width: 720px) { .wizard-panel { padding:18px; } .page-header { flex-direction:column; } .wizard-steps { grid-template-columns:1fr 1fr; } .form-grid, .service-grid { grid-template-columns:1fr; } .span-2, .span-3 { grid-column:span 1; } .wizard-actions { flex-direction:column; } .styled-button, .secondary-button { width:100%; } }
 </style>
+
 <script>
-    // Função para calcular o número de dias entre as datas de orçamento e faturamento
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    function toNumber(value) {
+        if (value === null || value === undefined) return 0;
+        let raw = String(value).trim();
+        if (raw === '') return 0;
+
+        raw = raw.replace(/R\$\s?/g, '').replace(/\s/g, '');
+
+        const hasComma = raw.includes(',');
+        const hasDot = raw.includes('.');
+
+        if (hasComma && hasDot) {
+            // Formato brasileiro: 1.234,56
+            raw = raw.replace(/\./g, '').replace(',', '.');
+        } else if (hasComma) {
+            // Formato brasileiro simples: 1234,56
+            raw = raw.replace(',', '.');
+        }
+        // Se tiver apenas ponto, mantém como decimal: 1234.56
+
+        return parseFloat(raw) || 0;
+    }
+
+    function hasFilledValue(id) {
+        const el = document.getElementById(id);
+        return el && String(el.value).trim() !== '';
+    }
+
+    function formatBRL(value) {
+        return (Number(value) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function setStep(step) {
+        currentStep = Math.min(Math.max(step, 1), totalSteps);
+        document.querySelectorAll('.wizard-step').forEach(el => el.classList.toggle('active', Number(el.dataset.step) === currentStep));
+        document.querySelectorAll('.step-indicator').forEach(el => el.classList.toggle('active', Number(el.dataset.stepTarget) === currentStep));
+        document.getElementById('prevStep').disabled = currentStep === 1;
+        document.getElementById('nextStep').style.display = currentStep === totalSteps ? 'none' : 'inline-flex';
+        document.getElementById('submit-button').style.display = currentStep === totalSteps ? 'inline-flex' : 'none';
+        updateSummary();
+    }
+
+    document.getElementById('nextStep').addEventListener('click', () => setStep(currentStep + 1));
+    document.getElementById('prevStep').addEventListener('click', () => setStep(currentStep - 1));
+    document.querySelectorAll('.step-indicator').forEach(btn => btn.addEventListener('click', () => setStep(Number(btn.dataset.stepTarget))));
+
     function calculateDias() {
-        const dataOrcamento = new Date(document.getElementById('data_orcamento').value);
-        const dataFaturamento = new Date(document.getElementById('data_faturamento').value);
-
-        if (dataOrcamento && dataFaturamento) {
-            const diffTime = Math.abs(dataFaturamento - dataOrcamento);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            document.getElementById('dias').value = diffDays;
-        }
+        const dataOrcamentoValue = document.getElementById('data_orcamento').value;
+        const dataFaturamentoValue = document.getElementById('data_faturamento').value;
+        if (!dataOrcamentoValue || !dataFaturamentoValue) return;
+        const dataOrcamento = new Date(dataOrcamentoValue);
+        const dataFaturamento = new Date(dataFaturamentoValue);
+        const diffTime = Math.abs(dataFaturamento - dataOrcamento);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        document.getElementById('dias').value = diffDays;
+        updateSummary();
     }
 
-    // Função para calcular o valor total (peças + serviços)
     function calculateValorTotal() {
-        // Obter os valores dos campos de entrada e substituir as vírgulas por pontos
-        const pecasValue = document.getElementById('pecas').value.replace(',', '.');
-        const servicosValue = document.getElementById('servicos').value.replace(',', '.');
-
-        // Converter os valores para números
-        const pecas = parseFloat(pecasValue) || 0;
-        const servicos = parseFloat(servicosValue) || 0;
-
-        // Calcular o valor total
-        const valorTotal = pecas + servicos;
-
-        // Atualizar o campo de valor total com o resultado formatado
-        document.getElementById('valor_total').value = valorTotal.toFixed(2);
+        const pecas = toNumber(document.getElementById('pecas').value);
+        const servicos = toNumber(document.getElementById('servicos').value);
+        document.getElementById('valor_total').value = (pecas + servicos).toFixed(2);
+        calculateValorMeta();
+        updateSummary();
     }
 
-    // Função para mostrar o campo de quantidade de aditivo se necessário
     function showAditivoQuantidadeField() {
-        const aditivo = document.getElementById('aditivo').value;
+        const aditivo = document.getElementById('aditivo');
         const qntdeAditivoField = document.getElementById('qntde_aditivo');
-        if (aditivo.trim().length > 0) {
-            qntdeAditivoField.style.display = 'block';
-        } else {
-            qntdeAditivoField.style.display = 'none';
-        }
+        if (!aditivo || !qntdeAditivoField) return;
+        qntdeAditivoField.style.display = aditivo.value.trim().length > 0 ? 'flex' : 'none';
     }
 
-    // Função para mostrar os campos específicos da loja de pneus
     function showPneuStoreFields() {
         const cia = document.getElementById('cia').value;
         const pneuStoreFields = document.getElementById('pneu_store_fields');
-        if (cia === 'pneu_store') {
-            pneuStoreFields.style.display = 'block';
-        } else {
-            pneuStoreFields.style.display = 'none';
-        }
+        pneuStoreFields.style.display = cia === 'pneu_store' ? 'flex' : 'none';
+        updateSummary();
     }
 
-    // Função para mostrar o campo do modelo da bateria se necessário
     function showModeloBateriaField() {
         const bateria = document.getElementById('bateria').value;
         const modeloBateriaField = document.getElementById('modelo_bateria_field');
-        if (bateria.trim().length > 0) {
-            modeloBateriaField.style.display = 'block';
-        } else {
-            modeloBateriaField.style.display = 'none';
-        }
+        modeloBateriaField.style.display = bateria.trim().length > 0 ? 'flex' : 'none';
     }
+
     function calculateValorMeta() {
-        // Obter os elementos pelo ID
         const valorTotalElement = document.getElementById('valor_total');
-        const bateriaElement = document.getElementById('bateria');
-        const pneusElement = document.getElementById('pneus');
         const valorMetaElement = document.getElementById('valor_meta');
-    
-        // Verificar se todos os elementos necessários estão presentes
-        if (valorTotalElement && bateriaElement && pneusElement && valorMetaElement) {
-            // Obter os valores dos campos e substituir as vírgulas por pontos
-            const valorTotal = parseFloat(valorTotalElement.value.replace(',', '.')) || 0;
-            const valorBateria = parseFloat(bateriaElement.value.replace(',', '.')) || 0;
-            const valorPneus = parseFloat(pneusElement.value.replace(',', '.')) || 0;
-    
-            // Verificar e obter os valores de elementos opcionais
-            const funilariaElement = document.getElementById('funilaria');
-            const arCondicionadoElement = document.getElementById('ar_condicionado');
-            const terceirosElement = document.getElementById('terceiros');
-            const alternadorElement = document.getElementById('alternador');
-    
-            const valorFunilaria = funilariaElement ? parseFloat(funilariaElement.value.replace(',', '.')) || 0 : 0;
-            const valorAr = arCondicionadoElement ? parseFloat(arCondicionadoElement.value.replace(',', '.')) || 0 : 0;
-            const valorTerceiros = terceirosElement ? parseFloat(terceirosElement.value.replace(',', '.')) || 0 : 0;
-            
-            const valorAlternado = alternadorElement ? parseFloat(alternadorElement.value.replace(',', '.')) || 0 : 0;
-            // Calcular o valor da meta
-            const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria - valorAr - valorTerceiros - valorAlternado;
-    
-            // Atualizar o campo de valor meta com o resultado formatado
-            valorMetaElement.value = valorMeta.toFixed(2);
-        } else {
-            // Mensagens de erro se algum elemento não for encontrado
-            if (!valorTotalElement) console.error('Elemento com ID "valor_total" não encontrado.');
-            if (!bateriaElement) console.error('Elemento com ID "bateria" não encontrado.');
-            if (!pneusElement) console.error('Elemento com ID "pneus" não encontrado.');
-            if (!valorMetaElement) console.error('Elemento com ID "valor_meta" não encontrado.');
+        if (!valorTotalElement || !valorMetaElement) return;
+
+        const valorTotal = toNumber(valorTotalElement.value);
+
+        // Não calcula meta enquanto os campos obrigatórios de desconto não forem lançados.
+        // Se não teve bateria/pneu, digite 0. Assim o sistema sabe que foi conferido.
+        if (!hasFilledValue('bateria') || !hasFilledValue('pneus')) {
+            valorMetaElement.value = '';
+            updateSummary();
+            return;
         }
-    }
-    
-    const calcularOleo =()=>{
-        let quantidade = document.getElementById('quantidade_oleo').value
-        let valor_unitario = document.getElementById('valor_oleo').value
-        let valor_convert = valor_unitario.replace(',', '.')
-        let valor_float = parseFloat(valor_convert) || 0
-        let qntd = parseInt(quantidade) || 0
-        let valor_total = qntd * valor_float
 
-        document.getElementById('oleos').value = valor_total
+        const valorBateria = toNumber(document.getElementById('bateria').value);
+        const valorPneus = toNumber(document.getElementById('pneus').value);
 
+        const funilariaElement = document.getElementById('funilaria');
+        const arCondicionadoElement = document.getElementById('ar_condicionado');
+        const terceirosElement = document.getElementById('terceiros');
+        const alternadorElement = document.getElementById('alternador');
+
+        const valorFunilaria = funilariaElement ? toNumber(funilariaElement.value) : 0;
+        const valorAr = arCondicionadoElement ? toNumber(arCondicionadoElement.value) : 0;
+        const valorTerceiros = terceirosElement ? toNumber(terceirosElement.value) : 0;
+        const valorAlternador = alternadorElement ? toNumber(alternadorElement.value) : 0;
+
+        const valorMeta = valorTotal - valorBateria - valorPneus - valorFunilaria - valorAr - valorTerceiros - valorAlternador;
+        valorMetaElement.value = valorMeta.toFixed(2);
+        updateSummary();
     }
+
+    const calcularOleo = () => {
+        const quantidade = toNumber(document.getElementById('quantidade_oleo')?.value);
+        const valorUnitario = toNumber(document.getElementById('valor_oleo')?.value);
+        const campoOleos = document.getElementById('oleos');
+
+        if (!campoOleos) return;
+
+        if (!hasFilledValue('quantidade_oleo') || !hasFilledValue('valor_oleo')) {
+            campoOleos.value = '';
+            updateSummary();
+            return;
+        }
+
+        campoOleos.value = (quantidade * valorUnitario).toFixed(2);
+        updateSummary();
+    }
+
+    function updateSummary() {
+        const placa = document.getElementById('placa')?.value || '---';
+        const modelo = document.getElementById('modelo_veiculo')?.value || 'Modelo não informado';
+        const pecas = toNumber(document.getElementById('pecas')?.value);
+        const servicos = toNumber(document.getElementById('servicos')?.value);
+        const total = toNumber(document.getElementById('valor_total')?.value);
+        const metaElement = document.getElementById('valor_meta');
+        const meta = metaElement?.value.trim() === '' ? null : toNumber(metaElement?.value);
+        const dinheiro = toNumber(document.getElementById('valor_dinheiro')?.value);
+        const oleos = toNumber(document.getElementById('oleos')?.value);
+        document.getElementById('summaryPlaca').textContent = placa.toUpperCase();
+        document.getElementById('summaryModelo').textContent = modelo;
+        document.getElementById('summaryPecas').textContent = formatBRL(pecas);
+        document.getElementById('summaryServicos').textContent = formatBRL(servicos);
+        document.getElementById('summaryTotal').textContent = formatBRL(total);
+        document.getElementById('summaryMeta').textContent = meta === null ? 'Aguardando bateria/pneus' : formatBRL(meta);
+        document.getElementById('summaryDinheiro').textContent = formatBRL(dinheiro);
+        document.getElementById('summaryOleo').textContent = formatBRL(oleos);
+        document.getElementById('summaryStatus').textContent = total > 0 ? 'Calculado' : 'Em preenchimento';
+        document.querySelectorAll('.service-card input').forEach(input => {
+            input.closest('.service-card')?.classList.toggle('has-value', toNumber(input.value) > 0 || input.value.trim().length > 0);
+        });
+    }
+
+    function applyMoneyMask(input) {
+        input.addEventListener('input', () => {
+            updateSummary();
+            input.closest('.service-card')?.classList.toggle('has-value', toNumber(input.value) > 0);
+        });
+        input.addEventListener('blur', () => {
+            const raw = toNumber(input.value);
+            if (input.value.trim() !== '') input.value = raw.toFixed(2).replace('.', ',');
+            calculateValorTotal();
+            calculateValorMeta();
+            calcularOleo();
+            showModeloBateriaField();
+            showAditivoQuantidadeField();
+            updateSummary();
+        });
+    }
+
+    document.querySelectorAll('.money-input').forEach(applyMoneyMask);
+    document.querySelectorAll('input, select, textarea').forEach(el => el.addEventListener('input', () => {
+        calculateValorMeta();
+        calcularOleo();
+        updateSummary();
+    }));
+
     function logButtonClick(event) {
         console.log("Botão clicado");
-        
-        // Prevenir envio de formulário para fins de teste
-        // event.preventDefault();
-
-        // Opcional: Verificar se todos os campos obrigatórios foram preenchidos
         const placa = document.getElementById("placa").value;
         const modeloVeiculo = document.getElementById("modelo_veiculo").value;
-
         console.log(`Valores inseridos: Placa=${placa}, Modelo=${modeloVeiculo}`);
-
-        // Adicione qualquer lógica adicional aqui para depurar o problema
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showPneuStoreFields();
+        showModeloBateriaField();
+        showAditivoQuantidadeField();
+        calculateValorTotal();
+        calculateValorMeta();
+        updateSummary();
+    });
 </script>
 {%endblock%}

@@ -228,7 +228,7 @@ class Database:
             query = 'SELECT nome FROM funcionarios ORDER BY nome ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
-            print(result)
+
             if result:
                 logging.info(f"Consulta concluída com sucesso. {len(result)} mecânico(s) encontrado(s).")
             else:
@@ -859,25 +859,22 @@ class Database:
             cursor = self.conn.cursor()
             cursor.execute(query, valores)
             self.conn.commit()
-            print(f"Ordem de serviço {num_os} atualizada com sucesso.")
+
         except Exception as e:
             print(f"Erro ao atualizar ordem de serviço {num_os}: {e}")
     
     def detalhes_filtros(self, mes, ano, mecanico):
         try:
             # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
             
             query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ? AND filtro_mecanico = ?'
             
             # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
             
             self.cursor.execute(query, (mes, ano, mecanico))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
             
             return result
         except Exception as e:
@@ -888,18 +885,17 @@ class Database:
     def detalhes_revitalizacao(self, mes, ano, mecanico):
         try:
             # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+
             
             query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ? AND mecanico = ?'
             
-            # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
+         
             
             self.cursor.execute(query, (mes, ano, mecanico))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
+    
             
             return result
         except Exception as e:
@@ -910,18 +906,18 @@ class Database:
     def ordens(self, mes, ano):
         try:
             # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}")
+            
             
             query = 'SELECT * FROM faturamento WHERE mes_faturamento = ? AND ano_faturamento = ?'
             
             # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano})")
+           
             
             self.cursor.execute(query, (mes, ano))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
+            
             
             return result
         except Exception as e:
@@ -1197,9 +1193,7 @@ class DatabasePortal:
         try:
             # Garantir que os parâmetros são strings
             mecanico = str(mecanico)
-            print(f'DB: {mecanico}')
             mes = str(mes)
-            print(f'Mes: {mes}')
             ano = str(ano)
 
             # Debugging
@@ -1475,19 +1469,16 @@ class DatabasePortal:
         
     def detalhes_filtros(self, mes, ano, mecanico):
         try:
-            # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+            
             
             query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ? AND filtro_mecanico = ?'
             
-            # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
+            
             
             self.cursor.execute(query, (mes, ano, mecanico))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
             
             return result
         except Exception as e:
@@ -1497,19 +1488,16 @@ class DatabasePortal:
 
     def detalhes_revitalizacao(self, mes, ano, mecanico):
         try:
-            # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
+           
             
             query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ? AND mecanico = ?'
             
-            # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
+          
             
             self.cursor.execute(query, (mes, ano, mecanico))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
             
             return result
         except Exception as e:
@@ -1519,19 +1507,16 @@ class DatabasePortal:
 
     def ordens(self, mes, ano):
         try:
-            # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}")
+            
             
             query = 'SELECT * FROM faturamento_portal WHERE mes_faturamento = ? AND ano_faturamento = ?'
             
-            # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano})")
+        
             
             self.cursor.execute(query, (mes, ano))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
             
             return result
         except Exception as e:
@@ -2055,7 +2040,6 @@ class DatabaseMorumbi:
             query = 'SELECT nome FROM funcionarios_morumbi ORDER BY nome ASC;'
             self.cursor.execute(query)
             result = self.cursor.fetchall()
-            print(result)
             if result:
                 logging.info(f"Consulta concluída com sucesso. {len(result)} mecânico(s) encontrado(s).")
             else:
@@ -2686,25 +2670,21 @@ class DatabaseMorumbi:
             cursor = self.conn.cursor()
             cursor.execute(query, valores)
             self.conn.commit()
-            print(f"Ordem de serviço {num_os} atualizada com sucesso.")
         except Exception as e:
             print(f"Erro ao atualizar ordem de serviço {num_os}: {e}")
     
     def detalhes_filtros(self, mes, ano, mecanico):
         try:
             # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
             
             query = 'SELECT * FROM faturamento_morumbi WHERE mes_faturamento = ? AND ano_faturamento = ? AND filtro_mecanico = ?'
             
             # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
             
             self.cursor.execute(query, (mes, ano, mecanico))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
             
             return result
         except Exception as e:
@@ -2715,18 +2695,15 @@ class DatabaseMorumbi:
     def detalhes_revitalizacao(self, mes, ano, mecanico):
         try:
             # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}, Mecânico: {mecanico}")
             
             query = 'SELECT * FROM faturamento_morumbi WHERE mes_faturamento = ? AND ano_faturamento = ? AND mecanico = ?'
             
             # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano}, {mecanico})")
             
             self.cursor.execute(query, (mes, ano, mecanico))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
             
             return result
         except Exception as e:
@@ -2737,18 +2714,15 @@ class DatabaseMorumbi:
     def ordens(self, mes, ano):
         try:
             # Adicionando prints para verificar os valores recebidos
-            print(f"Mes: {mes}, Ano: {ano}")
             
             query = 'SELECT * FROM faturamento_morumbi WHERE mes_faturamento = ? AND ano_faturamento = ?'
             
             # Verificando a query antes da execução
-            print(f"Executando query: {query} com os parâmetros ({mes}, {ano})")
             
             self.cursor.execute(query, (mes, ano))
             
             # Verificando o resultado obtido
             result = self.cursor.fetchall()
-            print(f"Resultado da consulta: {result}")
             
             return result
         except Exception as e:

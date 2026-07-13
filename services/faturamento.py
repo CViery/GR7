@@ -28,87 +28,95 @@ class Faturamento:
 
     def cadastrar(self, dados, usuario):
         try:
-            # Valida campos obrigatórios
-            required_fields = [
-                'data_faturamento', 'pecas', 'servicos', 'revitalizacao', 'aditivo',
-                'fluido_sangria', 'palheta', 'detergente_parabrisa', 'filtro',
-                'pneus', 'bateria', 'valor_oleo', 'valor_dinheiro', 'freios',
-                'suspensao', 'injecao_ignicao', 'cabeote_motor_arrefecimento', 'outros',
-                'oleos', 'transmissao', 'placa', 'modelo_veiculo', 'data_orcamento',
-                'dias', 'num_os', 'cia', 'conversao_pneustore', 'valor_total',
-                'quantidade_aditivo', 'modelo_bateria', 'quantidade_oleo',
-                'tipo_marca_oleo', 'mecanico', 'filtro_mecanico', 'valor_meta', 'terceiros'
-            ]
+            def moeda(valor):
+                if valor is None or valor == '':
+                    return 0.0
 
-            for field in required_fields:
-                if field not in dados:
-                    raise ValueError(f"Campo obrigatório ausente: {field}")
+                valor = str(valor).strip()
+                valor = valor.replace('R$', '').replace(' ', '')
 
-            # Processa dados da ordem de serviço
-            data = dados['data_faturamento']
-            mes, ano = data[5:7], data[:4]
+                # Ex: 1.000,50 -> 1000.50
+                if ',' in valor:
+                    valor = valor.replace('.', '').replace(',', '.')
 
-            # Função para processar valores monetários
-            def process_value(value_str):
-                return float(value_str.replace(',', '.'))
+                return float(valor)
+
+            def inteiro(valor):
+                if valor is None or valor == '':
+                    return 0
+
+                return int(float(str(valor).replace(',', '.')))
+
+            data = dados.get('data_faturamento', '')
+            mes = data[5:7]
+            ano = data[:4]
+
+            valor_aditivo = dados.get('aditivo') or dados.get('ar_condicionado') or 0
+            quantidade_litros = dados.get('quantidade_aditivo') or 0
+
+            valor_limpeza_freios = dados.get('limpeza_freios') or dados.get('funilaria') or 0
 
             ordem_servico = {
-                'placa': dados['placa'],
-                'modelo_veiculo': dados['modelo_veiculo'],
-                'data_orcamento': dados['data_orcamento'],
-                'data_faturamento': dados['data_faturamento'],
+                'placa': dados.get('placa', ''),
+                'modelo_veiculo': dados.get('modelo_veiculo', ''),
+                'data_orcamento': dados.get('data_orcamento', ''),
+                'data_faturamento': dados.get('data_faturamento', ''),
                 'mes_faturamento': mes,
                 'ano_faturamento': ano,
-                'dias_servico': int(dados['dias']),
-                'numero_os': int(dados['num_os']),
-                'companhia': dados['cia'],
-                'conversao_ps': dados['conversao_pneustore'],
-                'valor_pecas': process_value(dados['pecas']),
-                'valor_servicos': process_value(dados['servicos']),
-                'total_os': float(dados['valor_total']),
-                'valor_revitalizacao': process_value(dados['revitalizacao']),
-                'valor_aditivo': process_value(dados['aditivo']),
-                'quantidade_litros': int(dados['quantidade_aditivo']),
-                'valor_fluido_sangria': process_value(dados['fluido_sangria']),
-                'valor_palheta': process_value(dados['palheta']),
-                'valor_limpeza_freios': process_value(dados.get('limpeza_freios', '0')),
-                'valor_pastilha_parabrisa': process_value(dados['detergente_parabrisa']),
-                'valor_filtro': process_value(dados['filtro']),
-                'valor_pneu': process_value(dados['pneus']),
-                'valor_bateria': process_value(dados['bateria']),
-                'modelo_bateria': dados['modelo_bateria'],
-                'lts_oleo_motor': int(dados['quantidade_oleo']),
-                'valor_lt_oleo': process_value(dados['valor_oleo']),
-                'marca_e_tipo_oleo': dados['tipo_marca_oleo'],
-                'mecanico_servico': dados['mecanico'],
-                'servico_filtro': dados['filtro_mecanico'],
-                'valor_p_meta': process_value(dados['valor_meta']),
-                'valor_em_dinheiro': process_value(dados['valor_dinheiro']),
-                'valor_servico_freios': process_value(dados['freios']),
-                'valor_servico_suspensao': process_value(dados['suspensao']),
-                'valor_servico_injecao_ignicao': process_value(dados['injecao_ignicao']),
-                'valor_servico_cabecote_motor_arr': process_value(dados['cabeote_motor_arrefecimento']),
-                'valor_outros_servicos': process_value(dados['outros']),
-                'valor_servicos_oleos': process_value(dados['oleos']),
-                'valor_servico_transmissao': process_value(dados['transmissao']),
-                'usuario': usuario,
-                'obs': dados.get('obs', ''),  # Caso o campo 'obs' seja opcional
-                'valor_terceiros': process_value(dados['terceiros'])
-            }
-           
-            # Verifica se a ordem de serviço já existe
-            buscar_os = self.db.buscar_os_by_number(int(dados['num_os']))
-            if buscar_os:
-                return True  # Ordem já cadastrada, retorna True
-            else:
-                # Cadastra a ordem de serviço
-                self.db.cadastrar_faturamento(ordem_servico)
-                return False  # Ordem cadastrada com sucesso
+                'dias_servico': inteiro(dados.get('dias')),
+                'numero_os': inteiro(dados.get('num_os')),
+                'companhia': dados.get('cia', ''),
+                'conversao_ps': dados.get('conversao_pneustore', ''),
 
-        except ValueError as ve:
-            print(f"Erro de validação: {ve}")
+                'valor_pecas': moeda(dados.get('pecas')),
+                'valor_servicos': moeda(dados.get('servicos')),
+                'total_os': moeda(dados.get('valor_total')),
+
+                'valor_revitalizacao': moeda(dados.get('revitalizacao')),
+                'valor_aditivo': moeda(valor_aditivo),
+                'quantidade_litros': inteiro(quantidade_litros),
+                'valor_fluido_sangria': moeda(dados.get('fluido_sangria')),
+                'valor_palheta': moeda(dados.get('palheta')),
+                'valor_limpeza_freios': moeda(valor_limpeza_freios),
+                'valor_pastilha_parabrisa': moeda(dados.get('detergente_parabrisa')),
+                'valor_filtro': moeda(dados.get('filtro')),
+                'valor_pneu': moeda(dados.get('pneus')),
+                'valor_bateria': moeda(dados.get('bateria')),
+                'modelo_bateria': dados.get('modelo_bateria', ''),
+
+                'lts_oleo_motor': inteiro(dados.get('quantidade_oleo')),
+                'valor_lt_oleo': moeda(dados.get('valor_oleo')),
+                'marca_e_tipo_oleo': dados.get('tipo_marca_oleo', ''),
+
+                'mecanico_servico': dados.get('mecanico', ''),
+                'servico_filtro': dados.get('filtro_mecanico', ''),
+
+                'valor_p_meta': moeda(dados.get('valor_meta')),
+                'valor_em_dinheiro': moeda(dados.get('valor_dinheiro')),
+
+                'valor_servico_freios': moeda(dados.get('freios')),
+                'valor_servico_suspensao': moeda(dados.get('suspensao')),
+                'valor_servico_injecao_ignicao': moeda(dados.get('injecao_ignicao')),
+                'valor_servico_cabecote_motor_arr': moeda(dados.get('cabeote_motor_arrefecimento')),
+                'valor_outros_servicos': moeda(dados.get('outros')),
+                'valor_servicos_oleos': moeda(dados.get('oleos')),
+                'valor_servico_transmissao': moeda(dados.get('transmissao')),
+
+                'usuario': usuario,
+                'obs': dados.get('obs', '')
+            }
+
+            buscar_os = self.db.buscar_os_by_number(ordem_servico['numero_os'])
+
+            if buscar_os:
+                return True
+            else:
+                self.db.cadastrar_faturamento(ordem_servico)
+                return False
+
         except Exception as e:
-            print(f"Erro ao cadastrar ordem de serviço: {e}")
+            print(f"Erro ao cadastrar faturamento: {e}")
+            return None
 
     def filtrar_os(self, data_inicio=None, data_fim=None, placa=None, mecanico=None, num_os=None, cia=None):
         try:
@@ -322,6 +330,27 @@ class Faturamento:
         except Exception as e:
             raise e
 
+    def faturamento_diario_mes(self, mes, ano):
+        try:
+            query = """
+                SELECT
+                    DAY(data_faturamento) AS dia,
+                    SUM(total_os) AS bruto,
+                    SUM(valor_meta) AS liquido
+                FROM faturamento
+                WHERE MONTH(data_faturamento) = ?
+                AND YEAR(data_faturamento) = ?
+                GROUP BY DAY(data_faturamento)
+                ORDER BY DAY(data_faturamento)
+            """
+
+            self.cursor.execute(query, (int(mes), int(ano)))
+            return self.cursor.fetchall()
+
+        except Exception as e:
+            print(e)
+            return []
+    
     def faturamentos_gerais(self):
         try:
             faturamentos = []

@@ -3,34 +3,194 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="{{url_for('static', filename= 'css/login.css')}}">
+  <title>Login | GR7 Gestão</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
+
 <body>
 
-  <div class="login-container">
-    <h3>LOGIN</h3>
-    {% set mensagens = get_flashed_messages() %}
-    <form action="/autenticar" method='POST'>
-      <label for="usuario">Usuário</label>
-      <input type="text" name="usuario" id="usuario" required>
-      <label for="senha">Senha</label>
-      <input type="password" name="senha" id="senha" required>
-      <label for="empresa">Empresa</label>
-      <select name="empresa" id="empresa">
-        <option value="gr7">GR7</option>
-        <option value="portal">Portal</option>
-        <option value="gr7 morumbi">GR7 Morumbi</option>
-      </select>
-      <button type="submit">Entrar</button>
-    </form>
-    {%if mensagens%}
-      <div>
-        {%for msg in mensagens%}
-          {{msg}}
-        {%endfor%}
+<main class="login-page">
+
+  <section class="login-hero">
+    <div class="blur-ball"></div>
+
+    <div class="hero-content">
+      <div class="brand">
+        <div class="logo">GR7</div>
+        <span>GR7 Gestão</span>
       </div>
-    {%endif%}
-  </div>
+
+      <h1>Gestão Inteligente para Oficinas</h1>
+
+      <p>
+        Controle faturamento, produtividade, indicadores e resultados em um único lugar.
+      </p>
+
+      <div class="features">
+        <div class="feature-card">
+          <i class="fa-solid fa-chart-line"></i>
+          Controle de Faturamento
+        </div>
+
+        <div class="feature-card">
+          <i class="fa-solid fa-users-gear"></i>
+          Gestão de Mecânicos
+        </div>
+
+        <div class="feature-card">
+          <i class="fa-solid fa-file-lines"></i>
+          Relatórios Automáticos
+        </div>
+
+        <div class="feature-card">
+          <i class="fa-solid fa-gauge-high"></i>
+          Indicadores em Tempo Real
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <strong>R$ 2.4M</strong>
+          <span>Faturamento</span>
+        </div>
+
+        <div class="metric">
+          <strong>97%</strong>
+          <span>Produtividade</span>
+        </div>
+
+        <div class="metric">
+          <strong>1.250+</strong>
+          <span>Ordens</span>
+        </div>
+
+        <div class="metric">
+          <strong>99.9%</strong>
+          <span>Disponível</span>
+        </div>
+      </div>
+
+      <div class="dashboard-preview">
+        <div class="dash-header">
+          <div class="dash-title">Dashboard GR7</div>
+          <div class="dash-badge">Online agora</div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="dash-chart">
+            <strong>Faturamento mensal</strong>
+            <div class="bars">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <small>Meta atingida</small>
+            <strong>86%</strong>
+            <small>+12% acima do mês anterior</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="login-area">
+    <div class="login-card">
+
+      <div class="login-logo">GR7</div>
+
+      <h2>Bem-vindo ao GR7 Gestão</h2>
+      <p class="login-subtitle">Faça login para acessar o sistema.</p>
+
+      {% set mensagens = get_flashed_messages() %}
+
+      {% if mensagens %}
+        {% for msg in mensagens %}
+          <div class="alert {% if 'sucesso' in msg|lower %}success{% else %}error{% endif %}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form action="/autenticar" method="POST">
+
+        <label for="usuario">Usuário</label>
+        <div class="input-group">
+          <i class="fa-regular fa-user"></i>
+          <input 
+            type="text" 
+            name="usuario" 
+            id="usuario" 
+            placeholder="Digite seu usuário" 
+            required
+          >
+        </div>
+
+        <label for="senha">Senha</label>
+        <div class="input-group">
+          <i class="fa-solid fa-lock"></i>
+          <input 
+            type="password" 
+            name="senha" 
+            id="senha" 
+            placeholder="Digite sua senha" 
+            required
+          >
+
+          <button type="button" class="toggle-password" onclick="toggleSenha()">
+            <i class="fa-regular fa-eye" id="iconeSenha"></i>
+          </button>
+        </div>
+
+        <label for="empresa">Empresa</label>
+        <div class="input-group">
+          <i class="fa-regular fa-building"></i>
+          <select name="empresa" id="empresa">
+            <option value="gr7">GR7</option>
+            <option value="portal">Portal</option>
+            <option value="gr7 morumbi">GR7 Morumbi</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-login">
+          Entrar
+        </button>
+
+      </form>
+
+      <footer class="login-footer">
+        <span>GR7 Gestão v2.0</span>
+        <span>© 2026 GR7 Gestão</span>
+      </footer>
+
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function toggleSenha() {
+    const senha = document.getElementById('senha');
+    const icone = document.getElementById('iconeSenha');
+
+    if (senha.type === 'password') {
+      senha.type = 'text';
+      icone.classList.remove('fa-eye');
+      icone.classList.add('fa-eye-slash');
+    } else {
+      senha.type = 'password';
+      icone.classList.remove('fa-eye-slash');
+      icone.classList.add('fa-eye');
+    }
+  }
+</script>
+
 </body>
 </html>

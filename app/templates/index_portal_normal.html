@@ -1,43 +1,188 @@
 {% extends 'base.html' %}
+
 {% block title %}
-<title>Inicio - {{ empresa }}</title>
-<link rel="stylesheet" href="{{url_for('static', filename= 'css/home.css')}}">
+<title>Dashboard Executivo - {{ empresa }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block main %}
-<main>
-  <h4>Faturamento</h4>
-    <div class="box-container">
-      <div class="box box1">
-          <div class="text">
-              <h2 class="topic-heading">{{faturamento}}</h2>
-              <h2 class="topic">Faturamento Mês</h2>
-          </div>
+<main class="dashboard">
+
+  <section class="dashboard-header">
+    <div>
+      <h1>Dashboard Executivo</h1>
+      <p>GR7 - Centro Automotivo | {{ empresa|upper }}</p>
+    </div>
+  </section>
+
+  <!-- Indicadores principais -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <span>Faturamento Bruto</span>
+      <strong>{{ faturamento }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Faturamento Líquido</span>
+      <strong>{{ faturamento_meta }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Ticket Médio</span>
+      <strong>{{ ticket }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Passagens</span>
+      <strong>{{ passagens }}</strong>
+    </div>
+  </section>
+
+  <!-- Metas -->
+<section class="goals-grid">
+
+  <div class="goal-card">
+    <div class="goal-header">
+      <h3>Meta 1</h3>
+      <span>R$ 160.000,00</span>
+    </div>
+
+    <div class="goal-values">
+      <div>
+        <p>Valor atingido</p>
+        <strong>{{ valor_atingido_meta_1|default(faturamento_meta) }}</strong>
       </div>
 
-      <div class="box box2">
-          <div class="text">
-              <h2 class="topic-heading">{{faturamento_meta}}</h2>
-              <h2 class="topic">Meta</h2>
-          </div>
+      <div>
+        <p>Valor restante</p>
+        <strong>{{ valor_restante_meta_1|default(primeira_meta) }}</strong>
       </div>
-  
-    <div class="box box7">
-        <div class="text">
-            <h2 class="topic-heading">{{ticket}}</h2>
-            <h2 class="topic">Ticket Medio</h2>
-        </div>
     </div>
 
-    <div class="box box8">
-        <div class="text">
-            <h2 class="topic-heading">{{passagens}}</h2>
-            <h2 class="topic">Passagens</h2>
-        </div>
+    <div class="progress-area">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ percentual_meta_1|default(0) }}%;"></div>
+      </div>
+      <small>{{ percentual_meta_1|default(0) }}% atingido</small>
     </div>
+  </div>
+
+</section>
+
+
+  <!-- Gráfico + resumo financeiro -->
+  <section class="main-grid">
+
+    <div class="chart-card">
+      <div class="card-title">
+        <h3>Faturamento Diário do Mês</h3>
+      </div>
+
+      <canvas id="graficoFaturamento"></canvas>
     </div>
 
+    <div class="finance-card">
+      <h3>Resumo Financeiro</h3>
+
+      <div class="finance-line">
+        <span>Venda de Serviços</span>
+        <strong>{{ faturamento_servicos }}</strong>
+      </div>
+
+      <div class="finance-line">
+        <span>Venda de Peças</span>
+        <strong>{{ faturamento_pecas }}</strong>
+      </div>
+
+      <div class="finance-line">
+        <span>Compra de Peças</span>
+        <strong>{{ gastos_pecas }}</strong>
+      </div>
+
+      <div class="finance-line highlight">
+        <span>Lucro Final</span>
+        <strong>{{ porcentagem_pecas }}</strong>
+      </div>
     </div>
+
+  </section>
+
+  <!-- Rankings -->
+  <section class="ranking-grid">
+
+    <div class="ranking-card">
+      <h3>Top Mecânicos</h3>
+
+      {% for mecanico in top_mecanicos %}
+      <div class="ranking-item">
+        <span>{{ loop.index }}. {{ mecanico.nome }}</span>
+        <strong>{{ mecanico.valor }}</strong>
+      </div>
+      {% else %}
+      <p class="empty">Sem dados disponíveis</p>
+      {% endfor %}
+    </div>
+
+    <div class="ranking-card">
+      <h3>Top Companhias</h3>
+
+      {% for companhia in top_companhias %}
+      <div class="ranking-item">
+        <span>{{ loop.index }}. {{ companhia.nome }}</span>
+        <strong>{{ companhia.valor }}</strong>
+      </div>
+      {% else %}
+      <p class="empty">Sem dados disponíveis</p>
+      {% endfor %}
+    </div>
+
+    <div class="ranking-card">
+      <h3>Top Serviços</h3>
+
+      {% for servico in top_servicos %}
+      <div class="ranking-item">
+        <span>{{ loop.index }}. {{ servico.nome }}</span>
+        <strong>{{ servico.valor }}</strong>
+      </div>
+      {% else %}
+      <p class="empty">Sem dados disponíveis</p>
+      {% endfor %}
+    </div>
+
+  </section>
+
 </main>
+
+<script>
+const ctx = document.getElementById('graficoFaturamento');
+
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: {{ dias_faturamento|default([])|tojson }},
+    datasets: [{
+      label: 'Faturamento',
+      data: {{ valores_faturamento|default([])|tojson }},
+      tension: 0.35,
+      fill: true,
+      borderWidth: 3
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
 
 {% endblock %}

@@ -17,7 +17,7 @@ class Utills:
         try:
             # Obtém os dados de faturamento de peças para o mês e ano fornecidos
             dados = self.db.faturamento_pecas(mes, ano)
-            print(dados)
+            
             # Extrai os valores dos dados
             valores = [valor[0] for valor in dados]
 
@@ -256,7 +256,6 @@ class Utills:
 
             calculo = faturamento - gasto
             dados = self.formatar_moeda(calculo)
-            print(dados)
             return dados
 
         except Exception as e:
@@ -574,7 +573,6 @@ class UttilsGr7Morumbi:
         try:
             # Obtém os dados de faturamento de peças para o mês e ano fornecidos
             dados = self.db.faturamento_pecas(mes, ano)
-            print(dados)
             # Extrai os valores dos dados
             valores = [valor[0] for valor in dados]
 
@@ -595,7 +593,6 @@ class UttilsGr7Morumbi:
         try:
             # Obtém os dados de faturamento de serviços para o mês e ano fornecidos
             dados = self.db.faturamento_servicos(mes, ano)
-            print(dados)
             # Extrai os valores dos dados
             valores = [valor[0] for valor in dados]
 

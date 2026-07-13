@@ -1,275 +1,720 @@
 {% extends 'base.html' %}
 {% block title %}
 <title>Consultas - {{ empresa }}</title>
+
 <style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --bg: #f4f6fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --success: #16a34a;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
     body {
+        background: var(--bg);
+        color: var(--text);
         font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-        color: #333;
-        line-height: 1.6;
     }
 
-    .container {
-        max-width: 1200px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 5px;
+    .page {
+        max-width: 1400px;
+        margin: 24px auto;
+        padding: 0 20px;
     }
 
-    h1,
-    h2 {
-        color: #555;
-    }
-
-    form {
+    .header {
         display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 28px;
+        color: #111827;
+    }
+
+    .header p {
+        margin: 4px 0 0;
+        color: var(--muted);
+    }
+
+    .filters-card,
+    .table-card,
+    .summary-card {
+        background: var(--card);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+    }
+
+    .filters-card {
+        padding: 20px;
         margin-bottom: 20px;
     }
 
-    label {
-        margin-right: 5px;
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 14px;
     }
 
-    input[type="date"],
-    select,
-    button {
-        margin-right: 10px;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .field label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .field input,
+    .field select {
+        height: 42px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0 12px;
+        background: #fff;
+        outline: none;
         font-size: 14px;
     }
 
-    button {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        padding: 10px 20px;
-        border-radius: 3px;
+    .field input:focus,
+    .field select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
-    button:hover {
-        background-color: #0056b3;
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 16px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        border: none;
+        border-radius: 10px;
+        height: 42px;
+        padding: 0 18px;
+        cursor: pointer;
+        font-weight: 700;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-light {
+        background: #eef2ff;
+        color: var(--primary);
+    }
+
+    .btn-light:hover {
+        background: #dbeafe;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        padding: 20px;
+    }
+
+    .summary-card span {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .summary-card h3 {
+        margin: 8px 0 0;
+        font-size: 24px;
+        color: #111827;
+    }
+
+    .table-card {
+        padding: 20px;
+    }
+
+    .table-toolbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .table-toolbar h2 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .search-box {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .search-box input {
+        height: 42px;
+        width: 280px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0 12px;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 20px;
-    }
-
-    th,
-    td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: left;
+        min-width: 850px;
     }
 
     th {
-        background-color: #f4f4f4;
+        background: #f9fafb;
+        color: #374151;
+        font-size: 13px;
+        text-align: left;
+        padding: 14px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
     }
 
-    tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
+    td {
+        padding: 14px;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        color: #374151;
     }
 
-    .flex-container {
+    tbody tr {
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .money {
+        font-weight: 700;
+        color: var(--success);
+    }
+
+    .pagination {
         display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .flex-item {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        justify-content: space-between;
         align-items: center;
+        margin-top: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
-    .pagination-container {
+    .pagination-info {
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .pagination-buttons {
         display: flex;
-        flex-direction: row;
+        gap: 8px;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        z-index: 999;
         justify-content: center;
         align-items: center;
-        gap: 10px;
-        margin-top: 20px;
-        flex-wrap: wrap;
+        padding: 20px;
     }
 
-    .pagination-container a,
-    .pagination-container span {
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        text-decoration: none;
-        color: #333;
-        transition: background-color 0.3s ease;
+    .modal {
+        background: white;
+        border-radius: 18px;
+        max-width: 850px;
+        width: 100%;
+        box-shadow: var(--shadow);
+        overflow: hidden;
     }
 
-    .pagination-container a:hover {
-        background-color: #f0f0f0;
-    }
-
-    .pagination-container .active {
-        background-color: #007bff;
-        color: #fff;
-        border-color: #007bff;
-    }
-
-    .pagination-container .disabled {
-        pointer-events: none;
-        color: #ccc;
-    }
-    .infos{
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
         display: flex;
-        gap: 5em;
+        justify-content: space-between;
+        align-items: center;
     }
-    .infos_itens{
-       
+
+    .modal-header h3 {
+        margin: 0;
+    }
+
+    .close-modal {
+        border: none;
+        background: #f3f4f6;
+        border-radius: 8px;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        font-size: 20px;
+    }
+
+    .modal-body {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+    .detail-item {
+        background: #f9fafb;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+    }
+
+    .detail-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+
+    .detail-item strong {
+        color: #111827;
+        font-size: 15px;
+    }
+
+    .detail-wide {
+        grid-column: 1 / -1;
+    }
+
+    @media (max-width: 1100px) {
+        .filters-grid,
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 700px) {
+        .filters-grid,
+        .summary-grid,
+        .modal-body {
+            grid-template-columns: 1fr;
+        }
+
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
 
 {% block main %}
-<main>
-    <div class="container">
-        <h1>Consultas de Faturamentos</h1>
+<main class="page">
 
-        <form method="POST" action="/faturamentos/consultar">
-            <div class="flex-row">
-                <label for="data_inicio">Data Início:</label>
+    
+    <form method="POST" action="/faturamentos/consultar" class="filters-card">
+        <div class="filters-grid">
+
+            <div class="field">
+                <label for="data_inicio">Data Inicial</label>
                 <input type="date" id="data_inicio" name="data_inicio">
+            </div>
 
-                <label for="data_fim">Data Fim:</label>
+            <div class="field">
+                <label for="data_fim">Data Final</label>
                 <input type="date" id="data_fim" name="data_fim">
+            </div>
 
-                <label for="companhia">Companhia:</label>
+            <div class="field">
+                <label for="companhia">Companhia</label>
                 <select id="companhia" name="companhia">
-                    <option value="">Selecione a companhia..</option>
+                    <option value="">Todas</option>
                     {% for cia in cias %}
                     <option value="{{ cia }}">{{ cia }}</option>
                     {% endfor %}
                 </select>
+            </div>
 
-                <label for="num_os">Número da OS:</label>
-                <input type="text" id="numero_os" name="num_os">
-
-                <label for="placa">Placa:</label>
-                <input type="text" id="placa" name="placa">
-
-                <label for="mecanico_servico">Mecânico:</label>
+            <div class="field">
+                <label for="mecanico_servico">Mecânico</label>
                 <select id="mecanico_servico" name="mecanico_servico">
-                    <option value="">Selecione o mecânico</option>
+                    <option value="">Todos</option>
                     {% for mecanico in mecanicos %}
                     <option value="{{ mecanico }}">{{ mecanico }}</option>
                     {% endfor %}
                 </select>
+            </div>
 
-                <button type="submit">Filtrar</button>
+            <div class="field">
+                <label for="placa">Placa</label>
+                <input type="text" id="placa" name="placa" placeholder="Ex: ABC1234">
             </div>
-        </form>
-        <div class="infos">
-            <div class="infos_item">
-                <h4>Total</h4>
-                <h4>{{valor}}</h4>
+
+            <div class="field">
+                <label for="numero_os">Número OS</label>
+                <input type="text" id="numero_os" name="num_os" placeholder="Número da OS">
             </div>
-            <div class="infos_item">
-                <h4>Total meta</h4>
-                <h4>{{valor_meta}}</h4>
+
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <button type="button" class="btn btn-light" onclick="limparBusca()">Limpar busca</button>
+        </div>
+    </form>
+
+    <section class="summary-grid">
+        <div class="summary-card">
+            <span>Total Faturado</span>
+            <h3>{{ valor }}</h3>
+        </div>
+
+        <div class="summary-card">
+            <span>Total Meta</span>
+            <h3>{{ valor_meta }}</h3>
+        </div>
+
+        <div class="summary-card">
+            <span>Ticket Médio</span>
+            <h3 id="ticketMedio">R$ 0,00</h3>
+        </div>
+
+        <div class="summary-card">
+            <span>Quantidade de OS</span>
+            <h3 id="quantidadeOs">0</h3>
+        </div>
+    </section>
+
+    <section class="table-card">
+        <div class="table-toolbar">
+            <h2>Faturamentos Registrados</h2>
+
+            <div class="search-box">
+                <input type="text" id="instantSearch" placeholder="Buscar por placa, modelo, companhia ou mecânico...">
+                <button type="button" class="btn btn-light" onclick="exportarExcel()">Exportar Excel</button>
             </div>
         </div>
-        <div class="flex-container">
-            <div class="flex-item">
-                <h2>Faturamentos Registrados</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Placa</th>
-                            <th>Modelo Veículo</th>
-                            <th>Data Orçamento</th>
-                            <th>Data Faturamento</th>
-                            <th>Dias de Serviço</th>
-                            <th>Número OS</th>
-                            <th>Companhia</th>
-                            <th>Valor Peças</th>
-                            <th>Valor Serviços</th>
-                            <th>Total OS</th>
-                            <th>Revitalização</th>
-                            <th>Aditivo</th>
-                            <th>Qtd Litros</th>
-                            <th>Fluido Sangria</th>
-                            <th>Palheta</th>
-                            <th>Limpeza Freios</th>
-                            <th>Detergente Parabrisa</th>
-                            <th>Filtro</th>
-                            <th>Pneu</th>
-                            <th>Bateria</th>
-                            <th>Modelo Bateria</th>
-                            <th>Lts Óleo</th>
-                            <th>Valor Lt Óleo</th>
-                            <th>Marca e Tipo Óleo</th>
-                            <th>Mecânico</th>
-                            <th>Filtro Mecânico</th>
-                            <th>Valor P Meta</th>
-                            <th>Valor Dinheiro</th>
-                            <th>Valor Serviço Freios</th>
-                            <th>Valor Serviço Suspensão</th>
-                            <th>Valor Serviço Injeção/Ignição</th>
-                            <th>Valor Serviço Cabeçote/Motor/Arr</th>
-                            <th>Valor Outros Serviços</th>
-                            <th>Valor Serviços Óleos</th>
-                            <th>Valor Serviço Transmissão</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for faturamento in faturamentos %}
-                        <tr>
-                            <td>{{ faturamento['placa'] }}</td>
-                            <td>{{ faturamento['modelo_veiculo'] }}</td>
-                            <td>{{ faturamento['data_orcamento'] }}</td>
-                            <td>{{ faturamento['data_faturamento'] }}</td>
-                            <td>{{ faturamento['dias_servico'] }}</td>
-                            <td>{{ faturamento['numero_os'] }}</td>
-                            <td>{{ faturamento['companhia'] }}</td>
-                            <td>{{ faturamento['valor_pecas'] }}</td>
-                            <td>{{ faturamento['valor_servicos'] }}</td>
-                            <td>{{ faturamento['total_os'] }}</td>
-                            <td>{{ faturamento['valor_revitalizacao'] }}</td>
-                            <td>{{ faturamento['valor_aditivo'] }}</td>
-                            <td>{{ faturamento['quantidade_litros'] }}</td>
-                            <td>{{ faturamento['valor_fluido_sangria'] }}</td>
-                            <td>{{ faturamento['valor_palheta'] }}</td>
-                            <td>{{ faturamento['valor_limpeza_freios'] }}</td>
-                            <td>{{ faturamento['valor_pastilha_parabrisa'] }}</td>
-                            <td>{{ faturamento['valor_filtro'] }}</td>
-                            <td>{{ faturamento['valor_pneu'] }}</td>
-                            <td>{{ faturamento['valor_bateria'] }}</td>
-                            <td>{{ faturamento['modelo_bateria'] }}</td>
-                            <td>{{ faturamento['lts_oleo_motor'] }}</td>
-                            <td>{{ faturamento['valor_lt_oleo'] }}</td>
-                            <td>{{ faturamento['marca_e_tipo_oleo'] }}</td>
-                            <td>{{ faturamento['mecanico_servico'] }}</td>
-                            <td>{{ faturamento['servico_filtro'] }}</td>
-                            <td>{{ faturamento['valor_p_meta'] }}</td>
-                            <td>{{ faturamento['valor_em_dinheiro'] }}</td>
-                            <td>{{ faturamento['valor_servico_freios'] }}</td>
-                            <td>{{ faturamento['valor_servico_suspensao'] }}</td>
-                            <td>{{ faturamento['valor_servico_injecao_ignicao'] }}</td>
-                            <td>{{ faturamento['valor_servico_cabecote_motor_arr'] }}</td>
-                            <td>{{ faturamento['valor_outros_servicos'] }}</td>
-                            <td>{{ faturamento['valor_servicos_oleos'] }}</td>
-                            <td>{{ faturamento['valor_servico_transmissao'] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+        <div class="table-responsive">
+            <table id="faturamentosTable">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabela(0)">Placa</th>
+                        <th onclick="ordenarTabela(1)">Modelo</th>
+                        <th onclick="ordenarTabela(2)">Companhia</th>
+                        <th onclick="ordenarTabela(3)">Mecânico</th>
+                        <th onclick="ordenarTabela(4)">Valor Total</th>
+                        <th onclick="ordenarTabela(5)">Valor Líquido</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for faturamento in faturamentos %}
+                    <tr
+                        data-total="{{ faturamento['total_os'] }}"
+                        data-revitalizacao="{{ faturamento['valor_revitalizacao'] }}"
+                        data-aditivo="{{ faturamento['valor_aditivo'] }}"
+                        data-fluido="{{ faturamento['valor_fluido_sangria'] }}"
+                        data-palheta="{{ faturamento['valor_palheta'] }}"
+                        data-filtro="{{ faturamento['valor_filtro'] }}"
+                        data-pneu="{{ faturamento['valor_pneu'] }}"
+                        data-bateria="{{ faturamento['valor_bateria'] }}"
+                        data-oleo-litros="{{ faturamento['lts_oleo_motor'] }}"
+                        data-oleo-valor="{{ faturamento['valor_lt_oleo'] }}"
+                        data-oleo-marca="{{ faturamento['marca_e_tipo_oleo'] }}"
+                        data-os="{{ faturamento['numero_os'] }}"
+                        data-data-orcamento="{{ faturamento['data_orcamento'] }}"
+                        data-data-faturamento="{{ faturamento['data_faturamento'] }}"
+                        data-dias="{{ faturamento['dias_servico'] }}"
+                        data-pecas="{{ faturamento['valor_pecas'] }}"
+                        data-servicos="{{ faturamento['valor_servicos'] }}"
+                        data-dinheiro="{{ faturamento['valor_em_dinheiro'] }}"
+                        onclick="abrirModal(this)"
+                    >
+                        <td>{{ faturamento['placa'] }}</td>
+                        <td>{{ faturamento['modelo_veiculo'] }}</td>
+                        <td>{{ faturamento['companhia'] }}</td>
+                        <td>{{ faturamento['mecanico_servico'] }}</td>
+                        <td class="money">{{ faturamento['total_os'] }}</td>
+                        <td class="money">{{ faturamento['valor_p_meta'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <div class="pagination-info" id="paginationInfo"></div>
+
+            <div class="pagination-buttons">
+                <button type="button" class="btn btn-light" onclick="paginaAnterior()">Anterior</button>
+                <button type="button" class="btn btn-light" onclick="proximaPagina()">Próxima</button>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div class="modal-overlay" id="detailsModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle">Detalhes do Faturamento</h3>
+            <button class="close-modal" onclick="fecharModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="detail-item">
+                <span>Revitalização</span>
+                <strong id="modalRevitalizacao"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Aditivo</span>
+                <strong id="modalAditivo"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Fluido</span>
+                <strong id="modalFluido"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Palheta</span>
+                <strong id="modalPalheta"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Filtro</span>
+                <strong id="modalFiltro"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Pneu</span>
+                <strong id="modalPneu"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Bateria</span>
+                <strong id="modalBateria"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Óleo</span>
+                <strong id="modalOleo"></strong>
+            </div>
+
+            <div class="detail-item detail-wide">
+                <span>Observações</span>
+                <strong id="modalObservacoes"></strong>
             </div>
         </div>
     </div>
-</main>
+</div>
+
+<script>
+    const linhasOriginais = Array.from(document.querySelectorAll("#faturamentosTable tbody tr"));
+    let linhasFiltradas = [...linhasOriginais];
+    let paginaAtual = 1;
+    const itensPorPagina = 10;
+    let ordemAsc = true;
+
+    function converterMoeda(valor) {
+        if (!valor) return 0;
+
+        return parseFloat(
+            valor.toString()
+                .replace("R$", "")
+                .replace(/\./g, "")
+                .replace(",", ".")
+                .trim()
+        ) || 0;
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+    }
+
+    function atualizarResumo() {
+        const quantidade = linhasFiltradas.length;
+        const total = linhasFiltradas.reduce((soma, linha) => {
+            return soma + converterMoeda(linha.dataset.total);
+        }, 0);
+
+        const ticket = quantidade > 0 ? total / quantidade : 0;
+
+        document.getElementById("quantidadeOs").innerText = quantidade;
+        document.getElementById("ticketMedio").innerText = formatarMoeda(ticket);
+    }
+
+    function renderizarTabela() {
+        const tbody = document.querySelector("#faturamentosTable tbody");
+        tbody.innerHTML = "";
+
+        const inicio = (paginaAtual - 1) * itensPorPagina;
+        const fim = inicio + itensPorPagina;
+        const linhasPagina = linhasFiltradas.slice(inicio, fim);
+
+        linhasPagina.forEach(linha => tbody.appendChild(linha));
+
+        const totalPaginas = Math.max(Math.ceil(linhasFiltradas.length / itensPorPagina), 1);
+
+        document.getElementById("paginationInfo").innerText =
+            `Página ${paginaAtual} de ${totalPaginas} — ${linhasFiltradas.length} registro(s)`;
+
+        atualizarResumo();
+    }
+
+    function aplicarBusca() {
+        const termo = document.getElementById("instantSearch").value.toLowerCase();
+
+        linhasFiltradas = linhasOriginais.filter(linha =>
+            linha.innerText.toLowerCase().includes(termo)
+        );
+
+        paginaAtual = 1;
+        renderizarTabela();
+    }
+
+    function limparBusca() {
+        document.getElementById("instantSearch").value = "";
+        linhasFiltradas = [...linhasOriginais];
+        paginaAtual = 1;
+        renderizarTabela();
+    }
+
+    function proximaPagina() {
+        const totalPaginas = Math.ceil(linhasFiltradas.length / itensPorPagina);
+
+        if (paginaAtual < totalPaginas) {
+            paginaAtual++;
+            renderizarTabela();
+        }
+    }
+
+    function paginaAnterior() {
+        if (paginaAtual > 1) {
+            paginaAtual--;
+            renderizarTabela();
+        }
+    }
+
+    function ordenarTabela(indice) {
+        linhasFiltradas.sort((a, b) => {
+            let valorA = a.children[indice].innerText.trim();
+            let valorB = b.children[indice].innerText.trim();
+
+            if (indice === 4 || indice === 5) {
+                valorA = converterMoeda(valorA);
+                valorB = converterMoeda(valorB);
+            }
+
+            if (valorA < valorB) return ordemAsc ? -1 : 1;
+            if (valorA > valorB) return ordemAsc ? 1 : -1;
+            return 0;
+        });
+
+        ordemAsc = !ordemAsc;
+        paginaAtual = 1;
+        renderizarTabela();
+    }
+
+    function abrirModal(linha) {
+        const placa = linha.children[0].innerText;
+        const modelo = linha.children[1].innerText;
+
+        document.getElementById("modalTitle").innerText = `${placa} — ${modelo}`;
+
+        document.getElementById("modalRevitalizacao").innerText = linha.dataset.revitalizacao || "-";
+        document.getElementById("modalAditivo").innerText = linha.dataset.aditivo || "-";
+        document.getElementById("modalFluido").innerText = linha.dataset.fluido || "-";
+        document.getElementById("modalPalheta").innerText = linha.dataset.palheta || "-";
+        document.getElementById("modalFiltro").innerText = linha.dataset.filtro || "-";
+        document.getElementById("modalPneu").innerText = linha.dataset.pneu || "-";
+        document.getElementById("modalBateria").innerText = linha.dataset.bateria || "-";
+
+        document.getElementById("modalOleo").innerText =
+            `${linha.dataset.oleoLitros || "-"} L | ${linha.dataset.oleoValor || "-"} | ${linha.dataset.oleoMarca || "-"}`;
+
+        document.getElementById("modalObservacoes").innerText =
+            `OS: ${linha.dataset.os || "-"} | Data orçamento: ${linha.dataset.dataOrcamento || "-"} | Data faturamento: ${linha.dataset.dataFaturamento || "-"} | Dias: ${linha.dataset.dias || "-"} | Peças: ${linha.dataset.pecas || "-"} | Serviços: ${linha.dataset.servicos || "-"} | Dinheiro: ${linha.dataset.dinheiro || "-"}`;
+
+        document.getElementById("detailsModal").style.display = "flex";
+    }
+
+    function fecharModal() {
+        document.getElementById("detailsModal").style.display = "none";
+    }
+
+    function exportarExcel() {
+        let csv = "Placa;Modelo;Companhia;Mecânico;Valor Total;Valor Líquido\n";
+
+        linhasFiltradas.forEach(linha => {
+            const dados = Array.from(linha.children)
+                .map(td => td.innerText.replace(/;/g, ","));
+
+            csv += dados.join(";") + "\n";
+        });
+
+        const blob = new Blob(["\ufeff" + csv], {
+            type: "application/vnd.ms-excel;charset=utf-8;"
+        });
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "consulta_faturamentos.xls";
+        link.click();
+    }
+
+    document.getElementById("instantSearch").addEventListener("input", aplicarBusca);
+
+    document.getElementById("detailsModal").addEventListener("click", function(e) {
+        if (e.target === this) fecharModal();
+    });
+
+    renderizarTabela();
+</script>
 {% endblock %}
