@@ -171,7 +171,7 @@
                         <input type="text" id="revitalizacao" name="revitalizacao" class="styled-input money-input" required>
                     </div>
 
-                    {% if empresa == 'gr7' or empresa == 'gr7 morumbi' %}
+                    {% if empresa == 1 or empresa == 3 %}
                     <div class="input-group service-card money-field">
                         <label for="aditivo">Aditivo</label>
                         <input type="text" id="aditivo" name="aditivo" class="styled-input money-input" onchange="showAditivoQuantidadeField()" required>
@@ -180,7 +180,7 @@
                         <label for="quantidade_aditivo">Quantidade de Aditivo</label>
                         <input type="text" id="quantidade_aditivo" name="quantidade_aditivo" class="styled-input" required>
                     </div>
-                    {% elif empresa == 'portal' %}
+                    {% elif empresa == 2 %}
                     <div class="input-group service-card money-field">
                         <label for="ar_condicionado">Ar Condicionado</label>
                         <input type="text" id="ar_condicionado" name="ar_condicionado" class="styled-input money-input" onchange="calculateValorMeta()" required>
@@ -192,20 +192,20 @@
                     {% endif %}
 
                     <div class="input-group service-card money-field">
-                        {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                        {%if empresa == 1 or empresa == 3%}
                         <label for="fluido_sangria">Fluido/Sangria</label>
                         <input type="text" id="fluido_sangria" name="fluido_sangria" class="styled-input money-input" required>
-                        {%elif empresa == 'portal'%}
+                        {%elif empresa == 2 %}
                         <label for="lavagem">Lavagem</label>
                         <input type="text" id="lavagem" name="fluido_sangria" class="styled-input money-input" required>
                         {%endif%}
                     </div>
 
                     <div class="input-group service-card money-field">
-                        {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                        {%if empresa == 1 or empresa == 3%}
                         <label for="palheta">Palheta</label>
                         <input type="text" id="palheta" name="palheta" class="styled-input money-input" required>
-                        {%elif empresa == 'portal' %}
+                        {%elif empresa == 2 %}
                         <label for="alternador">Alternador/Motor de arranque</label>
                         <input type="text" id="alternador" name="palheta" class="styled-input money-input" onchange="calculateValorMeta()" required>
                         {%endif%}
@@ -220,10 +220,10 @@
                         <input type="text" id="filtro" name="filtro" class="styled-input money-input" required>
                     </div>
                     <div class="input-group service-card money-field">
-                        {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                        {%if empresa == 1 or empresa == 3%}
                         <label for="limpeza_freios">Limpeza dos Freios</label>
                         <input type="text" id="limpeza_freios" name="limpeza_freios" class="styled-input money-input" required>
-                        {%elif empresa == 'portal'%}
+                        {%elif empresa == 2 %}
                         <label for="funilaria">Funilaria</label>
                         <input type="text" id="funilaria" name="funilaria" class="styled-input money-input" onchange="calculateValorMeta()" required>
                         {%endif%}
@@ -232,7 +232,7 @@
                         <label for="pneus">Pneus</label>
                         <input type="text" id="pneus" name="pneus" class="styled-input money-input" onchange="calculateValorMeta()" required>
                     </div>
-                    {%if empresa == 'gr7' or empresa == 'gr7 morumbi'%}
+                    {%if empresa == 1 or empresa == 3%}
                     <div class="input-group service-card money-field">
                         <label for="terceiros">Terceiros</label>
                         <input type="text" id="terceiros" name="terceiros" class="styled-input money-input" onchange="calculateValorMeta()" required>

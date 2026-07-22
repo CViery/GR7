@@ -11,17 +11,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.drawing.image import Image
 
-def get_db_empresa():
-    empresa = session.get('empresa')
 
-    if empresa == 'gr7':
-        return faturamento.Faturamento()
-    elif empresa == 'portal':
-        return faturamento.FaturamentoPortal()
-    elif empresa == 'gr7 morumbi':
-        return faturamento.FaturamentoMorumbi()
-
-    return None
 
 PERMISSAO_TOTAL_ADMIN = 0
 PERMISSAO_GR7_USER = 1
@@ -37,73 +27,70 @@ class Routes:
 
     @app.route('/')
     def show_login():
-        return render_template('login.html')
+        db = login.Login()
+        empresas = db.empresas()
+
+        return render_template(
+            'login.html',
+            empresas=empresas
+        )
+
 
     @app.route('/autenticar', methods=['POST'])
     def autenticar():
         try:
-            usuario = request.form.get('usuario')
-            senha = request.form.get('senha')
-            empresa = request.form.get('empresa')
+            usuario = request.form.get('usuario', '').strip()
+            senha = request.form.get('senha', '')
+            empresa_form = request.form.get('empresa')
 
-            # Verificar se os campos obrigatórios estão presentes
-            if not usuario or not senha or not empresa:
+            if not usuario or not senha or not empresa_form:
                 flash('Preencha todos os campos!')
                 return redirect('/')
 
-            db = login.Login()
-            auten = db.login(usuario.upper(), senha)
+            try:
+                empresa = int(empresa_form)
 
-            if auten == 'ADMIN':
-                session['usuario'] = usuario
-                session['empresa'] = empresa
-                if empresa == 'gr7':
-                    if session['permission_empresa'] in [PERMISSAO_TOTAL_ADMIN, PERMISSAO_GR7_USER]:
-                        return redirect('/home')
-                    else:
-                        flash('Desculpe, seu acesso não permite acessar esta área.')
-                        return redirect('/')
-                elif empresa == 'portal':
-                    if session['permission_empresa'] in [PERMISSAO_PORTAL_ADMIN, PERMISSAO_TOTAL_ADMIN]:
-                        return redirect('/home')
-                    else:
-                        flash('Desculpe, empresa inválida ou sem permissão.')
-                        return redirect('/')
-                elif empresa == 'gr7 morumbi':
-                    if session['permission_empresa'] in [PERMISSAO_GR7_MORUMBI_ADMIN, PERMISSAO_TOTAL_ADMIN]:
-                        return redirect('/home')
-                    else:
-                        flash('Desculpe, empresa inválida ou sem permissão.')
-                        return redirect('/')
-            elif auten == 'NORMAL':
-                session['usuario'] = usuario
-                session['empresa'] = empresa
-                if empresa == 'gr7':
-                    if session['permission_empresa'] in [PERMISSAO_GR7_ADMIN, PERMISSAO_GR7_USER]:
-                        return redirect('/home')
-                    else:
-                        flash('Desculpe, empresa inválida ou sem permissão.')
-                        return redirect('/')
-                elif empresa == 'portal':
-                    if session['permission_empresa'] == PERMISSAO_PORTAL_ADMIN:
-                        return redirect('/home')
-                    else:
-                        flash('Desculpe, empresa inválida ou sem permissão.')
-                        return redirect('/')
-                elif empresa == 'gr7 morumbi':
-                    if session['permission_empresa'] == PERMISSAO_GR7_MORUMBI_ADMIN:
-                        return redirect('/home')
-                    else:
-                        flash('Desculpe, empresa inválida ou sem permissão.')
-                        return redirect('/')
-                return 'Usuário Normal'
-                
-            else:
-                flash('Usuário ou senha incorretos.')
+            except (TypeError, ValueError):
+                flash('Empresa inválida.')
                 return redirect('/')
 
-        except Exception as e:
-            print(f"Erro durante autenticação: {e}")
+            login_service = login.Login()
+
+            resultado = login_service.login(
+                usuario.upper(),
+                senha
+            )
+
+            if not resultado['autenticado']:
+                flash(resultado['mensagem'])
+                return redirect('/')
+
+            guia_usuario = resultado['guia']
+
+            # Guia 0 possui acesso a todas as empresas.
+            tem_acesso = (
+                guia_usuario == 0
+                or guia_usuario == empresa
+            )
+
+            if not tem_acesso:
+                session.clear()
+
+                flash(
+                    'Desculpe, seu acesso não permite '
+                    'acessar esta empresa.'
+                )
+                return redirect('/')
+
+            session['empresa'] = empresa
+
+            return redirect('/home')
+
+        except Exception as erro:
+            print(f'Erro durante autenticação: {erro}')
+
+            session.clear()
+
             flash('Ocorreu um erro. Tente novamente.')
             return redirect('/')
 
@@ -130,14 +117,14 @@ class Routes:
             empresa = session['empresa']
             permission = session.get('permission', None)
 
-            if empresa == 'gr7':
+            if empresa == 1:
                 if permission == 'ADMIN':
                     return rotas.render_gr7_admin(usuario)
                 else:
                     flash('Você não tem permissão para acessar esta página.')
                     return redirect('/')
 
-            elif empresa == 'portal':
+            if empresa == 2:
                 if permission == 'ADMIN':
                     return rotas.render_portal_admin(usuario)
                 elif permission == 'NORMAL':
@@ -146,7 +133,7 @@ class Routes:
                     flash('Permissão de acesso inválida.')
                     return redirect('/')
                 
-            elif empresa == 'gr7 morumbi':
+            if empresa == 3:
                 if permission == 'ADMIN':
                     return rotas.render_gr7_morumbi_admin(usuario)
                 elif permission == 'NORMAL':
@@ -163,482 +150,7 @@ class Routes:
             print(f"Erro no carregamento da página home: {e}")
             flash('Ocorreu um erro ao carregar a página. Tente novamente.')
             return redirect('/')
-
-
-    @app.route('/gastos/cadastros/notas')
-    def tela_cadastro_notas():
-        if 'usuario' in session:
-            if session['empresa'] == 'gr7':
-                db = utills.Utills()
-            elif session['empresa'] == 'portal':
-                db = utills.Utills_portal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = utills.UttilsGr7Morumbi()
-            
-            fornecedores = db.fornecedores()
-            despesas = db.despesas()
-            empresa = session['empresa']
-            emitido_para = db.emitido_para()
-            return render_template('cadastrar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas, emitido_para=emitido_para)
-        else:
-            flash('usario não está logado')
-            return redirect('/')
-
-    @app.route('/gastos/cadastros/notas-cadastrar-nota', methods=['POST'])
-    def cadastrar_nota():
-        if session['empresa'] == 'gr7':
-            enviar = cadastrar_notas.Notas()
-        elif session['empresa'] == 'portal':
-            enviar = cadastrar_notas.NotasPortal()
-        elif session['empresa'] == 'gr7 morumbi':
-            enviar = cadastrar_notas.Notas_morumbi()
-        USUARIO = session['usuario']
-        dados = {
-                'empresa': session['empresa'],
-                'emitido_para': request.form['emitido-para'],
-                'status': request.form['status'],
-                'boleto': request.form['boleto'],
-                'nota': request.form['nota'],
-                'duplicata': request.form['duplicata'],
-                'fornecedor': request.form['fornecedor'],
-                'emissao': request.form['emissao'],
-                'valor': request.form['valor'],
-                'despesa': request.form['despesa'],
-                'sub': request.form['subcategoria'],
-                'usuario': USUARIO,
-                'obs':request.form['obs']
-            }
-        enviar.cadastrar(dados, USUARIO)
-        if dados['boleto'] == 'Sim':
-            return render_template('cadastrar_boleto.html', empresa=session['empresa'], num_nota=dados['nota'], fornecedor=dados['fornecedor'])
-        else:
-            flash('Nota cadastrada')
-            return redirect('/gastos/cadastros/notas')
-
-    @app.route('/gastos/cadatro/duplicata')
-    def duplicata():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastrar_duplicatas.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/cadastrar_boletos', methods=['POST'])
-    def cadastrar_boletos():
-        try:
-            # Define o banco de dados de acordo com a empresa que o usuario está logado
-            if session['empresa'] == 'gr7':
-                db = cadastrar_notas.Boletos()
-            elif session['empresa'] == 'portal':
-                db = cadastrar_notas.BoletosPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = cadastrar_notas.BoletosMorumbi()
-            else:
-                return "Empresa não reconhecida", 400
-
-            # Coleta e processa os dados do formulário
-            numero_nota = request.form['num_nota']
-            fornecedor = request.form['fornecedor']
-            num_parcelas = int(request.form['numParcelas'])
-            parcelas = []
-
-            for i in range(1, num_parcelas + 1):
-                valor = request.form[f'valorParcela{i}']
-                data_vencimento = request.form[f'dataVencimento{i}']
-                parcelas.append({'valor': valor, 'data_vencimento': data_vencimento})
-
-            for parcela in parcelas:
-                boleto = {
-                    'num_nota': numero_nota,
-                    'notas': '',
-                    'fornecedor': fornecedor,
-                    'vencimento': parcela['data_vencimento'],
-                    'valor': parcela['valor']
-                }
-                db.cadastrar(boleto)
-
-            flash('Boletos cadastrados com sucesso!')
-            return redirect('/gastos/cadastros/notas')
         
-        except Exception as e:
-            print(f'Erro: {e}')
-            return "Erro no processamento dos dados", 400
-        
-    @app.route('/api/nota/<numero_nota>', methods=['GET'])
-    def get_nota(numero_nota):
-        if session['empresa'] == 'gr7':
-            db = dados_notas.DadosGastos()
-        elif session['empresa'] == 'portal':
-            db = dados_notas.DadosGastosPortal()
-        elif session['empresa'] == 'gr7 morumbi':
-            db = dados_notas.DadosGastosMorumbi()
-            
-        nota = db.nota_por_numero(numero_nota)
-        if nota:
-            return jsonify(nota)
-        else:
-            return jsonify({'error': 'Nota não encontrada'}), 404
-        
-    @app.route('/cadastrar_duplicata', methods=['POST'])
-    def cadastrar_duplicata():
-        if session['empresa'] == 'gr7':
-            db = cadastrar_duplicata.Boletos()
-        elif session['empresa'] == 'portal':
-            db = cadastrar_duplicata.BoletosPortal()
-        elif session['empresa'] == 'gr7 morumbi':
-            db = cadastrar_duplicata.Boletos_morumbi()
-
-        numero_duplicata = request.form['numeroDuplicata']
-        notas_cadastradas = []
-        parcelas_cadastradas = []
-
-        numero_notas = request.form.getlist('numeroNota[]')
-        fornecedor_notas = request.form.getlist('fornecedorNota[]')
-        data_emissao_notas = request.form.getlist('dataEmissaoNota[]')
-        valor_notas = request.form.getlist('valorNota[]')
-
-        for i in range(len(numero_notas)):
-            nota = {
-                'numero': numero_notas[i],
-                'fornecedor': fornecedor_notas[i],
-                'data_emissao': data_emissao_notas[i],
-                'valor': valor_notas[i]
-            }
-            notas_cadastradas.append(nota)
-
-        quantidade_parcelas = int(request.form['quantidadeParcelas'])
-
-        for i in range(1, quantidade_parcelas + 1):
-            parcela = {
-                'valor': request.form[f'valorParcela{i}'],
-                'vencimento': request.form[f'vencimentoParcela{i}']
-            }
-            parcelas_cadastradas.append(parcela)
-
-        duplicata = {
-            'numero_duplicata': numero_duplicata,
-            'notas': notas_cadastradas,
-            'parcelas': parcelas_cadastradas
-        }
-            
-        db.cadastrar_duplicatas(duplicata)
-
-            # Aqui você pode salvar a duplicata no banco de dados
-            # Colocar para retornar na tela de cadastos
-
-        return render_template('resposta_cadastro.html', rota='/gastos/cadastros/duplicatas')
-        
-    @app.route('/gastos/cadastros/duplicatas')
-    def tela_duplicatas():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastrar_duplicatas.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/gastos', methods=['GET', 'POST'])
-    def tela_gastos():
-        def get_mes_nome(mes_codigo):
-            match mes_codigo:
-                case "01": return 'Janeiro'
-                case "02": return "Fevereiro"
-                case "03": return "Março"
-                case "04": return "Abril"
-                case "05": return "Maio"
-                case "06": return "Junho"
-                case "07": return "Julho"
-                case "08": return "Agosto"
-                case "09": return "Setembro"
-                case "10": return "Outubro"
-                case "11": return "Novembro"
-                case "12": return "Dezembro"
-
-        if 'usuario' not in session:
-            print('Usuário não está logado')
-            return redirect('/')
-
-        empresa = session.get('empresa')
-        session['link'] = '/gastos'
-
-        # Seleciona o banco de dados conforme a empresa
-        if empresa == 'gr7':
-            db = dados_notas.DadosGastos()
-        elif empresa == 'portal':
-            if session.get('permission') == 'ADMIN':
-                db = dados_notas.DadosGastosPortal()
-            else:
-                return render_template('resposta_permissao.html', empresa=empresa)
-        elif empresa == 'gr7 morumbi':
-            db = dados_notas.DadosGastosMorumbi()
-        else:
-            return "Empresa não suportada", 400
-
-        meses = [(f"{i:02}", get_mes_nome(f"{i:02}")) for i in range(1, 13)]
-        anos = [str(ano) for ano in range(2024, 2031)]
-
-        # Pega dados padrão (mês, ano, dia atuais)
-        now = datetime.now()
-        dia_atual = now.strftime('%d')
-        mes_atual = now.strftime('%m')
-        ano_atual = now.strftime('%Y')
-
-        if request.method == 'POST':
-            mes_dados = request.form.get('mes', mes_atual)
-            ano_dados = request.form.get('ano', ano_atual)
-
-            dados_tipos = db.dados_gastos(mes_dados, ano_dados)
-            valor_gasto = db.valor_gastos(mes_dados, ano_dados)
-            mes_select = get_mes_nome(mes_dados)
-            ano_select = ano_dados
-
-            if 'dia' in request.form:
-                data = request.form['dia']
-                dia = data[8:]
-                mes = data[5:7]
-                ano = data[:4]
-            else:
-                dia = dia_atual
-                mes = mes_atual
-                ano = ano_atual
-
-            boletos = db.boletos_do_dia(dia, mes, ano)
-            valor_a_pagar = db.valor_a_pagar(dia, mes, ano)
-
-            return render_template('gastos.html', anos=anos, meses=meses,
-                                tipo_despesa=dados_tipos, empresa=empresa,
-                                boletos=boletos, valor_gastos=valor_gasto,
-                                valor_a_pagar=valor_a_pagar, 
-                                mes_escolhido=mes_select,
-                                ano_escolhido=ano_select, dia=f"{ano}-{mes}-{dia}")
-        else:
-            # Requisição GET
-            dados_tipos = db.dados_gastos(mes_atual, ano_atual)
-            valor_gasto = db.valor_gastos(mes_atual, ano_atual)
-            boletos = db.boletos_do_dia(dia_atual, mes_atual, ano_atual)
-            valor_a_pagar = db.valor_a_pagar(dia_atual, mes_atual, ano_atual)
-
-            return render_template('gastos.html', anos=anos, meses=meses,
-                                tipo_despesa=dados_tipos, empresa=empresa,
-                                boletos=boletos, valor_gastos=valor_gasto,
-                                valor_a_pagar=valor_a_pagar,
-                                mes_escolhido=get_mes_nome(mes_atual),
-                                ano_escolhido=ano_atual,
-                                dia=now.strftime('%Y-%m-%d'))
-
-    @app.route('/atualizar', methods=['POST'])
-    def atualizar_boletos():
-        if 'empresa' not in session:
-            return 'Sessão expirada ou não autenticada', 401
-
-        empresa = session['empresa']
-
-        # Seleciona o DB apropriado
-        if empresa == 'gr7':
-            db = dados_notas.DadosGastos()
-        elif empresa == 'portal':
-            db = dados_notas.DadosGastosPortal()
-        elif empresa == 'gr7 morumbi':
-            db = dados_notas.DadosGastosMorumbi()
-        else:
-            return 'Empresa não suportada', 400
-
-        dia = request.form.get('dia')
-        mes = request.form.get('mes')
-        ano = request.form.get('ano')
-
-        # Usa data atual se o campo dia não for fornecido
-        if not dia:
-            dia = datetime.now().strftime('%d')
-
-        # Valida presença de mês e ano
-        if not mes or not ano:
-            return 'Parâmetros inválidos', 400
-
-        boletos = db.boletos_do_dia(dia, mes, ano)
-        return jsonify({'boletos': boletos})
-    
-    @app.route('/cadastros')
-    def tela_cadastro():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastros.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/cadastros/fornecedor')
-    def tela_cadastro_fornecedor():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastro_fornecedor.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/fornecedor_cadastrar', methods=['GET', 'POST'])
-    def cadastrar_fornecedor():
-        if session['empresa'] == 'gr7':
-            db = utills.Utills()
-        elif session['empresa'] == 'portal':
-            db = utills.Utills_portal()
-        elif session['empresa'] == 'gr7 morumbi':
-            db = utills.UttilsGr7Morumbi()
-
-        dados = request.form.to_dict()
-        db.cadastrar_fornecedor(dados)
-        return redirect('/cadastros/fornecedor')
-        
-    @app.route('/cadastros/despesas')
-    def tela_cadastro_despesas():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastro_despesa.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/cadastros/despesas-cadastrar', methods=['GET', 'POST'])
-    def cadastrar_despesa():
-        if request.method == 'POST':
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-            elif session['empresa'] == 'portal':
-                db = dados_notas.DadosGastosPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = dados_notas.DadosGastosMorumbi()
-
-            despesa = request.form['despesa']
-                
-            db.cadastrar_despesa(despesa)
-            # Criar tela retorno
-            return redirect('/cadastros/despesas')
-        else:
-            return 'erro aqui'
-
-    @app.route('/consultar_notas', methods=['GET', 'POST'])
-    def consultas():
-        if 'usuario' in session:
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-                db_utils = utills.Utills()
-            elif session['empresa'] == 'portal':
-                db = dados_notas.DadosGastosPortal()
-                db_utils = utills.Utills_portal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = dados_notas.DadosGastosMorumbi()
-                db_utils = utills.UttilsGr7Morumbi()
-
-            empresa = session['empresa']
-            session['link'] = '/consultar_notas'
-                
-            mes = str(datetime.now().month)
-            ano = str(datetime.now().year)
-            fornecedores = db_utils.fornecedores()
-            despesas = db_utils.despesas()
-            notas = []
-
-            data_inicio = request.args.get('data_inicio')
-            data_fim = request.args.get('data_fim')
-            fornecedor = request.args.get('fornecedor')
-            despesa = request.args.get('despesa')
-            obs = request.args.get('obs')
-
-            if request.method == 'POST':
-                data_inicio = request.form.get('data_inicio')
-                data_fim = request.form.get('data_fim')
-                fornecedor = request.form.get('fornecedor')
-                despesa = request.form.get('despesa')
-                obs = request.form.get('obs')
-                notas = db.filtrar_notas(
-                    data_inicio, data_fim, fornecedor, despesa, obs)
-                    
-                valor = db.filtrar_notas_valor(
-                    data_inicio, data_fim, fornecedor, despesa, obs)
-            elif data_inicio or data_fim or fornecedor or despesa or obs:
-                notas = db.filtrar_notas(
-                    data_inicio, data_fim, fornecedor, despesa, obs)
-                valor = db.filtrar_notas_valor(
-                    data_inicio, data_fim, fornecedor, despesa, obs)
-            else:
-                notas = db.todas_as_notas_mes(mes, ano)
-                valor = db.valor_nota()
-
-                # Configuração da paginação
-            # page = request.args.get(get_page_parameter(), type=int, default=1)
-                # per_page = 10
-                # offset = (page - 1) * per_page
-                # paginated_notas = notas[offset: offset + per_page]
-
-                # pagination = Pagination(page=page, total=len(notas), per_page=per_page, css_framework='bootstrap4')
-
-            return render_template('consultar_notas.html', empresa=empresa, fornecedores=fornecedores, despesas=despesas, notas=notas,
-                                       data_inicio=data_inicio, data_fim=data_fim, fornecedor=fornecedor, despesa=despesa, valor=valor)
-        else:
-            print('Usuário não está logado')
-            return redirect('/')
-
-
-    @app.route('/dados_boletos/<num_nota>', methods=['GET', 'POST'])
-    def dados_boletos(num_nota):
-         if 'usuario' in session:
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-            elif session['empresa'] == 'portal':
-                db = dados_notas.DadosGastosPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = dados_notas.DadosGastosMorumbi()
-                
-            empresa = session['empresa']
-                
-            boletos = db.todos_os_boletos_por_nota(num_nota)
-            quantidade = len(boletos)
-            valor = db.valor_gastos_boletos_valor(num_nota)
-            link = session['link']
-            nota = db.nota_por_numero(num_nota)
-            return render_template('dados_boletos.html', empresa=empresa, boletos=boletos, valor=valor, quantidade=quantidade, num_nota=num_nota, link=link, nota=nota)
-            
-    @app.route('/consultar_boletos', methods=['GET', 'POST'])
-    def consultar_boletos():
-        if 'usuario' in session:
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-                db_utils = utills.Utills()
-            elif session['empresa'] == 'portal':
-                db = dados_notas.DadosGastosPortal()
-                db_utils = utills.Utills_portal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = dados_notas.DadosGastosMorumbi()
-                db_utils = utills.UttilsGr7Morumbi()
-
-            session['link'] = '/consultar_boleto'
-            empresa = session['empresa']
-                
-            fornecedores = db_utils.fornecedores()
-
-            boletos = []
-
-            if request.method == 'POST':
-                data_inicio = request.form.get('data_inicio')
-                data_fim = request.form.get('data_fim')
-                fornecedor = request.form.get('fornecedor')
-
-                # Obter boletos filtrados
-                boletos = db.filtrar_boletos(
-                    data_inicio, data_fim, fornecedor)
-                valor = db.filtrar_boletos_valor(
-                    data_inicio, data_fim, fornecedor)
-            else:
-                # Se não houver filtros, exibir todos os boletos
-                boletos = db.todos_os_boletos()
-                valor = db.valor_boleto()
-                # Configuração da paginação
-
-            return render_template('consultar_boletos.html', empresa=empresa, fornecedores=fornecedores, boletos=boletos, valor=valor)
-        else:
-            print('Usuário não está logado')
-            return redirect('/')
 
     @app.route('/faturamento', methods=['GET', 'POST'])
     def tela_faturamentos():
@@ -648,21 +160,8 @@ class Routes:
 
         empresa = session.get('empresa')
         permissao = session.get('permission')
-
-       
-        match empresa:
-            case 'gr7':
-                db = faturamento.Faturamento()
-                services = utills.Utills()
-            case 'portal':
-                db = faturamento.FaturamentoPortal()
-                services = utills.Utills_portal()
-            case 'gr7 morumbi':
-                db = faturamento.FaturamentoMorumbi()
-                services = utills.UttilsGr7Morumbi()
-            case _:
-                return "Empresa não suportada", 400
-
+        db = faturamento.Faturamento()
+        services = utills.Utills()
         
         def get_mes_nome(codigo):
             meses_map = {
@@ -736,8 +235,8 @@ class Routes:
         if 'usuario' not in session:
             return redirect('/')
 
-        db = get_db_empresa()
-
+        db = faturamento.Faturamento()
+        empresa = session['empresa']
         if db is None:
             return redirect('/')
 
@@ -745,7 +244,7 @@ class Routes:
             'cadastrar_faturamento.html',
             empresa=session['empresa'],
             cias=db.companhias(),
-            mecanicos=db.funcionarios(),
+            mecanicos=db.funcionarios(empresa),
             response=''
         )
 
@@ -755,7 +254,7 @@ class Routes:
         if 'usuario' not in session:
             return redirect('/')
 
-        db = get_db_empresa()
+        db = faturamento.Faturamento()
 
         if db is None:
             return redirect('/')
@@ -764,7 +263,7 @@ class Routes:
         usuario = session['usuario']
 
         ja_existe = db.cadastrar(data, usuario)
-
+        empresa = session['empresa']
         if ja_existe:
             response = f"A OS {data['num_os']} já está cadastrada"
         else:
@@ -774,28 +273,17 @@ class Routes:
             'cadastrar_faturamento.html',
             empresa=session['empresa'],
             cias=db.companhias(),
-            mecanicos=db.funcionarios(),
+            mecanicos=db.funcionarios(empresa),
             response=response
         )       
 
     @app.route('/faturamentos/consultar', methods=['GET', 'POST'])
     def consultar_faturamentos():
         if 'usuario' in session:
-            if session['empresa'] == 'gr7':
-                empresa = session['empresa']
-                db = faturamento.Faturamento()
-            elif session['empresa'] == 'portal':
-                empresa = session['empresa']
-                db = faturamento.FaturamentoPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                empresa = session['empresa']
-                db = faturamento.FaturamentoMorumbi()
-            
-
+            empresa = session['empresa']
+            db = faturamento.Faturamento()
             cias = db.companhias()
-            mecanicos = db.funcionarios()
-
-                
+            mecanicos = db.funcionarios(empresa)
             if request.method == 'POST':
                 data_inicio = request.form.get('data_inicio')
                 data_fim = request.form.get('data_fim')
@@ -834,13 +322,7 @@ class Routes:
     @app.route('/faturamentos/ordens_com_dinheiro/', methods=['GET', 'POST'])
     def consultar_faturamentos_c_dinheiro():
         if 'usuario' in session:
-            if session['empresa'] == 'gr7':
-                db = faturamento.Faturamento()
-            elif session['empresa'] == 'portal':
-                db = faturamento.FaturamentoPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = faturamento.FaturamentoMorumbi()
-
+            db = faturamento.Faturamento()
             mes = session.get('mes_atual')
             ano = session.get('ano_atual')
             empresa = session['empresa']
@@ -882,140 +364,23 @@ class Routes:
             print('Usuário não está logado.')
             return redirect('/')
 
-    @app.route('/cadastros/companhias')
-    def tela_cadastro_companhia():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastrar_companhias.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/cadastros/baterias')
-    def tela_cadastro_bateria():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastrar_bateria.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/cadastros/oleos')
-    def tela_cadastro_oleo():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastrar_oleo.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/cadastros/funcionarios')
-    def tela_cadastro_funcionarios():
-        if 'usuario' in session:
-            empresa = session['empresa']
-            return render_template('cadastrar_funcionarios.html', empresa=empresa)
-        else:
-            print('usario não está logado')
-            return redirect('/')
-
-    @app.route('/oleo-cadastrar', methods=['GET', 'POST'])
-    def cadastrar_oleos():
-        if request.method == 'POST':
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-            elif session['empresa'] == 'portal':
-                db = dados_notas.DadosGastosPortal
-            elif session['empresa'] == 'gr7 morumbi':
-                db = dados_notas.DadosGastosMorumbi()
-
-            dados = request.form.to_dict()
-            db.cadastrar_oleo(dados)
-            return redirect('/cadastros/oleos')
-        else:
-            return 'erro aqui'
-
-    @app.route('/cadastros/companhia-cadastrar', methods=['GET', 'POST'])
-    def cadastrar_companhia():
-        if request.method == 'POST':
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-            elif session['empresa'] == 'portal':
-                db = dados_notas.DadosGastosPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = dados_notas.DadosGastosMorumbi()
-                
-            dados = request.form.to_dict()   
-            db.cadastrar_companhia(dados)
-            return redirect('/cadastros/companhias')
-        else:
-            return 'erro aqui'
-
-    @app.route('/funcionario-cadastrar', methods=['GET', 'POST'])
-    def cadastrar_funcionario():
-        if request.method == 'POST':
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-            elif session['empresa'] == 'potal':
-                db = dados_notas.DadosGastosPortal()
-            elif session['empresa'] == 'potal':
-                db = dados_notas.DadosGastosMorumbi()
-
-            dados = request.form.to_dict()
-            db.cadastrar_funcionario(dados)
-            return redirect('/cadastros/funcionarios')
-        else:
-            return 'erro aqui'
-
-    @app.route('/bateria-cadastrar', methods=['GET', 'POST'])
-    def cadastrar_bateria():
-        if request.method == 'POST':
-            if session['empresa'] == 'gr7':
-                db = dados_notas.DadosGastos()
-            elif session['empresa'] == 'portal':
-                db = dados_notas.DadosGastosPortal()
-            elif session['empresa'] == 'gr7 morumbi':
-                db = dados_notas.DadosGastosMorumbi()
-
-            dados = request.form.to_dict()
-            db.cadastrar_baterias(dados)
-            return redirect('/cadastros/oleos')
-        else:
-            return 'erro aqui'
-
     @app.route('/relatorios')
     def page_relatorios():
-        if session['empresa'] == 'gr7':
-            db = faturamento.Faturamento()
-            db_utils = utills.Utills()
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-            db_utils = utills.Utills()
-        elif session['empresa'] == 'gr7 morumbi':
-            db = faturamento.FaturamentoMorumbi()
-            db_utils = utills.UttilsGr7Morumbi()
-
-        departamentos = db_utils.despesas()
-        mecanicos = db.funcionarios()
+        
+        db = faturamento.Faturamento()
+        db_utils = utills.Utills()
+        
+        mecanicos = db.funcionarios(session['empresa'])
         context = {
-                'departamentos': departamentos,
                 'mecanicos': mecanicos
             } 
         return render_template('relatorios.html', **context)
 
     @app.route('/fechamento_mensal', methods=['GET', 'POST'])
     def gerar_pdf():
-        if session['empresa'] == 'gr7':
-            db = faturamento.Faturamento()
-            services = utills.Utills()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-            services = utills.Utills_portal()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoMorumbi()
-            services = utills.UttilsGr7Morumbi()
-            empresa = session['empresa']   
+        db = faturamento.Faturamento()
+        services = utills.Utills()
+        empresa = session['empresa']
         mes = request.form.get('mes')
         ano = request.form.get('ano')
         # Dados para o template
@@ -1079,36 +444,14 @@ class Routes:
         response.headers['Content-Disposition'] = f'attachment; filename="{name_arquivo}.pdf"'
         return response
 
-    @app.route('/api/subcategorias', methods=['GET'])
-    def get_subcategorias():
-        if session['empresa'] == 'gr7' or 'portal' or 'gr7 morumbi':
-            despesa = request.args.get('despesa')
-            if not despesa:
-                return jsonify([])
-
-            # Substitua com sua lógica para buscar subcategorias no banco de dados
-            db = gastos_db.GastosDataBase()
-            dados = db.get_subcategorias(despesa)
-            subcategorias = dados
-            subcategorias = [sub[3] for sub in subcategorias]
-            return jsonify(subcategorias)
-
+   
 
     @app.route('/fechamento_filtros', methods=['GET', 'POST'])
     def gerar_relatorio_filtros():
         # Obtendo os valores do formulário
-        if session['empresa'] == 'gr7':
-            db = faturamento.Faturamento()
-            services = utills.Utills()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-            services = utills.Utills_portal()
-            empresa = session['empresa']
-        elif session['empresa'] == 'gr7 morumbi':
-            db = faturamento.FaturamentoMorumbi()
-            services = utills.UttilsGr7Morumbi()
-            empresa = session['empresa']
+        db = faturamento.Faturamento()
+        services = utills.Utills()
+        empresa = session['empresa']
 
         mes = request.form.get('mes')
         ano = request.form.get('ano')
@@ -1165,15 +508,8 @@ class Routes:
     @app.route('/fechamento_revitalizacao', methods=['GET', 'POST'])
     def gerar_relatorio_revitalizacao():
         # Obtendo os valores do formulário
-        if session['empresa'] == 'gr7':
-            db = faturamento.Faturamento()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-            empresa = session['empresa']
+        db = faturamento.Faturamento()
+        empresa = session['empresa']
 
         mes = request.form.get('mes')
         ano = request.form.get('ano')
@@ -1233,15 +569,8 @@ class Routes:
         
 
         # Inicializando os objetos para acessar os dados
-        if session['empresa'] == 'gr7':
-            db = faturamento.Faturamento()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoMorumbi()
-            empresa = session['empresa']
+        db = faturamento.Faturamento()
+        empresa = session['empresa']
 
         # Buscando os dados de acordo com os filtros
         dados = db.ordens_dinheiro_relat(mes, ano)
@@ -1294,15 +623,8 @@ class Routes:
 
         
         # Inicializando os objetos para acessar os dados
-        if session['empresa'] == 'gr7':
-            db = faturamento.Faturamento()
-            empresa = session['empresa']
-        elif session['empresa'] == 'portal':
-            db = faturamento.FaturamentoPortal()
-            empresa = session['empresa']
-        elif session['empresa'] == 'gr7 morumbi':
-            db = faturamento.FaturamentoMorumbi()
-            empresa = session['empresa']
+        db = faturamento.Faturamento()
+        empresa = session['empresa']
         
 
         # Buscando os dados de acordo com os filtros
@@ -1394,18 +716,15 @@ class Routes:
         mes = request.form.get('mes')
         ano = request.form.get('ano')
         tipo_despesa = request.form.get('tipo_despesa')
-
+        db = dados_notas.DadosGastos()
        
 
         # Inicializando os objetos para acessar os dados
-        if session['empresa'] == 'gr7':
-            db = dados_notas.DadosGastos()
+        if session['empresa'] == 1:
             nome_empresa = "GR7 Centro Automotivo"
-        elif session['empresa'] == 'portal':
-            db = dados_notas.DadosGastosPortal()
+        elif session['empresa'] == 2:
             nome_empresa = "Portal do Morumbi Centro Automotivo"
-        elif session['empresa'] == 'gr7 morumbi':
-            db = dados_notas.DadosGastosMorumbi()
+        elif session['empresa'] == 3:
             nome_empresa = "GR7 Morumbi Centro Automotivo"
         
 
@@ -1497,16 +816,13 @@ class Routes:
         # Obtendo os valores do formulário
         mes = request.form.get('mes')
         ano = request.form.get('ano')
-
+        db = dados_notas.DadosGastos()
         # Inicializando os objetos para acessar os dados
-        if session['empresa'] == 'gr7':
-            db = dados_notas.DadosGastos()
+        if session['empresa'] == 1:
             nome_empresa = "GR7 Centro Automotivo"
-        elif session['empresa'] == 'portal':
-            db = dados_notas.DadosGastosPortal()
+        elif session['empresa'] == 2:
             nome_empresa = "Portal do Morumbi Centro Automotivo"
-        elif session['empresa'] == 'gr7 morumbi':
-            db = dados_notas.DadosGastosMorumbi()
+        elif session['empresa'] == 3:
             nome_empresa = "GR7 Morumbi Centro Automotivo"
 
         # Buscando os dados de acordo com os filtros
@@ -1595,17 +911,7 @@ class Routes:
     @app.route('/dados-loja/<loja>')
     def dados_loja(loja):
         ano = request.args.get('ano', default=2025, type=int)
-        
-       
-        if loja == 'GR7':     
-            db = conection.Database() 
-        elif loja == 'Portal': 
-            conection.DatabasePortal()
-        elif loja == 'GR7 Morumbi':
-            conection. DatabaseMorumbi()
-        
-        
-
+        db = conection.Database() 
         faturamento = db.faturamento_loja_ano(loja, ano)
         
         
@@ -1617,8 +923,6 @@ class Routes:
        
         if loja == 'GR7':
             db = conection.Database() 
-        elif loja == "Portal": 
-            db = conection.DatabasePortal()
         
         
         

@@ -175,8 +175,8 @@ def render_gr7_admin(usuario):
 
 
 def render_portal_admin(usuario):
-    utils = utills.Utills_portal()
-    db = faturamento.FaturamentoPortal()
+    utils = utills.Utills()
+    db = faturamento.Faturamento()
     now = datetime.now()
     mes_dados = now.strftime('%m')
     ano_dados = now.strftime('%Y')
@@ -220,8 +220,8 @@ def render_portal_admin(usuario):
 
 
 def render_portal_normal(usuario):
-    utils = utills.Utills_portal()
-    db = faturamento.FaturamentoPortal()
+    utils = utills.Utills()
+    db = faturamento.Faturamento()
     now = datetime.now()
     mes_dados = now.strftime('%m')
     ano_dados = now.strftime('%Y')
@@ -265,8 +265,8 @@ def render_portal_normal(usuario):
 
 
 def render_gr7_morumbi_admin(usuario):
-    utils = utills.UttilsGr7Morumbi()
-    db = faturamento.FaturamentoMorumbi()
+    utils = utills.Utills()
+    db = faturamento.Faturamento()
     now = datetime.now()
     mes_dados = now.strftime('%m')
     ano_dados = now.strftime('%Y')
@@ -311,8 +311,8 @@ def render_gr7_morumbi_admin(usuario):
 
 
 def render_gr7_morumbi_normal(usuario):
-    utils = utills.UttilsGr7Morumbi()
-    db = faturamento.FaturamentoMorumbi()
+    utils = utills.Utills()
+    db = faturamento.Faturamento()
     now = datetime.now()
     mes_dados = now.strftime('%m') 
     ano_dados = now.strftime('%Y')

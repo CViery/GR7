@@ -1,23 +1,41 @@
+import logging
+from database import conection
+
+
 class Login:
     def __init__(self):
-        pass
+        self.db = conection.Database()
 
-    def get_user(self, user):
+    def get_user(self, usuario):
         try:
-            # Guia 0=Acesso total, 1=GR7, 2=Portal, 3=sem acesso
-            users = [
-                ('CRISTIAN', 'viery2312', 'ADMIN', 0),
-                ('GIOVANNA', 'Giovanna1653@', 'ADMIN', 0),
-                ('GILBERTO', 'Giba130364@2024', 'ADMIN', 0),
-                ('THIAGO', 'Qazplm82*', 'ADMIN', 2),
-                ('DANIEL', '415263', 'ADMIN', 0),
-                ('ANA MARIA', '1234', 'NORMAL', 2),
-                ('MARCOS LARA', 'portal555', 'NORMAL', 2),
-                ('BRUNO', '1234', 'ADMIN', 0)
-            ]
-            for person in users:
-                if person[0] == user:
-                    return person
-        except Exception as e:
-            print(f"Erro ao buscar usuário: {e}")
+            query = """
+                SELECT
+                    id,
+                    usuario,
+                    senha,
+                    perfil,
+                    guia
+                FROM usuarios
+                WHERE UPPER(usuario) = UPPER(?);
+            """
+
+            self.db.cursor.execute(query, (usuario,))
+            return self.db.cursor.fetchone()
+
+        except Exception as erro:
+            logging.exception(
+                "Erro ao buscar usuário no banco: %s",
+                erro
+            )
             return None
+
+    def get_empresa(self):
+        try:
+            return self.db.get_empresa()
+
+        except Exception as erro:
+            logging.exception(
+                "Erro ao buscar empresas: %s",
+                erro
+            )
+            return []

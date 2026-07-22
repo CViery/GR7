@@ -153,9 +153,9 @@
         <div class="input-group">
           <i class="fa-regular fa-building"></i>
           <select name="empresa" id="empresa">
-            <option value="gr7">GR7</option>
-            <option value="portal">Portal</option>
-            <option value="gr7 morumbi">GR7 Morumbi</option>
+            {% for empresa in empresas %}
+              <option value="{{empresa[0]}}">{{empresa[1]}}</option>
+            {% endfor %}
           </select>
         </div>
 
