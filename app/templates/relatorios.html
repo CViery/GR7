@@ -114,6 +114,14 @@ body{
     margin:30px 0 20px;
 }
 
+.modal-backdrop{
+    z-index:1050 !important;
+}
+
+.modal{
+    z-index:1060 !important;
+}
+
 </style>
 
 {% endblock %}
@@ -215,7 +223,6 @@ body{
     <div class="reports-grid">
 
         <!-- Fechamento -->
-
         <div class="report-card">
 
             <div class="report-icon bg-primary-soft">
@@ -228,11 +235,9 @@ body{
                 Resumo financeiro completo do período.
             </p>
 
-            <form action="/fechamento_mensal" method="post">
-                <button class="btn btn-primary w-100">
-                    Gerar Relatório
-                </button>
-            </form>
+            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#modalFechamentoMensal">
+                Gerar Relatório
+            </button>
 
         </div>
 
@@ -390,4 +395,85 @@ body{
 
 </div>
 
+<!-- MODAL FECHAMENTO MENSAL -->
+<div class="modal fade" id="modalFechamentoMensal" tabindex="-1" aria-labelledby="modalFechamentoMensalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none;">
+            <form action="/fechamento_mensal" method="post">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="modalFechamentoMensalLabel">
+                        <i class="bi bi-calendar-event text-primary me-2"></i>Fechamento Mensal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">
+                        Escolha o mês e o ano de referência para gerar o PDF:
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-7">
+                            <label for="fechamento_mes" class="form-label fw-semibold">Mês</label>
+                            <select id="fechamento_mes" name="mes" class="form-select" required>
+                                <option value="01">Janeiro</option>
+                                <option value="02">Fevereiro</option>
+                                <option value="03">Março</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Maio</option>
+                                <option value="06">Junho</option>
+                                <option value="07">Julho</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                        </div>
+
+                        <div class="col-5">
+                            <label for="fechamento_ano" class="form-label fw-semibold">Ano</label>
+                            <select id="fechamento_ano" name="ano" class="form-select" required>
+                                {% for ano in range(2024, 2035) %}
+                                <option value="{{ ano }}">{{ ano }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4" onclick="const m = bootstrap.Modal.getInstance(document.getElementById('modalFechamentoMensal')); if(m) m.hide();">
+                        <i class="bi bi-download me-1"></i> Baixar PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Move o modal direto para o <body> para evitar conflito de z-index/transform dos cards
+    const modalEl = document.getElementById('modalFechamentoMensal');
+    if (modalEl && modalEl.parentElement !== document.body) {
+        document.body.appendChild(modalEl);
+    }
+
+    const hoje = new Date();
+    const mesAtual = String(hoje.getMonth() + 1).padStart(2, '0');
+    const anoAtual = String(hoje.getFullYear());
+
+    document.getElementById('fechamento_mes').value = mesAtual;
+    document.getElementById('fechamento_ano').value = anoAtual;
+
+    // Mantém os filtros globais da página também sincronizados com o mês/ano atual
+    const selMesGlobal = document.getElementById('mes');
+    const selAnoGlobal = document.getElementById('ano');
+    if (selMesGlobal) selMesGlobal.value = mesAtual;
+    if (selAnoGlobal) selAnoGlobal.value = anoAtual;
+});
+</script>
 {% endblock %}

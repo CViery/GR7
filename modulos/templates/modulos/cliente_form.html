@@ -1,0 +1,10 @@
+{% extends 'modulos/base.html' %}{% block content %}
+<header><h1>Novo cliente</h1><p>Cadastre os dados principais.</p></header>
+<form class="panel form-grid" method="post">
+<label class="span-2">Nome / Razão social<input required name="nome" placeholder="Ex.: João da Silva"></label>
+<label>CPF / CNPJ<input name="cpf_cnpj"></label><label>Telefone<input name="telefone"></label>
+<label class="span-2">E-mail<input type="email" name="email"></label><label>Contato<input name="contato"></label><label>CEP<input name="cep"></label>
+<label class="span-2">Endereço<input name="endereco"></label><label>Número<input name="numero"></label><label>Bairro<input name="bairro"></label>
+<label class="span-2">Cidade<input name="cidade"></label><label>UF<input maxlength="2" name="uf"></label>
+<div class="actions span-4"><a class="btn secondary" href="{{ url_for('modulos.clientes') }}">Cancelar</a><button class="btn">Salvar cliente</button></div>
+</form>{% endblock %}

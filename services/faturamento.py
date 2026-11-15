@@ -9,6 +9,14 @@ class Faturamento:
     def __init__(self):
         self.db = conection.Database()
 
+    def orcamentistas(self, empresa):
+        try:
+            dados = self.db.get_orcamentistas(empresa)
+            return [item[0] for item in dados if item[0]]
+        except Exception as e:
+            print(e)
+            return []
+        
     def formatar_moeda(self, valor):
         """
         Formata um valor numérico como uma string de moeda no formato brasileiro (R$).
@@ -28,6 +36,19 @@ class Faturamento:
 
     def cadastrar(self, dados, usuario):
         try:
+            # Novos registros passam a usar a tabela centralizada. O código
+            # legado abaixo permanece temporariamente apenas como referência
+            # durante a migração dos relatórios antigos.
+            from services.faturamento_novo import FaturamentoNovo
+            novo = FaturamentoNovo()
+            if novo.disponivel():
+                resultado = novo.cadastrar(
+                    dados,
+                    session['usuario_id'],
+                    session['empresa'],
+                )
+                return resultado['duplicado']
+
             def moeda(valor):
                 if valor is None or valor == '':
                     return 0.0
@@ -103,7 +124,8 @@ class Faturamento:
                 'valor_servico_transmissao': moeda(dados.get('transmissao')),
 
                 'usuario': usuario,
-                'obs': dados.get('obs', '')
+                'obs': dados.get('obs', ''),
+                'orcamentista': dados.get('orcamentista', '')
             }
 
             buscar_os = self.db.buscar_os_by_number(ordem_servico['numero_os'])
@@ -136,6 +158,8 @@ class Faturamento:
 
                 # Cria um dicionário com as informações formatadas
                 os = {
+                    'id': ordem_servico[0] if len(ordem_servico) > 42 and ordem_servico[42] else None,
+                    'editavel': bool(len(ordem_servico) > 42 and ordem_servico[42]),
                     'placa': ordem_servico[1],
                     'modelo_veiculo': ordem_servico[2],
                     'data_orcamento': data_orcamento,
@@ -333,16 +357,17 @@ class Faturamento:
 
     def faturamento_diario_mes(self, mes, ano):
         try:
-            query = """
+            tabela = self.db.get_tabela()
+            query = f"""
                 SELECT
-                    DAY(data_faturamento) AS dia,
-                    SUM(total_os) AS bruto,
+                    DAY(TRY_CONVERT(date, data_faturamento, 23)) AS dia,
+                    SUM(valor_os) AS bruto,
                     SUM(valor_meta) AS liquido
-                FROM faturamento
-                WHERE MONTH(data_faturamento) = ?
-                AND YEAR(data_faturamento) = ?
-                GROUP BY DAY(data_faturamento)
-                ORDER BY DAY(data_faturamento)
+                FROM {tabela}
+                WHERE MONTH(TRY_CONVERT(date, data_faturamento, 23)) = ?
+                AND YEAR(TRY_CONVERT(date, data_faturamento, 23)) = ?
+                GROUP BY DAY(TRY_CONVERT(date, data_faturamento, 23))
+                ORDER BY DAY(TRY_CONVERT(date, data_faturamento, 23))
             """
 
             self.cursor.execute(query, (int(mes), int(ano)))
@@ -365,6 +390,8 @@ class Faturamento:
                     ordem_servico[4], "%Y-%m-%d")
                 data_faturamento = data_objeto_faturamento.strftime("%d/%m/%Y")
                 os = {
+                    'id': ordem_servico[0] if len(ordem_servico) > 42 and ordem_servico[42] else None,
+                    'editavel': bool(len(ordem_servico) > 42 and ordem_servico[42]),
                     'placa': ordem_servico[1],
                     'modelo_veiculo': ordem_servico[2],
                     'data_orcamento': data_orcamento,
@@ -894,4 +921,306 @@ class Faturamento:
         except Exception as e:
             print(f"Erro ao obter faturamentos: {e}")
             return []
+
+
+    def quantidade_os(self, status):
+        quantidades = self.db.buscar_quantidade(status)
+        return quantidades[0]
+        
+    def vendas_mes(self, mes, ano):
+        status = 'FATURADO'
+        valor = self.db.soma_vendas_mes(status, mes, ano)
+        total = self.formatar_moeda(valor)
+        return total
+
+    def ultimas_movimentacoes(self):
+        ordens = self.db.ultimas_movimentacoes()
+        return ordens
+
+    def listar_veiculos_client(self, client_id):
+        cliente = self.db.listar_veiculos_client(client_id)
+        return cliente
+
     
+    def relatorio_gerencial_mensal(self, mes, ano, empresa):
+        """Consolida todos os dados para o PDF Gerencial de 2 páginas nas 3 unidades."""
+        ordens = self.db.faturamento_ordens(mes, ano) or []
+        is_portal = (int(empresa or 3) == 2)
+
+        nomes_unidades = {
+            1: ("GR7 Santo Amaro", "UNIDADE SANTO AMARO"),
+            2: ("Portal do Morumbi", "UNIDADE PORTAL DO MORUMBI"),
+            3: ("GR7 Morumbi", "UNIDADE MORUMBI"),
+        }
+        titulo_loja, subtitulo_unidade = nomes_unidades.get(
+            int(empresa or 3), ("GR7 Centro Automotivo", "UNIDADE")
+        )
+
+        # Nomes dos serviços conforme a loja (Funilaria só existe na Portal)
+        if is_portal:
+            mapa_servicos = [
+                ("aditivo", 15, "Ar Condicionado", True),
+                ("fluido_sangria", 17, "Lavagem", True),
+                ("palheta", 18, "Alternador / Motor de Arranque", True),
+                ("filtro", 21, "Filtros e Higienização", True),
+                ("detergente_parabrisa", 20, "Detergente de Para-brisa", True),
+                ("revitalizacao", 14, "Revitalização", True),
+                ("limpeza_freios", 19, "Funilaria", False),
+            ]
+        else:
+            mapa_servicos = [
+                ("filtro", 21, "Filtros (Trocas Realizadas)", True),
+                ("fluido_sangria", 17, "Fluído e Sangria", True),
+                ("limpeza_freios", 19, "Limpeza de Freios", True),
+                ("aditivo", 15, "Aditivos de Arrefecimento", True),
+                ("palheta", 18, "Palhetas", True),
+                ("revitalizacao", 14, "Revitalização", True),
+            ]
+
+        total_os = len(ordens)
+        bruto_total = 0.0
+        liquido_total = 0.0
+        pecas_total = 0.0
+        servicos_total = 0.0
+
+        bateria_valor = 0.0
+        bateria_qtd = 0
+        pneu_valor = 0.0
+        pneu_qtd = 0
+        funilaria_valor = 0.0
+        funilaria_qtd = 0
+        terceiros_valor = 0.0
+        terceiros_qtd = 0
+
+        # Agrupadores
+        mecanicos_map = {}
+        especiais_map = {}
+        mesa_map = {}
+        servicos_stats = {
+            chave: {"nome": nome, "na_meta": na_meta, "qtd": 0, "valor": 0.0}
+            for chave, _, nome, na_meta in mapa_servicos
+        }
+        filtros_mec = {}
+        revi_mec = {}
+
+        nomes_especiais = {"BATERIA_DOMICILIO", "DOMICILIO", "TERCEIROS", "OUTROS"}
+
+        for row in ordens:
+            v_pecas = float(row[11] or 0)
+            v_servicos = float(row[12] or 0)
+            v_bruto = float(row[13] or 0)
+            v_meta = float(row[28] or 0)
+            v_revi = float(row[14] or 0)
+            v_funilaria = float(row[19] or 0) if is_portal else 0.0
+            v_filtro = float(row[21] or 0)
+            v_pneu = float(row[22] or 0)
+            v_bateria = float(row[23] or 0)
+            v_terceiros = float(row[41] or 0) if len(row) > 41 and isinstance(row[41], (int, float)) else 0.0
+
+            mec_raw = str(row[29] or "NÃO INFORMADO").strip()
+            mec_upper = mec_raw.upper()
+            orc_raw = (getattr(row, "orcamentista", None) or "").strip()
+
+            bruto_total += v_bruto
+            liquido_total += v_meta
+            pecas_total += v_pecas
+            servicos_total += v_servicos
+
+            if v_bateria > 0:
+                bateria_valor += v_bateria
+                bateria_qtd += 1
+            if v_pneu > 0:
+                pneu_valor += v_pneu
+                pneu_qtd += 1
+            if v_funilaria > 0:
+                funilaria_valor += v_funilaria
+                funilaria_qtd += 1
+            if v_terceiros > 0:
+                terceiros_valor += v_terceiros
+                terceiros_qtd += 1
+
+            # Agrupamento por mecânico ou linha especial
+            if mec_upper in nomes_especiais:
+                label_esp = {
+                    "BATERIA_DOMICILIO": "Bateria Domicílio",
+                    "DOMICILIO": "Bateria Domicílio",
+                    "TERCEIROS": "Terceiros",
+                    "OUTROS": "Outros",
+                }.get(mec_upper, mec_raw.title())
+                alvo = especiais_map.setdefault(
+                    label_esp,
+                    {"nome": label_esp, "os": 0, "pecas": 0.0, "servicos": 0.0, "bruto": 0.0, "meta": 0.0},
+                )
+            else:
+                alvo = mecanicos_map.setdefault(
+                    mec_raw,
+                    {"nome": mec_raw, "os": 0, "pecas": 0.0, "servicos": 0.0, "bruto": 0.0, "meta": 0.0},
+                )
+
+            alvo["os"] += 1
+            alvo["pecas"] += v_pecas
+            alvo["servicos"] += v_servicos
+            alvo["bruto"] += v_bruto
+            alvo["meta"] += v_meta
+
+            # Agrupamento por Orçamentista / Mesa
+            if orc_raw:
+                mesa_item = mesa_map.setdefault(
+                    orc_raw,
+                    {
+                        "nome": orc_raw,
+                        "os": 0,
+                        "bruto": 0.0,
+                        "bateria": 0.0,
+                        "pneu": 0.0,
+                        "funilaria": 0.0,
+                        "meta": 0.0,
+                    },
+                )
+                mesa_item["os"] += 1
+                mesa_item["bruto"] += v_bruto
+                mesa_item["bateria"] += v_bateria
+                mesa_item["pneu"] += v_pneu
+                mesa_item["funilaria"] += v_funilaria
+                mesa_item["meta"] += v_meta
+
+            # Contabiliza serviços
+            for chave, idx, _, _ in mapa_servicos:
+                val = float(row[idx] or 0)
+                if val > 0:
+                    servicos_stats[chave]["qtd"] += 1
+                    servicos_stats[chave]["valor"] += val
+
+            # Detalhamento de Filtros por mecânico
+            if v_filtro > 0 and mec_upper not in nomes_especiais:
+                f_entry = filtros_mec.setdefault(mec_raw, {"nome": mec_raw, "qtd": 0, "valor": 0.0})
+                f_entry["qtd"] += 1
+                f_entry["valor"] += v_filtro
+
+            # Detalhamento de Revitalização por mecânico
+            if v_revi > 0 and mec_upper not in nomes_especiais:
+                r_entry = revi_mec.setdefault(mec_raw, {"nome": mec_raw, "qtd": 0, "valor": 0.0})
+                r_entry["qtd"] += 1
+                r_entry["valor"] += v_revi
+
+        deducoes_total = max(0.0, bruto_total - liquido_total)
+
+        # Ordena mecânicos por Líquido Meta decrescente
+        lista_mecanicos = sorted(mecanicos_map.values(), key=lambda x: x["meta"], reverse=True)
+        for item in lista_mecanicos:
+            item["part_meta"] = (item["meta"] / liquido_total * 100) if liquido_total > 0 else 0.0
+
+        lista_especiais = sorted(especiais_map.values(), key=lambda x: x["bruto"], reverse=True)
+        for item in lista_especiais:
+            item["part_meta"] = (item["meta"] / liquido_total * 100) if liquido_total > 0 else 0.0
+
+        # Ordena Orçamentistas (Mesa) por Bruto Total decrescente
+        lista_mesa = sorted(mesa_map.values(), key=lambda x: x["bruto"], reverse=True)
+        total_mesa_os = sum(x["os"] for x in lista_mesa)
+        total_mesa_bruto = sum(x["bruto"] for x in lista_mesa)
+        total_mesa_bateria = sum(x["bateria"] for x in lista_mesa)
+        total_mesa_pneu = sum(x["pneu"] for x in lista_mesa)
+        total_mesa_funilaria = sum(x["funilaria"] for x in lista_mesa)
+        total_mesa_meta = sum(x["meta"] for x in lista_mesa)
+
+        for item in lista_mesa:
+            item["part_bruto"] = (item["bruto"] / total_mesa_bruto * 100) if total_mesa_bruto > 0 else 0.0
+
+        # Destaques dinâmicos
+        top3 = lista_mecanicos[:3]
+        top3_nomes = ", ".join(m["nome"].split()[0] for m in top3)
+        top3_perc = sum(m["part_meta"] for m in top3)
+
+        # Tabela de Indicadores de Serviços na Meta & Deduções
+        indicadores_servicos = [
+            {
+                "nome": "Mão de Obra / Serviços Gerais",
+                "status": "Na Meta",
+                "na_meta": True,
+                "qtd": total_os,
+                "valor": servicos_total,
+            }
+        ]
+        for chave, _, _, _ in mapa_servicos:
+            st = servicos_stats[chave]
+            indicadores_servicos.append({
+                "nome": st["nome"],
+                "status": "Na Meta" if st["na_meta"] else "Fora da Meta",
+                "na_meta": st["na_meta"],
+                "qtd": st["qtd"],
+                "valor": st["valor"],
+            })
+
+        indicadores_servicos.append({
+            "nome": "Baterias (Vendas Diretas)",
+            "status": "Fora da Meta",
+            "na_meta": False,
+            "qtd": bateria_qtd,
+            "valor": bateria_valor,
+        })
+        if not is_portal or pneu_valor > 0:
+            indicadores_servicos.append({
+                "nome": "Pneus",
+                "status": "Fora da Meta",
+                "na_meta": False,
+                "qtd": pneu_qtd,
+                "valor": pneu_valor,
+            })
+        if terceiros_valor > 0:
+            indicadores_servicos.append({
+                "nome": "Terceiros",
+                "status": "Fora da Meta",
+                "na_meta": False,
+                "qtd": terceiros_qtd,
+                "valor": terceiros_valor,
+            })
+
+        lista_filtros = sorted(filtros_mec.values(), key=lambda x: x["valor"], reverse=True)
+        total_filtros_qtd = sum(x["qtd"] for x in lista_filtros)
+        total_filtros_val = sum(x["valor"] for x in lista_filtros)
+
+        lista_revi = sorted(revi_mec.values(), key=lambda x: x["valor"], reverse=True)
+        total_revi_qtd = sum(x["qtd"] for x in lista_revi)
+        total_revi_val = sum(x["valor"] for x in lista_revi)
+
+        meses_nomes = {
+            "01": "Janeiro", "02": "Fevereiro", "03": "Março", "04": "Abril",
+            "05": "Maio", "06": "Junho", "07": "Julho", "08": "Agosto",
+            "09": "Setembro", "10": "Outubro", "11": "Novembro", "12": "Dezembro",
+        }
+        mes_nome = meses_nomes.get(str(mes).zfill(2), mes)
+
+        return {
+            "is_portal": is_portal,
+            "titulo_loja": titulo_loja,
+            "subtitulo_unidade": subtitulo_unidade,
+            "mes_nome": mes_nome,
+            "ano": ano,
+            "bruto_total": bruto_total,
+            "liquido_total": liquido_total,
+            "total_os": total_os,
+            "deducoes_total": deducoes_total,
+            "bateria_qtd": bateria_qtd,
+            "pneu_qtd": pneu_qtd,
+            "funilaria_qtd": funilaria_qtd,
+            "pecas_total": pecas_total,
+            "servicos_total": servicos_total,
+            "mecanicos": lista_mecanicos,
+            "especiais": lista_especiais,
+            "mesa": lista_mesa,
+            "total_mesa_os": total_mesa_os,
+            "total_mesa_bruto": total_mesa_bruto,
+            "total_mesa_bateria": total_mesa_bateria,
+            "total_mesa_pneu": total_mesa_pneu,
+            "total_mesa_funilaria": total_mesa_funilaria,
+            "total_mesa_meta": total_mesa_meta,
+            "indicadores_servicos": indicadores_servicos,
+            "filtros": lista_filtros,
+            "total_filtros_qtd": total_filtros_qtd,
+            "total_filtros_val": total_filtros_val,
+            "revitalizacao": lista_revi,
+            "total_revi_qtd": total_revi_qtd,
+            "total_revi_val": total_revi_val,
+            "top3_nomes": top3_nomes,
+            "top3_perc": top3_perc,
+        }

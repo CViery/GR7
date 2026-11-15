@@ -1,267 +1,569 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório de Serviços</title>
+  <title>Relatório Gerencial - {{ titulo_loja }}</title>
   <style>
-    /* Base styles */
+    @page {
+      size: A4 portrait;
+      margin: 14mm 12mm 14mm 12mm;
+    }
+
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9pt;
+      color: #1e293b;
       margin: 0;
       padding: 0;
-      color: #333;
     }
 
-    h1 {
-      text-align: center;
-      padding: 20px 0;
-      background-color: #007BFF;
-      color: #fff;
-      margin: 0;
-      font-size: 2rem;
-    }
-
-    h2 {
-      margin-top: 20px;
-      text-align: left;
-      color: #333;
-      font-size: 1.5rem;
-      border-bottom: 2px solid #007BFF;
-      padding-bottom: 5px;
-    }
-
-    .table-container {
-      margin: 20px auto;
-      width: 90%;
-    }
-
-    table {
+    /* Cabeçalho da Página */
+    .header-table {
       width: 100%;
-      border-collapse: collapse;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+
+    .header-title {
+      font-size: 18pt;
+      font-weight: bold;
+      color: #0f172a;
       margin: 0;
-      background: #fff;
-      border: 1px solid #ccc;
     }
 
-    th, td {
-      padding: 5px;
-      text-align: left;
-      border: 1px solid #ddd;
+    .header-sub {
+      font-size: 9pt;
+      color: #64748b;
+      margin-top: 2px;
     }
 
-    th {
-      background-color: #007BFF;
-      color: #fff;
+    .badge-unidade {
+      background-color: #0f172a;
+      color: #ffffff;
+      font-size: 8pt;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .badge-periodo {
+      font-size: 8pt;
+      color: #475569;
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* Cards KPI */
+    .kpi-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 6px 0;
+      margin: 0 -6px 14px -6px;
+    }
+
+    .kpi-box {
+      border: 1px solid #cbd5e1;
+      border-top: 3px solid #2563eb;
+      border-radius: 5px;
+      padding: 8px 10px;
+      background-color: #f8fafc;
+      width: 25%;
+      vertical-align: top;
+    }
+
+    .kpi-box.green { border-top-color: #16a34a; }
+    .kpi-box.slate { border-top-color: #475569; }
+    .kpi-box.orange { border-top-color: #ea580c; }
+
+    .kpi-label {
+      font-size: 7pt;
+      font-weight: bold;
+      color: #64748b;
       text-transform: uppercase;
     }
 
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    tr:hover {
-      background-color: #f1f5ff;
-    }
-
-    .summary {
-      text-align: left;
+    .kpi-value {
+      font-size: 12.5pt;
       font-weight: bold;
-      padding: 20px;
-      margin: 20px auto;
-      width: 90%;
-      background-color: #f5f5f5;
-      border: 1px solid #ddd;
+      color: #0f172a;
+      margin: 4px 0 3px 0;
     }
 
-    footer {
-      text-align: center;
-      padding: 10px 0;
-      background-color: #007BFF;
-      color: #fff;
-      font-size: 0.9rem;
-      margin-top: 30px;
+    .kpi-box.green .kpi-value { color: #15803d; }
+    .kpi-box.orange .kpi-value { color: #c2410c; }
+
+    .kpi-note {
+      font-size: 7pt;
+      color: #64748b;
     }
-    img{
-      width: 90%;
-      height: 10px;
+
+    /* Títulos de Seção */
+    .section-title {
+      font-size: 11.5pt;
+      font-weight: bold;
+      color: #0f172a;
+      margin: 10px 0 2px 0;
+    }
+
+    .section-desc {
+      font-size: 8pt;
+      color: #64748b;
+      margin: 0 0 8px 0;
+    }
+
+    /* Tabelas de Dados */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      font-size: 8.3pt;
+    }
+
+    table.data-table th {
+      background-color: #0f172a;
+      color: #ffffff;
+      font-weight: bold;
+      padding: 6px 6px;
+      border: 1px solid #0f172a;
+      font-size: 7.5pt;
+    }
+
+    table.data-table td {
+      padding: 5.5px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      border-left: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    table.data-table tr.alt td {
+      background-color: #f8fafc;
+    }
+
+    table.data-table tr.especial td {
+      background-color: #fffbeb;
+      color: #78350f;
+    }
+
+    table.data-table tr.total-row td {
+      background-color: #e2e8f0;
+      font-weight: bold;
+      color: #0f172a;
+      border-top: 1.5px solid #0f172a;
+      border-bottom: 1.5px solid #0f172a;
+    }
+
+    .text-left { text-align: left; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .bold { font-weight: bold; }
+    .meta-highlight { font-weight: bold; color: #15803d; }
+
+    .status-na-meta {
+      background-color: #dcfce7;
+      color: #166534;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 7.5pt;
+    }
+
+    .status-fora-meta {
+      background-color: #ffedd5;
+      color: #9a3412;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 7.5pt;
+    }
+
+    /* Caixas de Observação / Destaques */
+    .obs-box {
+      background-color: #f1f5f9;
+      border-left: 3px solid #0f172a;
+      padding: 8px 10px;
+      font-size: 8pt;
+      color: #334155;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .destaques-box {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid #2563eb;
+      padding: 9px 12px;
+      font-size: 8.2pt;
+      color: #1e3a8a;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+
+    .destaques-box ul {
+      margin: 4px 0 0 14px;
+      padding: 0;
+    }
+
+    .destaques-box li {
+      margin-bottom: 3px;
+    }
+
+    /* Layout lado a lado na Página 2 */
+    .two-col-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .two-col-table td.col-half {
+      width: 49%;
+      vertical-align: top;
+    }
+
+    .two-col-table td.col-spacer {
+      width: 2%;
+    }
+
+    .sub-card-title {
+      font-size: 9pt;
+      font-weight: bold;
+      color: #0f172a;
+      background-color: #e2e8f0;
+      padding: 5px 8px;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      margin-bottom: 0;
+    }
+
+    /* Rodapé e Quebra de Página */
+    .footer-table {
+      width: 100%;
+      border-top: 1px solid #cbd5e1;
+      margin-top: 14px;
+      padding-top: 5px;
+      font-size: 7.5pt;
+      color: #64748b;
+    }
+
+    .page-break {
+      page-break-before: always;
     }
   </style>
 </head>
 <body>
 
-  <img src="{{url_for('static', filename= 'imgs/logogr7.jpg')}}" alt="logo" class="logos">
+  <!-- ==================== PÁGINA 1 ==================== -->
+  <table class="header-table">
+    <tr>
+      <td style="width: 70%; vertical-align: top;">
+        <div class="header-title">{{ titulo_loja }}</div>
+        <div class="header-sub">Relatório Gerencial de Desempenho &amp; Consolidação de Faturamento</div>
+      </td>
+      <td style="width: 30%; text-align: right; vertical-align: top;">
+        <div class="badge-unidade">{{ subtitulo_unidade }}</div>
+        <div class="badge-periodo">Competência: <strong>{{ mes_nome }} / {{ ano }}</strong></div>
+      </td>
+    </tr>
+  </table>
 
-  <h2>Filtros por Mecânico</h2>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Mecânico</th>
-          <th>Quantidade</th>
-          <th>Valor</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for filtro  in dados_filtros  %}
-          <tr>
-            <td><strong>{{filtro.mecanico}}</strong></td>
-            <td>{{filtro.quantidade}}</td>
-            <td>R$ {{filtro.valor}}</td>
-          </tr>
-        {% endfor %}
-        <tr>
-          <td><strong>Total</strong></td>
-          {% for faturamento  in faturamento_servico  %}
-          {%if faturamento[0] == 'filtro' %}
-          <td><strong>{{ faturamento[2] }}</strong></td>
-          <td> <strong>{{ faturamento[1] }}</strong></td>
+  <!-- 4 Cards de KPI -->
+  <table class="kpi-table">
+    <tr>
+      <td class="kpi-box">
+        <div class="kpi-label">FAT. BRUTO TOTAL</div>
+        <div class="kpi-value">R$ {{ fmt(bruto_total) }}</div>
+        <div class="kpi-note">Total acumulado da unidade</div>
+      </td>
+      <td class="kpi-box green">
+        <div class="kpi-label">FAT. LÍQUIDO (META)</div>
+        <div class="kpi-value">R$ {{ fmt(liquido_total) }}</div>
+        <div class="kpi-note">Base oficial para metas</div>
+      </td>
+      <td class="kpi-box slate">
+        <div class="kpi-label">TOTAL DE OS</div>
+        <div class="kpi-value">{{ total_os }} OS</div>
+        <div class="kpi-note">Volume de atendimentos</div>
+      </td>
+      <td class="kpi-box orange">
+        <div class="kpi-label">DEDUÇÕES META</div>
+        <div class="kpi-value">R$ {{ fmt(deducoes_total) }}</div>
+        <div class="kpi-note">
+          {% if is_portal %}
+            Baterias ({{ bateria_qtd }}) + Funilaria ({{ funilaria_qtd }})
+          {% else %}
+            Baterias ({{ bateria_qtd }}) + Pneus ({{ pneu_qtd }})
           {% endif %}
-          
-          
-          {% endfor %}
-        </tr>
-      </tbody>
-    </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Seção 1 -->
+  <div class="section-title">1. Desempenho da Equipe Técnica (Mecânicos)</div>
+  <div class="section-desc">Apurado por faturamento de peças, serviços e deduções</div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th class="text-left" style="width: 26%;">MECÂNICO</th>
+        <th class="text-center" style="width: 7%;">OS</th>
+        <th class="text-right" style="width: 16%;">PEÇAS (R$)</th>
+        <th class="text-right" style="width: 16%;">SERVIÇOS (R$)</th>
+        <th class="text-right" style="width: 16%;">BRUTO TOTAL (R$)</th>
+        <th class="text-right" style="width: 11%;">LÍQUIDO META (R$)</th>
+        <th class="text-right" style="width: 8%;">% PART. META</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in mecanicos %}
+      <tr class="{{ 'alt' if loop.index is even else '' }}">
+        <td class="text-left bold">{{ m.nome }}</td>
+        <td class="text-center">{{ m.os }}</td>
+        <td class="text-right">{{ fmt(m.pecas) }}</td>
+        <td class="text-right">{{ fmt(m.servicos) }}</td>
+        <td class="text-right">{{ fmt(m.bruto) }}</td>
+        <td class="text-right meta-highlight">{{ fmt(m.meta) }}</td>
+        <td class="text-right">{{ fmt(m.part_meta) }}%</td>
+      </tr>
+      {% endfor %}
+
+      {% for esp in especiais %}
+      <tr class="especial">
+        <td class="text-left bold">{{ esp.nome }}</td>
+        <td class="text-center">{{ esp.os }}</td>
+        <td class="text-right">{{ fmt(esp.pecas) }}</td>
+        <td class="text-right">{{ fmt(esp.servicos) }}</td>
+        <td class="text-right">{{ fmt(esp.bruto) }}</td>
+        <td class="text-right bold">{{ fmt(esp.meta) }}</td>
+        <td class="text-right">{{ fmt(esp.part_meta) }}%</td>
+      </tr>
+      {% endfor %}
+
+      <tr class="total-row">
+        <td class="text-left">TOTAL GERAL</td>
+        <td class="text-center">{{ total_os }}</td>
+        <td class="text-right">{{ fmt(pecas_total) }}</td>
+        <td class="text-right">{{ fmt(servicos_total) }}</td>
+        <td class="text-right">{{ fmt(bruto_total) }}</td>
+        <td class="text-right">{{ fmt(liquido_total) }}</td>
+        <td class="text-right">100,00%</td>
+      </tr>
+    </tbody>
+  </table>
+
+  {% if mesa %}
+  <div class="section-title">2. Desempenho da Mesa (Atendimento &amp; Orçamentistas)</div>
+  <div class="section-desc">
+    {% if is_portal %}
+      Consolidação por consultor(a) com deduções de Baterias e Funilaria
+    {% else %}
+      Consolidação por consultor(a) com deduções de Baterias e Pneus
+    {% endif %}
   </div>
 
-  <h2>Revitalização</h2>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Mecânico</th>
-          <th>Quantidade</th>
-          <th>Valor Mecânico</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for dados in dados_revitalizacao  %}
-        <tr>
-          <td><strong>{{dados.mecanico}}</strong></td>
-          <td>{{dados.quantidade}}</td>
-          <td>R$ {{dados.valor}}</td>
-        </tr>
-        {% endfor %}
-        
-        <tr>
-          <td><strong>Total</strong></td>
-          {% for faturamento  in faturamento_servico  %}
-          {%if faturamento[0] == 'revitalizacao' %}
-          <td><strong>{{ faturamento[2] }}</strong></td>
-          <td> <strong>{{ faturamento[1] }}</strong></td>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th class="text-left" style="width: 24%;">CONSULTOR(A)</th>
+        <th class="text-center" style="width: 8%;">OS</th>
+        <th class="text-right" style="width: 17%;">BRUTO TOTAL (R$)</th>
+        <th class="text-right" style="width: 14%;">BATERIAS (R$)</th>
+        {% if is_portal %}
+        <th class="text-right" style="width: 14%;">FUNILARIA (R$)</th>
+        {% else %}
+        <th class="text-right" style="width: 14%;">PNEUS (R$)</th>
+        {% endif %}
+        <th class="text-right" style="width: 15%;">LÍQUIDO META (R$)</th>
+        <th class="text-right" style="width: 8%;">% PART.</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in mesa %}
+      <tr class="{{ 'alt' if loop.index is even else '' }}">
+        <td class="text-left bold">{{ c.nome }}</td>
+        <td class="text-center">{{ c.os }}</td>
+        <td class="text-right">{{ fmt(c.bruto) }}</td>
+        <td class="text-right">{{ fmt(c.bateria) }}</td>
+        {% if is_portal %}
+        <td class="text-right">{{ fmt(c.funilaria) }}</td>
+        {% else %}
+        <td class="text-right">{{ fmt(c.pneu) }}</td>
+        {% endif %}
+        <td class="text-right meta-highlight">{{ fmt(c.meta) }}</td>
+        <td class="text-right">{{ fmt(c.part_bruto) }}%</td>
+      </tr>
+      {% endfor %}
+      <tr class="total-row">
+        <td class="text-left">TOTAL MESA</td>
+        <td class="text-center">{{ total_mesa_os }}</td>
+        <td class="text-right">{{ fmt(total_mesa_bruto) }}</td>
+        <td class="text-right">{{ fmt(total_mesa_bateria) }}</td>
+        {% if is_portal %}
+        <td class="text-right">{{ fmt(total_mesa_funilaria) }}</td>
+        {% else %}
+        <td class="text-right">{{ fmt(total_mesa_pneu) }}</td>
+        {% endif %}
+        <td class="text-right">{{ fmt(total_mesa_meta) }}</td>
+        <td class="text-right">100,00%</td>
+      </tr>
+    </tbody>
+  </table>
+  {% else %}
+  <div class="obs-box">
+    <strong>Observação Estrutural de Vendas:</strong> Não há registros de orçamentista/mesa vinculados às ordens de serviço
+    desta competência na unidade <strong>{{ titulo_loja }}</strong>. O faturamento está computado diretamente via
+    produção operacional técnica da oficina.
+  </div>
+  {% endif %}
+
+  <table class="footer-table">
+    <tr>
+      <td class="text-left">Relatório Gerencial de Faturamento · {{ titulo_loja }} ({{ mes_nome }}/{{ ano }})</td>
+      <td class="text-right">Página 1 de 2</td>
+    </tr>
+  </table>
+
+  <!-- ==================== PÁGINA 2 ==================== -->
+  <div class="page-break"></div>
+
+  <table class="header-table">
+    <tr>
+      <td style="width: 70%; vertical-align: top;">
+        <div class="header-title">{{ titulo_loja }}</div>
+        <div class="header-sub">Consolidação de Serviços na Meta, Deduções &amp; Agregados</div>
+      </td>
+      <td style="width: 30%; text-align: right; vertical-align: top;">
+        <div class="badge-unidade">{{ subtitulo_unidade }}</div>
+        <div class="badge-periodo">Competência: <strong>{{ mes_nome }} / {{ ano }}</strong></div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Seção 2 -->
+  <div class="section-title">2. Indicadores de Serviços na Meta &amp; Deduções</div>
+  <div class="section-desc">Classificação por enquadramento operacional</div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th class="text-left" style="width: 46%;">SERVIÇO / AGREGADO</th>
+        <th class="text-center" style="width: 20%;">STATUS NA META</th>
+        <th class="text-center" style="width: 14%;">QTD OS</th>
+        <th class="text-right" style="width: 20%;">VALOR TOTAL (R$)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in indicadores_servicos %}
+      <tr class="{{ 'alt' if loop.index is even else '' }}">
+        <td class="text-left bold">{{ item.nome }}</td>
+        <td class="text-center">
+          {% if item.na_meta %}
+            <span class="status-na-meta">{{ item.status }}</span>
+          {% else %}
+            <span class="status-fora-meta">{{ item.status }}</span>
           {% endif %}
-          {% endfor %}
-        </tr>
-      </tbody>
-    </table>
+        </td>
+        <td class="text-center">{{ item.qtd }} OS</td>
+        <td class="text-right bold">R$ {{ fmt(item.valor) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Seção 3 -->
+  <div class="section-title">3. Detalhamento de Serviços Agregados por Mecânico</div>
+  <div class="section-desc">Vendas de Filtros e Revitalização de Faróis por profissional</div>
+
+  <table class="two-col-table">
+    <tr>
+      <!-- Coluna Esquerda: Filtros -->
+      <td class="col-half">
+        <div class="sub-card-title">Filtros ({{ total_filtros_qtd }} un. · R$ {{ fmt(total_filtros_val) }})</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="text-left" style="width: 56%;">MECÂNICO</th>
+              <th class="text-center" style="width: 16%;">QTD</th>
+              <th class="text-right" style="width: 28%;">TOTAL (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in filtros %}
+            <tr class="{{ 'alt' if loop.index is even else '' }}">
+              <td class="text-left">{{ f.nome }}</td>
+              <td class="text-center">{{ f.qtd }}</td>
+              <td class="text-right bold">{{ fmt(f.valor) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center">Sem vendas de filtros no período.</td></tr>
+            {% endfor %}
+            <tr class="total-row">
+              <td class="text-left">TOTAL FILTROS</td>
+              <td class="text-center">{{ total_filtros_qtd }}</td>
+              <td class="text-right">{{ fmt(total_filtros_val) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+
+      <td class="col-spacer"></td>
+
+      <!-- Coluna Direita: Revitalização -->
+      <td class="col-half">
+        <div class="sub-card-title">Revitalização ({{ total_revi_qtd }} OS · R$ {{ fmt(total_revi_val) }})</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="text-left" style="width: 56%;">MECÂNICO</th>
+              <th class="text-center" style="width: 16%;">QTD</th>
+              <th class="text-right" style="width: 28%;">TOTAL (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in revitalizacao %}
+            <tr class="{{ 'alt' if loop.index is even else '' }}">
+              <td class="text-left">{{ r.nome }}</td>
+              <td class="text-center">{{ r.qtd }}</td>
+              <td class="text-right bold">{{ fmt(r.valor) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center">Sem revitalizações no período.</td></tr>
+            {% endfor %}
+            <tr class="total-row">
+              <td class="text-left">TOTAL REVITALIZAÇÃO</td>
+              <td class="text-center">{{ total_revi_qtd }}</td>
+              <td class="text-right">{{ fmt(total_revi_val) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Destaques Operacionais -->
+  <div class="destaques-box">
+    <strong>Destaques Operacionais:</strong>
+    <ul>
+      {% if top3_nomes %}
+      <li>
+        <strong>Alta Produção Técnica:</strong> Os 3 principais mecânicos ({{ top3_nomes }}) concentram
+        <strong>{{ fmt(top3_perc) }}%</strong> de todo o faturamento de meta da {{ titulo_loja }}.
+      </li>
+      {% endif %}
+      <li>
+        <strong>Venda de Serviços Agregados:</strong> Acompanhamento detalhado das vendas de Filtros
+        (<strong>{{ total_filtros_qtd }} unidades / R$ {{ fmt(total_filtros_val) }}</strong>) e Revitalização de Faróis
+        (<strong>{{ total_revi_qtd }} serviços / R$ {{ fmt(total_revi_val) }}</strong>) por profissional.
+      </li>
+    </ul>
   </div>
 
-  <h2>Total de Serviços</h2>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Serviço</th>
-          <th>Quantidade de Veículos</th>
-          <th>Valor</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tbody>
-          {% for faturamento in faturamento_servico %}
-          <tr>
-              {%if faturamento[0] == 'revitalizacao' %}
-              <td><strong>REVITALIZAÇÃO</strong></td>
-              <td>{{ faturamento[2] }}</td>
-              <td>{{ faturamento[1] }}</td>
-              {% endif %}
-              {%if faturamento[0] == 'aditivo' %}
-                  {%if empresa == 'gr7'%}
-                      <td><strong>ADITIVO</strong></td>
-                      <td>{{ faturamento[2] }}</td>
-                      <td>{{ faturamento[1] }}</td>
-
-                  {%elif empresa == 'portal'%}
-                      <td><strong>AR CONDICIONADO</strong></td>
-                      <td>{{ faturamento[2] }}</td>
-                      <td>{{ faturamento[1] }}</td>
-                  {%endif%}
-              {% endif %}
-              {%if faturamento[0] == 'fluido_sangria' %}
-                  {%if empresa == 'gr7'%}
-                  <td><strong>FLUIDO E SANGRIA</strong></td>
-                  <td>{{ faturamento[2] }}</td>
-                  <td>{{ faturamento[1] }}</td>
-
-                  {%elif empresa == 'portal'%}
-                      <td><strong>LAVAGEM</strong></td>
-                      <td>{{ faturamento[2] }}</td>
-                      <td>{{ faturamento[1] }}</td>
-
-                  {%endif%}
-                  {% endif %}
-              {%if faturamento[0] == 'palheta' %}
-                  {%if empresa == 'gr7'%}
-                      <td><strong>PALHETA</strong></td>
-                      <td>{{ faturamento[2] }}</td>
-                      <td>{{ faturamento[1] }}</td>
-
-              {%elif empresa == 'portal'%}
-                  <td><strong>ALTERNADOR/MOTOR DE ARRANQUE</strong></td>
-                  <td>{{ faturamento[2] }}</td>
-                  <td>{{ faturamento[1] }}</td>
-
-              {%endif%}
-              {% endif %}
-              {%if faturamento[0] == 'limpeza_freios' %}
-                  {%if empresa == 'gr7'%}
-                  <td><strong>LIMPEZA DE FREIOS</strong></td>
-                  <td>{{ faturamento[2] }}</td>
-                  <td>{{ faturamento[1] }}</td>
-
-                  {%elif empresa == 'portal'%}
-                  <td><strong>FUNILARIA</strong></td>
-                  <td>{{ faturamento[2] }}</td>
-                  <td>{{ faturamento[1] }}</td>
-
-                {%endif%}
-              {% endif %}
-              {%if faturamento[0] == 'detergente_parabrisa' %}
-              <td><strong>DETERGENTE PARABRISA</strong></td>
-              <td>{{ faturamento[2] }}</td>
-              <td>{{ faturamento[1] }}</td>
-              {% endif %}
-              {%if faturamento[0] == 'filtro' %}
-              <td><strong>FILTRO</strong></td>
-              <td>{{ faturamento[2] }}</td>
-              <td>{{ faturamento[1] }}</td>
-              {% endif %}
-              {%if faturamento[0] == 'pneus' %}
-              <td><strong>PNEUS</strong></td>
-              <td>{{ faturamento[2] }}</td>
-              <td>{{ faturamento[1] }}</td>
-              {% endif %}
-              {%if faturamento[0] == 'bateria' %}
-              <td><strong>BATERIA</strong></td>
-              <td>{{ faturamento[2] }}</td>
-              <td>{{ faturamento[1] }}</td>
-              {% endif %}
-          </tr>
-          
-          {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="summary">
-    <p><strong>Faturamento Bruto:</strong> R$ {{valor_faturamento_total}}</p>
-    <p><strong>Valor Líquido:</strong> R$ {{valor_faturamento_meta}}</p>
-    <p><strong>Passagem de Veiculos</strong> {{passagens}}</p>
-    <p><strong>Tickte Medio</strong> {{ticket}}</p>
-  </div>
-
-  <footer>© 2024 Relatório de Serviços. Todos os direitos reservados.</footer>
+  <table class="footer-table">
+    <tr>
+      <td class="text-left">Relatório Gerencial de Faturamento · {{ titulo_loja }} ({{ mes_nome }}/{{ ano }})</td>
+      <td class="text-right">Página 2 de 2</td>
+    </tr>
+  </table>
 
 </body>
 </html>

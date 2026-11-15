@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}GR7 Módulos{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('modulos.static', filename='css/app.css') }}">
+</head>
+<body>
+  <div class="mobile-topbar">
+    <div class="brand-mobile">GR7 <span>MÓDULOS</span></div>
+    <button type="button" class="menu-toggle" onclick="document.getElementById('sidebar-menu').classList.toggle('open')">
+      ☰ Menu
+    </button>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar-menu">
+      <div class="brand">GR7 <span>MÓDULOS</span></div>
+      <nav>
+        <a class="{{ 'active' if request.endpoint == 'modulos.dashboard' else '' }}" href="{{ url_for('modulos.dashboard') }}">⌂ <span>Início</span></a>
+        <a class="{{ 'active' if request.endpoint == 'modulos.orcamentos' else '' }}" href="{{ url_for('modulos.orcamentos') }}">O <span>Orçamentos</span></a>
+        <a class="{{ 'active' if request.endpoint and 'venda' in request.endpoint else '' }}" href="{{ url_for('modulos.vendas') }}">V <span>Vendas / OS</span></a>
+        <a class="{{ 'active' if request.endpoint and 'cliente' in request.endpoint else '' }}" href="{{ url_for('modulos.clientes') }}">C <span>Cadastros</span></a>
+        <a class="{{ 'active' if request.endpoint and 'produto' in request.endpoint else '' }}" href="{{ url_for('modulos.produtos') }}">P <span>Serviços / Peças</span></a>
+        <a class="{{ 'active' if request.endpoint == 'modulos.gastos' else '' }}" href="{{ url_for('modulos.gastos') }}">G <span>Gastos</span></a>
+        <a class="{{ 'active' if request.endpoint == 'modulos.faturamento' else '' }}" href="{{ url_for('modulos.faturamento') }}">F <span>Faturamento</span></a>
+        <a class="{{ 'active' if request.endpoint == 'modulos.relatorios' else '' }}" href="{{ url_for('modulos.relatorios') }}">R <span>Relatórios</span></a>
+        <a class="nav-logout" href="{{ url_for('logout') }}">⎋ <span>Sair</span></a>
+      </nav>
+      <div class="user">
+        <small>Usuário conectado</small>
+        <strong>{{ session.get('usuario', 'Usuário') }}</strong>
+        <span>{{ session.get('permission', '') }} · Filial 4</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

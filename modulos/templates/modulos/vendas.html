@@ -1,0 +1,6 @@
+{% extends 'modulos/base.html' %}{% block content %}
+<header><h1>{{ titulo }}</h1><p>{{ subtitulo }}</p></header>
+<div class="toolbar"><form class="search"><input name="q" value="{{ q }}" placeholder="Cliente, placa, veículo ou módulo">{% if not somente_orcamentos %}<select name="status"><option value="">Todos os status</option>{% for s in ['ORCAMENTO','APROVADO','EM_SERVICO','FINALIZADO','FATURADO','CANCELADO'] %}<option {{ 'selected' if status==s else '' }}>{{ s }}</option>{% endfor %}</select>{% endif %}<button class="btn secondary">Filtrar</button></form><a class="btn" href="{{ url_for('modulos.venda_nova') }}">{{ acao }}</a></div>
+<div class="table-wrap"><table><thead><tr><th>Nº</th><th>Data</th><th>Cliente</th><th>Veículo</th><th>Status</th><th>Valor</th></tr></thead><tbody>
+{% for v in vendas %}<tr><td><a href="{{ url_for('modulos.venda_detalhe', venda_id=v.id) }}"><strong>{{ v.numero }}</strong></a></td><td>{{ v.data_abertura.strftime('%d/%m/%Y') if v.data_abertura else '-' }}</td><td>{{ v.cliente.nome }}</td><td>{{ v.veiculo or '-' }} · {{ v.placa or '-' }}</td><td><span class="tag">{{ v.status }}</span></td><td>{{ v.valor_total|brl }}</td></tr>{% else %}<tr><td colspan="6">Nenhuma OS encontrada.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

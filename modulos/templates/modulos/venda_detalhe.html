@@ -1,0 +1,95 @@
+{% extends 'modulos/base.html' %}{% block content %}
+<header><h1>{{ venda.numero }}</h1><p>Ordem de serviço / venda · {{ venda.cliente.nome }}</p></header>
+<div class="status-line"><span class="tag large">{{ venda.status }}</span><span>Criada em {{ venda.data_abertura.strftime('%d/%m/%Y %H:%M') if venda.data_abertura else '-' }}</span></div>
+<section class="detail-grid">
+  <div class="panel">
+    <h2>Cliente e veículo</h2>
+    <p><strong>{{ venda.cliente.nome }}</strong><br>{{ venda.veiculo or '-' }} · {{ venda.placa or '-' }} · {{ venda.ano_veiculo or '-' }}<br>Contato: {{ venda.cliente.telefone or '-' }}</p>
+    <h3>Módulo</h3>
+    <p>{{ venda.modulo or '-' }} {{ venda.codigo_modulo or '' }}</p>
+  </div>
+  <div class="panel">
+    <h2>Valores</h2>
+    <dl>
+      <dt>Serviços</dt><dd>{{ venda.valor_servicos|brl }}</dd>
+      <dt>Peças</dt><dd>{{ venda.valor_pecas|brl }}</dd>
+      <dt>Desconto</dt><dd>{{ venda.desconto|brl }}</dd>
+      <dt>Total</dt><dd><strong>{{ venda.valor_total|brl }}</strong></dd>
+    </dl>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Itens da OS</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Tipo</th><th>Descrição</th><th>Qtd.</th><th>Custo</th><th>Venda</th><th>Total</th></tr></thead>
+      <tbody>
+        {% for i in venda.itens %}
+        <tr><td>{{ i.tipo }}</td><td>{{ i.descricao }}</td><td>{{ i.quantidade }}</td><td>{{ i.custo_unitario|brl }}</td><td>{{ i.valor_unitario|brl }}</td><td>{{ i.valor_total|brl }}</td></tr>
+        {% else %}
+        <tr><td colspan="6">Sem itens.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <div class="panel">
+    <h2>Defeito relatado</h2><p>{{ venda.defeito_relatado or '-' }}</p>
+    <h2>Diagnóstico</h2><p>{{ venda.diagnostico or '-' }}</p>
+  </div>
+  <div class="panel">
+    <h2>Alterar status</h2>
+    <form method="post" action="{{ url_for('modulos.venda_status', venda_id=venda.id) }}" style="display: flex; flex-direction: column; gap: 10px;">
+      <label>Status
+        <select name="status" id="status-select" onchange="toggleFaturamento(this.value)">
+          {% for s in ['ORCAMENTO','APROVADO','EM_SERVICO','FINALIZADO','FATURADO','CANCELADO'] %}
+            <option value="{{ s }}" {{ 'selected' if venda.status==s else '' }}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <div id="campos-faturamento" style="display: {{ 'flex' if venda.status == 'FATURADO' else 'none' }}; flex-direction: column; gap: 10px;">
+        <label>Forma de pagamento
+          <select name="forma_pagamento" id="forma-pagamento">
+            <option value="">Selecione...</option>
+            {% set fp_atual = venda.faturamentos[0].forma_pagamento if venda.faturamentos else '' %}
+            {% for fp in ['PIX', 'CARTAO_CREDITO', 'CARTAO_DEBITO', 'DINHEIRO', 'BOLETO', 'TRANSFERENCIA'] %}
+              <option value="{{ fp }}" {{ 'selected' if fp_atual == fp else '' }}>{{ fp.replace('_', ' ') }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>Status do pagamento
+          <select name="status_pagamento">
+            {% set sp_atual = venda.faturamentos[0].status_pagamento if venda.faturamentos else 'PAGO' %}
+            <option value="PAGO" {{ 'selected' if sp_atual == 'PAGO' else '' }}>Pago</option>
+            <option value="PENDENTE" {{ 'selected' if sp_atual == 'PENDENTE' else '' }}>Pendente / A prazo</option>
+          </select>
+        </label>
+      </div>
+
+      <div>
+        <button class="btn">Atualizar</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+function toggleFaturamento(status) {
+  const box = document.getElementById("campos-faturamento");
+  const selectFp = document.getElementById("forma-pagamento");
+  if (status === "FATURADO") {
+    box.style.display = "flex";
+    selectFp.required = true;
+  } else {
+    box.style.display = "none";
+    selectFp.required = false;
+  }
+}
+toggleFaturamento(document.getElementById("status-select").value);
+</script>
+{% endblock %}

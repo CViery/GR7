@@ -1,0 +1,71 @@
+{% extends 'modulos/base.html' %}{% block content %}
+<header>
+    <h1>Nova OS / venda</h1>
+    <p>Selecione o cliente, veículo e os itens do atendimento.</p>
+</header>
+<form class="panel" method="post">
+<div class="form-grid">
+    <label class="span-2">Cliente
+        <select required name="cliente_id">
+            <option value="">Selecione</option>
+                {% for c in clientes %}
+            <option value="{{ c.id }}">
+                {{ c.nome }}</option>
+                {% endfor %}
+        </select>
+    </label>
+    <label>Placa<input required name="placa" placeholder="ABC1D23"></label>
+    <label>Ano<input name="ano_veiculo"></label>
+    <label class="span-2">Veículo<input name="veiculo" placeholder="Jeep Compass"></label>
+    <label class="span-2">Módulo<input name="modulo" placeholder="Módulo de injeção"></label>
+    <label class="span-2">Código módulo<input name="codigo_modulo"></label>
+    <label>Status<select name="status">{% for s in ['ORCAMENTO','APROVADO','EM_SERVICO'] %}<option>{{ s }}</option>{% endfor %}</select></label>
+    <label>Desconto<input type="number" step="0.01" name="desconto" value="0"></label>
+    <label class="span-2">Defeito relatado<textarea name="defeito_relatado"></textarea></label>
+    <label class="span-2">Diagnóstico<textarea name="diagnostico"></textarea></label>
+</div>
+
+<h2>Itens</h2>
+<p class="muted">O MVP permite até 5 itens por lançamento. Ao selecionar, o valor padrão é preenchido automaticamente, mas pode ser alterado.</p>
+
+<div style="display: grid; grid-template-columns: 1fr 110px 150px; gap: 10px; margin-bottom: 6px;">
+    <small class="muted">Peça / Serviço</small>
+    <small class="muted">Qtd</small>
+    <small class="muted">Valor unit. (R$)</small>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px;">
+    {% for n in range(5) %}
+    <div class="item-row" style="display: grid; grid-template-columns: 1fr 110px 150px; gap: 10px; align-items: center;">
+        <select name="produto_id" onchange="preencherPreco(this)">
+            <option value="" data-preco="0.00">— Item {{ n+1 }} —</option>
+            {% for p in produtos %}
+                <option value="{{ p.id }}" data-preco="{{ '%.2f'|format(p.valor_padrao or 0) }}">
+                    {{ p.tipo }} · {{ p.descricao }} · {{ p.valor_padrao|brl }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="number" min="0.01" step="0.01" name="quantidade" value="1">
+        <input type="number" min="0" step="0.01" name="valor_unitario" value="0.00" placeholder="0,00">
+    </div>
+    {% endfor %}
+</div>
+
+<div class="actions">
+    <a class="btn secondary" href="{{ url_for('modulos.orcamentos') }}">Cancelar</a>
+    <button class="btn">Salvar orçamento / OS</button>
+</div>
+</form>
+
+<script>
+function preencherPreco(selectEl) {
+  const option = selectEl.options[selectEl.selectedIndex];
+  const preco = option.getAttribute("data-preco") || "0.00";
+  const row = selectEl.closest(".item-row");
+  const inputPreco = row.querySelector('input[name="valor_unitario"]');
+  if (inputPreco) {
+    inputPreco.value = preco;
+  }
+}
+</script>
+{% endblock %}

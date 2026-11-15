@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GR7 Módulos</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f5f7;
+            color: #172033;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 230px;
+            height: 100vh;
+            background-color: #111a2b;
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 35px 28px;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            display: block;
+            margin-top: 6px;
+            color: #79a9ff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .menu {
+            margin-top: 30px;
+            flex: 1;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: #c7ced9;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 15px 20px;
+            margin: 7px 15px;
+
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .menu a:hover {
+            background-color: #1f2a3d;
+            color: white;
+        }
+
+        .menu a.active {
+            background-color: #2f6fed;
+            color: white;
+            font-weight: bold;
+        }
+
+        .menu-icon {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 50%;
+            background-color: #354052;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .active .menu-icon {
+            background-color: white;
+            color: #2f6fed;
+        }
+
+        /* =========================
+           USUÁRIO
+        ========================= */
+
+        .usuario {
+            padding: 20px 28px;
+            border-top: 1px solid #344054;
+        }
+
+        .usuario small {
+            color: #8993a4;
+        }
+
+        .usuario strong {
+            display: block;
+            margin-top: 8px;
+        }
+
+        .badge-admin {
+            display: inline-block;
+
+            margin-top: 10px;
+            padding: 7px 14px;
+
+            background-color: #3a4558;
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .sair {
+            padding: 20px 28px 30px;
+        }
+
+        .sair a {
+            color: #ff8f8f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* =========================
+           CONTEÚDO
+        ========================= */
+
+        .main {
+            margin-left: 230px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background-color: white;
+            border-bottom: 1px solid #e0e3e7;
+
+            padding: 22px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar h1 {
+            font-size: 27px;
+            margin-bottom: 5px;
+        }
+
+        .topbar p {
+            color: #747b87;
+            font-size: 14px;
+        }
+
+        .btn-ajuda {
+            background: white;
+            border: 1px solid #d6dae0;
+
+            padding: 10px 28px;
+
+            border-radius: 25px;
+            cursor: pointer;
+
+            font-weight: bold;
+            color: #697180;
+        }
+
+        .conteudo {
+            padding: 40px;
+        }
+
+        /* =========================
+           INDICADORES
+        ========================= */
+
+        .indicadores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            margin-bottom: 45px;
+        }
+
+        .card-indicador {
+            background: white;
+            border: 1px solid #e0e3e7;
+            border-radius: 12px;
+
+            padding: 23px;
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-indicador::before {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            top: 0;
+
+            width: 6px;
+            height: 100%;
+        }
+
+        .card-indicador.aberto::before {
+            background-color: #ffa800;
+        }
+
+        .card-indicador.andamento::before {
+            background-color: #2f6fed;
+        }
+
+        .card-indicador.vendas::before {
+            background-color: #19ad62;
+        }
+
+        .card-indicador.custo::before {
+            background-color: #813cff;
+        }
+
+        .card-indicador h3 {
+            color: #727986;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .card-indicador .valor {
+            font-size: 27px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .card-indicador .descricao {
+            color: #808795;
+            font-size: 13px;
+        }
+
+        /* =========================
+           ATALHOS
+        ========================= */
+
+        .titulo-secao {
+            font-size: 21px;
+            margin-bottom: 18px;
+        }
+
+        .atalhos {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 45px;
+        }
+
+        .atalho {
+            background-color: white;
+            border: 1px solid #e0e3e7;
+            border-radius: 12px;
+
+            padding: 20px;
+
+            display: flex;
+            gap: 15px;
+            align-items: center;
+
+            text-decoration: none;
+            color: #172033;
+
+            transition: 0.2s;
+        }
+
+        .atalho:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .atalho-icon {
+            min-width: 45px;
+            height: 45px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background-color: #e3e6eb;
+            color: #737b89;
+
+            font-weight: bold;
+        }
+
+        .atalho.destaque .atalho-icon {
+            background-color: #2f6fed;
+            color: white;
+        }
+
+        .atalho h3 {
+            font-size: 15px;
+            margin-bottom: 7px;
+        }
+
+        .atalho p {
+            color: #838a96;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* =========================
+           MOVIMENTAÇÕES
+        ========================= */
+
+        .cabecalho-tabela {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 12px;
+        }
+
+        .btn-ver-todas {
+            padding: 10px 23px;
+
+            background: white;
+            border: 1px solid #d9dde3;
+            border-radius: 8px;
+
+            color: #172033;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .tabela-container {
+            background-color: white;
+            border: 1px solid #e1e4e8;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f2f3f5;
+
+            text-align: left;
+
+            padding: 15px;
+
+            font-size: 13px;
+            color: #697180;
+
+            border-right: 1px solid #dedfe2;
+        }
+
+        td {
+            padding: 16px 15px;
+
+            font-size: 13px;
+
+            border-top: 1px solid #e3e5e8;
+            border-right: 1px solid #e3e5e8;
+        }
+
+        tr:hover td {
+            background-color: #f8f9fb;
+        }
+
+        /* =========================
+           RESPONSIVIDADE
+        ========================= */
+
+        @media(max-width: 1100px) {
+
+            .indicadores,
+            .atalhos {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h1>GR7</h1>
+            <span>MÓDULOS</span>
+        </div>
+
+
+        <nav class="menu">
+
+            <a href="#" class="active">
+                <div class="menu-icon">I</div>
+                Início
+            </a>
+
+            <a href="#">
+                <div class="menu-icon">O</div>
+                Orçamentos
+            </a>
+
+            <a href="#">
+                <div class="menu-icon">V</div>
+                Vendas / OS
+            </a>
+
+            <a href="#">
+                <div class="menu-icon">C</div>
+                Cadastros
+            </a>
+
+            <a href="#">
+                <div class="menu-icon">Q</div>
+                Consultas
+            </a>
+
+            <a href="#">
+                <div class="menu-icon">R</div>
+                Relatórios
+            </a>
+
+        </nav>
+
+
+        <div class="usuario">
+
+            <small>Usuário</small>
+
+            <strong>
+                {{ user }}
+            </strong>
+
+            <span class="badge-admin">
+                ADMIN
+            </span>
+
+        </div>
+
+
+        <div class="sair">
+            <a href="/logout">Sair</a>
+        </div>
+
+    </aside>
+
+
+    <!-- CONTEÚDO -->
+    <main class="main">
+
+        <!-- TOPO -->
+        <header class="topbar">
+
+            <div>
+                <h1>Visão geral</h1>
+
+                <p>
+                    Resumo operacional da GR7 Módulos e atalhos para os lançamentos mais usados.
+                </p>
+            </div>
+
+            <button class="btn-ajuda">
+                Ajuda
+            </button>
+
+        </header>
+
+
+        <div class="conteudo">
+
+            <!-- INDICADORES -->
+
+            <section class="indicadores">
+
+                <div class="card-indicador aberto">
+
+                    <h3>ORÇAMENTOS EM ABERTO</h3>
+
+                    <div class="valor">
+                        {{ orcamentos_abertos }}
+                    </div>
+
+                    <div class="descricao">
+                        Orçamentos aguardando aprovação
+                    </div>
+
+                </div>
+
+
+                <div class="card-indicador andamento">
+
+                    <h3>OS EM ANDAMENTO</h3>
+
+                    <div class="valor">
+                        {{ orcamentos_andamento }}
+                    </div>
+
+                    <div class="descricao">
+                        Serviços em execução
+                    </div>
+
+                </div>
+
+
+                <div class="card-indicador vendas">
+
+                    <h3>VENDAS NO MÊS</h3>
+
+                    <div class="valor">
+                        {{ vendas_mes }}
+                    </div>
+
+                    <div class="descricao">
+                        Total faturado no mês
+                    </div>
+
+                </div>
+
+
+                <div class="card-indicador custo">
+
+                    <h3>CUSTO NO MÊS</h3>
+
+                    <div class="valor">
+                        {{ custo_mes | default('R$ 0,00') }}
+                    </div>
+
+                    <div class="descricao">
+                        Peças + serviços externos
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ATALHOS -->
+
+            <section>
+
+                <h2 class="titulo-secao">
+                    Atalhos rápidos
+                </h2>
+
+                <div class="atalhos">
+
+
+                    <a href="#" class="atalho destaque">
+
+                        <div class="atalho-icon">
+                            +
+                        </div>
+
+                        <div>
+                            <h3>Novo orçamento</h3>
+
+                            <p>
+                                Criar proposta para cliente
+                            </p>
+                        </div>
+
+                    </a>
+
+
+                    <a href="#" class="atalho destaque">
+
+                        <div class="atalho-icon">
+                            V
+                        </div>
+
+                        <div>
+                            <h3>Nova OS / venda</h3>
+
+                            <p>
+                                Lançar serviço aprovado
+                            </p>
+                        </div>
+
+                    </a>
+
+
+                    <a href="#" class="atalho">
+
+                        <div class="atalho-icon">
+                            C
+                        </div>
+
+                        <div>
+                            <h3>Cadastrar cliente</h3>
+
+                            <p>
+                                Novo cliente ou veículo
+                            </p>
+                        </div>
+
+                    </a>
+
+
+                    <a href="#" class="atalho">
+
+                        <div class="atalho-icon">
+                            Q
+                        </div>
+
+                        <div>
+                            <h3>Consultar OS</h3>
+
+                            <p>
+                                Buscar por placa ou número
+                            </p>
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- ÚLTIMAS MOVIMENTAÇÕES -->
+
+            <section>
+
+                <div class="cabecalho-tabela">
+
+                    <h2 class="titulo-secao">
+                        Últimas movimentações
+                    </h2>
+
+                    <a href="#" class="btn-ver-todas">
+                        Ver todas
+                    </a>
+
+                </div>
+
+
+                <div class="tabela-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>N°</th>
+                                <th>Cliente / veículo</th>
+                                <th>Tipo</th>
+                                <th>Status</th>
+                                <th>Valor</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for venda in ultimas_vendas %}
+
+                            <tr>
+
+                                <td>
+                                    {{ venda[0] }}
+                                </td>
+
+                                <td>
+                                    {{ venda[1] }}
+                                </td>
+
+                                <td>
+                                    {{ venda[2] }}
+                                </td>
+
+                                <td>
+                                    {{ venda[3] }}
+                                </td>
+
+                                <td>
+                                    {{ venda[4] }}
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr>
+
+                                <td colspan="5" style="text-align:center; color:#888;">
+                                    Nenhuma movimentação encontrada.
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

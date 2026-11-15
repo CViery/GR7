@@ -1,34 +1,46 @@
-import pandas as pd
-from io import BytesIO
+import logging
 from datetime import datetime
+from io import BytesIO
+
 from flask import send_file
+from openpyxl import Workbook
+
+
+logger = logging.getLogger(__name__)
+
 
 class GerarExcel:
-    def __init__(self):
-        pass
-    
+    """Exporta dados sem carregar pandas/numpy na memória da aplicação."""
+
     def exportar_faturamentos_excel(self, dados):
+        if not dados:
+            return None
+
         try:
-            if dados:
-                df = pd.DataFrame(dados)
-                
-                # Cria um buffer em memória para o arquivo Excel
-                output = BytesIO()
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    df.to_excel(writer, index=False, sheet_name='Faturamentos')
-                
-                # Posiciona o cursor no início do buffer
-                output.seek(0)
-                
-                # Gera um nome de arquivo com base no timestamp atual
-                now = datetime.now()
-                filename = now.strftime("%Y-%m-%d_%H-%M-%S") + ".xlsx"
-               
-                # Retorna o arquivo Excel como uma resposta HTTP
-                return send_file(output, attachment_filename=filename, as_attachment=True)
+            workbook = Workbook(write_only=True)
+            sheet = workbook.create_sheet('Faturamentos')
+
+            primeiro = dados[0]
+            if isinstance(primeiro, dict):
+                colunas = list(primeiro.keys())
+                sheet.append(colunas)
+                for item in dados:
+                    sheet.append([item.get(coluna) for coluna in colunas])
             else:
-                print("Nenhum dado foi retornado.")
-                return None
-        except Exception as e:
-            print(f"Erro ao exportar dados para Excel: {e}")
+                for item in dados:
+                    sheet.append(list(item))
+
+            output = BytesIO()
+            workbook.save(output)
+            output.seek(0)
+            filename = datetime.now().strftime('%Y-%m-%d_%H-%M-%S.xlsx')
+
+            return send_file(
+                output,
+                download_name=filename,
+                as_attachment=True,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+        except Exception:
+            logger.exception('Erro ao exportar faturamentos para Excel.')
             return None

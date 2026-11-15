@@ -1,0 +1,50 @@
+{% extends 'modulos/base.html' %}
+{% block content %}
+<header>
+  <h1>Serviços / Peças</h1>
+  <p>Catálogo de peças e serviços cadastrados.</p>
+</header>
+
+<div class="toolbar">
+  <form class="search">
+    <input name="q" value="{{ q or '' }}" placeholder="Buscar por código ou descrição">
+    <button class="btn secondary">Buscar</button>
+  </form>
+  <a class="btn" href="{{ url_for('modulos.produto_novo') }}">+ Nova peça / serviço</a>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Descrição</th>
+        <th>Tipo</th>
+        <th>Custo padrão</th>
+        <th>Venda padrão</th>
+        <th>Ativo</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in produtos %}
+      <tr>
+        <td>{{ p.codigo or '-' }}</td>
+        <td><strong>{{ p.descricao }}</strong></td>
+        <td><span class="tag">{{ p.tipo }}</span></td>
+        <td>{{ p.custo_padrao|brl }}</td>
+        <td>{{ p.valor_padrao|brl }}</td>
+        <td>{{ 'Sim' if p.ativo else 'Não' }}</td>
+        <td>
+          <a class="btn secondary" href="{{ url_for('modulos.produto_editar', produto_id=p.id) }}">Editar</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7">Nenhuma peça ou serviço encontrado.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

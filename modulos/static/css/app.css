@@ -1,0 +1,567 @@
+:root {
+  --nav: #111a2d;
+  --blue: #2f6fed;
+  --bg: #f4f6f9;
+  --text: #151b2b;
+  --muted: #6b7280;
+  --border: #dde2ea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mobile-topbar {
+  display: none;
+}
+
+.layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 235px minmax(0, 1fr);
+  width: 100%;
+}
+
+.sidebar {
+  background: var(--nav);
+  color: #dbe3ef;
+  padding: 26px 16px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.brand {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 0 12px 28px;
+}
+
+.brand span {
+  display: block;
+  font-size: 15px;
+  color: #77a9ff;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.sidebar nav {
+  display: grid;
+  gap: 6px;
+}
+
+.sidebar nav a {
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  font-size: 15px;
+  transition: background 0.15s;
+}
+
+.sidebar nav a.active,
+.sidebar nav a:hover {
+  background: var(--blue);
+  color: white;
+}
+
+.sidebar nav a.nav-logout {
+  margin-top: 10px;
+  border-top: 1px solid #28354f;
+  padding-top: 14px;
+  color: #fca5a5;
+}
+
+.sidebar nav a.nav-logout:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+.user {
+  margin-top: auto;
+  border-top: 1px solid #39445a;
+  padding: 20px 12px 4px;
+  display: grid;
+  gap: 6px;
+}
+
+.user small {
+  color: #8f9aaf;
+}
+
+.user span {
+  background: #445067;
+  border-radius: 999px;
+  padding: 5px 10px;
+  width: max-content;
+  font-size: 12px;
+}
+
+.content {
+  padding: 28px 36px;
+  width: 100%;
+  min-width: 0;
+}
+
+header {
+  background: white;
+  margin: -28px -36px 28px;
+  padding: 22px 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+h2 {
+  margin: 26px 0 14px;
+  font-size: 20px;
+}
+
+h3 {
+  margin: 18px 0 8px;
+}
+
+p {
+  color: #4b5563;
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.metric {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  border-left: 6px solid;
+  min-width: 0;
+}
+
+.metric span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  display: block;
+}
+
+.metric strong {
+  display: block;
+  font-size: clamp(22px, 2vw, 28px);
+  margin: 12px 0;
+  word-break: break-word;
+}
+
+.metric small {
+  color: var(--muted);
+}
+
+.orange { border-left-color: #ffac18; }
+.blue   { border-left-color: #2f6fed; }
+.green  { border-left-color: #17a65b; }
+.purple { border-left-color: #7c3aed; }
+
+.quick {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.quick > a {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+}
+
+.quick b {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--blue);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 19px;
+}
+
+.quick small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Container da tabela: rola internamente sem empurrar o layout */
+.table-wrap {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  background: #f0f2f5;
+  color: #667085;
+  font-size: 13px;
+}
+
+tbody tr:hover {
+  background: #fafbfc;
+}
+
+.tag {
+  display: inline-block;
+  background: #eef2ff;
+  color: #374151;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tag.large {
+  font-size: 14px;
+}
+
+.toolbar, .section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  margin: 0 0 18px;
+  flex-wrap: wrap;
+}
+
+.search {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.search input {
+  max-width: 420px;
+}
+
+.btn {
+  border: 0;
+  background: var(--blue);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn.secondary {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+input, select, textarea {
+  width: 100%;
+  border: 1px solid #d5dbe5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: white;
+  font: inherit;
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.panel {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #667085;
+}
+
+.form-grid input, .form-grid select, .form-grid textarea {
+  margin-top: 7px;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.span-2 { grid-column: span 2; }
+.span-4 { grid-column: span 4; }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 10px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.status-line {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 20px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin: 0;
+}
+
+dt, dd { margin: 0; }
+dd { font-weight: 700; }
+
+.muted { color: var(--muted); }
+
+.flash {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  background: #e8f6ed;
+  border: 1px solid #bce0c8;
+}
+
+.compact { margin-bottom: 24px; }
+
+/* Tablet e Celular com Menu Sanduíche */
+@media (max-width: 960px) {
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--nav);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+    width: 100%;
+  }
+
+  .mobile-topbar .brand-mobile {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  .mobile-topbar .brand-mobile span {
+    color: #77a9ff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .menu-toggle {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .sidebar {
+    display: none;
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 12px 16px 18px;
+    border-top: 1px solid #28354f;
+  }
+
+  .sidebar.open {
+    display: flex;
+  }
+
+  .sidebar .brand {
+    display: none;
+  }
+
+  .sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .sidebar nav a {
+    padding: 11px 14px;
+    font-size: 14px;
+  }
+
+  .sidebar nav a.nav-logout {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 11px;
+    background: rgba(220, 38, 38, 0.18);
+  }
+
+  .user {
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+
+  .content {
+    padding: 20px 16px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  header {
+    margin: -20px -16px 20px;
+    padding: 18px 16px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .cards,
+  .quick {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .span-4 {
+    grid-column: span 2;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Celular estreito */
+@media (max-width: 560px) {
+  .sidebar nav {
+    grid-template-columns: 1fr;
+  }
+
+  .cards,
+  .quick,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .span-2,
+  .span-4 {
+    grid-column: span 1;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .search {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .search input {
+    max-width: 100%;
+  }
+
+  .item-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .item-row select {
+    grid-column: span 2;
+  }
+}

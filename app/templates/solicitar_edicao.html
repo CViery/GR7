@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}<title>Solicitar edição - OS {{ faturamento.num_os }}</title>{% endblock %}
+{% block main %}
+<style>
+.approval-page{max-width:900px;margin:28px auto;padding:0 20px}.approval-card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:26px;box-shadow:0 10px 30px rgba(15,23,42,.08)}.record{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:#f8fafc;padding:18px;border-radius:12px;margin:18px 0}.record small{display:block;color:#64748b}.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}.fields label{border:1px solid #dbe2ea;border-radius:10px;padding:12px}textarea{width:100%;min-height:120px;padding:12px;border:1px solid #cbd5e1;border-radius:10px}.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}.button{padding:11px 18px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:700;text-decoration:none}.button.light{background:#e2e8f0;color:#1e293b}@media(max-width:700px){.record,.fields{grid-template-columns:1fr}}
+</style>
+<main class="approval-page"><section class="approval-card">
+<h1>Solicitar autorização de edição</h1><p>Explique por que a OS precisa ser corrigida e indique os campos envolvidos.</p>
+<div class="record"><div><small>OS</small><strong>{{ faturamento.num_os }}</strong></div><div><small>Placa</small><strong>{{ faturamento.placa }}</strong></div><div><small>Veículo</small><strong>{{ faturamento.modelo_veiculo }}</strong></div></div>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ approval_csrf_token() }}">
+<strong>Campos que pretende alterar</strong><div class="fields">
+{% for value, label in [('identificacao','Placa ou veículo'),('datas','Datas'),('valores','Peças, serviços ou total'),('pagamento','Valor em dinheiro'),('observacoes','Observações'),('servicos_adicionais','Serviços adicionais')] %}
+<label><input type="checkbox" name="campos" value="{{ value }}"> {{ label }}</label>{% endfor %}
+</div><label for="motivo"><strong>Motivo da alteração</strong></label><textarea id="motivo" name="motivo" required minlength="10" placeholder="Ex.: o valor das peças foi lançado incorretamente e precisa ser ajustado conforme a OS."></textarea>
+<div class="actions"><a class="button light" href="{{ url_for('listar_aprovacoes') }}">Cancelar</a><button class="button" type="submit">Enviar solicitação</button></div></form>
+</section></main>
+{% endblock %}

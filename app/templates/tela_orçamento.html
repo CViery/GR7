@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Novo Orçamento | GR7 Módulos</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            color: #182033;
+        }
+
+        /* =========================
+           LAYOUT
+        ========================= */
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 220px;
+            background: #111a2b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 32px 15px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .logo {
+            margin-bottom: 50px;
+            padding-left: 12px;
+        }
+
+        .logo h1 {
+            font-size: 34px;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            display: block;
+            margin-top: 5px;
+            color: #7dabff;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
+            border-radius: 10px;
+            color: #c6cbd5;
+            cursor: pointer;
+            transition: .2s;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .menu-item:hover {
+            background: #1c2940;
+            color: white;
+        }
+
+        .menu-item.active {
+            background: #2f6feb;
+            color: white;
+            font-weight: bold;
+        }
+
+        .usuario {
+            margin-top: auto;
+            border-top: 1px solid #344055;
+            padding-top: 25px;
+            padding-left: 12px;
+        }
+
+        .usuario small {
+            display: block;
+            color: #9ba4b5;
+            margin-bottom: 8px;
+        }
+
+        .usuario strong {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .badge-admin {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: #3a465b;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .sair {
+            color: #ff8b8b;
+            margin-top: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* =========================
+           CONTEÚDO
+        ========================= */
+
+        .content {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+        }
+
+        .topbar {
+            background: white;
+            padding: 22px 40px;
+            border-bottom: 1px solid #e3e6eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .topbar p {
+            color: #727887;
+            font-size: 14px;
+        }
+
+        .btn-ajuda {
+            border: 1px solid #d9dde5;
+            background: white;
+            padding: 10px 22px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .main {
+            padding: 30px 40px 60px;
+        }
+
+        /* =========================
+           ETAPAS
+        ========================= */
+
+        .steps {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .step {
+            min-width: 130px;
+            text-align: center;
+            padding: 10px 18px;
+            border-radius: 20px;
+            background: #e9edf3;
+            color: #727887;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .step.active {
+            background: #2f6feb;
+            color: white;
+        }
+
+        .step.done {
+            background: #dce8ff;
+            color: #2f6feb;
+        }
+
+        /* =========================
+           CARDS
+        ========================= */
+
+        .card {
+            background: white;
+            border: 1px solid #e0e4ea;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            margin-bottom: 8px;
+            font-size: 21px;
+        }
+
+        .card-subtitle {
+            color: #747b89;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* =========================
+           FORMULÁRIOS
+        ========================= */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #656c7a;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            border: 1px solid #d9dde5;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2f6feb;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 85px;
+        }
+
+        /* =========================
+           CLIENTE SELECIONADO
+        ========================= */
+
+        .cliente-info {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr auto;
+            gap: 18px;
+            align-items: end;
+        }
+
+        .info-box label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #767d8b;
+            margin-bottom: 6px;
+        }
+
+        .info-box strong {
+            display: block;
+            font-size: 15px;
+        }
+
+        .info-box span {
+            color: #6e7582;
+            font-size: 14px;
+        }
+
+        /* =========================
+           BOTÕES
+        ========================= */
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #2f6feb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #245fd0;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #d9dde5;
+            color: #222b3b;
+        }
+
+        .btn-danger {
+            background: #fff1f1;
+            color: #c0392b;
+            border: 1px solid #ffd0d0;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        /* =========================
+           ITENS
+        ========================= */
+
+        .itens-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .itens-header h3 {
+            font-size: 22px;
+        }
+
+        .itens-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #f1f3f6;
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            color: #6b7280;
+            border: 1px solid #e1e4e8;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #e1e4e8;
+            font-size: 14px;
+        }
+
+        .empty-row td {
+            text-align: center;
+            color: #9298a5;
+            padding: 32px;
+        }
+
+        /* =========================
+           RESUMO
+        ========================= */
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+            margin-top: 24px;
+        }
+
+        .resumo {
+            background: white;
+            border: 1px solid #e0e4ea;
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .resumo h3 {
+            margin-bottom: 18px;
+        }
+
+        .resumo-linha {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 13px;
+            color: #696f7d;
+        }
+
+        .resumo-total {
+            padding-top: 14px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .resumo-total strong {
+            color: #2f6feb;
+        }
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal {
+            width: 550px;
+            max-width: calc(100% - 30px);
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-grid .full {
+            grid-column: 1 / -1;
+        }
+
+        /* =========================
+           REVISÃO
+        ========================= */
+
+        .revisao-cliente {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .revisao-box {
+            padding: 16px;
+            background: #f8f9fb;
+            border-radius: 8px;
+        }
+
+        .revisao-box small {
+            display: block;
+            color: #777e8c;
+            margin-bottom: 6px;
+        }
+
+        /* =========================
+           UTIL
+        ========================= */
+
+        .hidden {
+            display: none;
+        }
+
+        .erro {
+            color: #c0392b;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        @media(max-width: 1000px) {
+            .form-grid,
+            .cliente-info,
+            .revisao-cliente {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 750px) {
+            .sidebar {
+                display: none;
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .form-grid,
+            .cliente-info,
+            .revisao-cliente {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h1>GR7</h1>
+            <span>MÓDULOS</span>
+        </div>
+
+        <nav class="menu">
+            <a class="menu-item">Início</a>
+            <a class="menu-item active">Orçamentos</a>
+            <a class="menu-item">Vendas / OS</a>
+            <a class="menu-item">Cadastros</a>
+            <a class="menu-item">Consultas</a>
+            <a class="menu-item">Relatórios</a>
+        </nav>
+
+        <div class="usuario">
+            <small>Usuário</small>
+            <strong>Cristian Viery</strong>
+            <span class="badge-admin">ADMIN</span>
+
+            <div class="sair">Sair</div>
+        </div>
+
+    </aside>
+
+    <!-- =========================
+         CONTEÚDO
+    ========================== -->
+
+    <main class="content">
+
+        <header class="topbar">
+            <div>
+                <h2>Novo orçamento</h2>
+                <p>Monte serviços e peças no mesmo orçamento e transforme em OS após aprovação.</p>
+            </div>
+
+            <button class="btn-ajuda">Ajuda</button>
+        </header>
+
+        <section class="main">
+
+            <!-- ETAPAS -->
+
+            <div class="steps">
+                <div class="step active" id="step1">1. Cliente</div>
+                <div class="step" id="step2">2. Itens</div>
+                <div class="step" id="step3">3. Revisão</div>
+            </div>
+
+            <!-- =========================
+                 ETAPA 1 - CLIENTE
+            ========================== -->
+
+            <section id="etapaCliente">
+
+                <div class="card">
+
+                    <h3 class="card-title">Cliente e veículo</h3>
+                    <p class="card-subtitle">
+                        Selecione o cliente para carregar os veículos vinculados.
+                    </p>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Cliente</label>
+
+                            <select id="cliente">
+                                <option value="">Selecione o cliente</option>
+                                <option value="1">Carlos Mendes</option>
+                                <option value="2">Marina Souza</option>
+                                <option value="3">GR7 Santo Amaro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Veículo</label>
+
+                            <select id="veiculo" disabled>
+                                <option value="">Selecione primeiro o cliente</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Validade</label>
+
+                            <select id="validade">
+                                <option value="7">7 dias</option>
+                                <option value="10">10 dias</option>
+                                <option value="15">15 dias</option>
+                                <option value="30">30 dias</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Responsável</label>
+                            <input
+                                type="text"
+                                id="responsavel"
+                                value="Cristian"
+                                readonly
+                            >
+                        </div>
+
+                    </div>
+
+                    <div id="erroCliente" class="erro"></div>
+
+                    <div class="actions">
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            onclick="avancarParaItens()"
+                        >
+                            Avançar →
+                        </button>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =========================
+                 ETAPA 2 - ITENS
+            ========================== -->
+
+            <section id="etapaItens" class="hidden">
+
+                <!-- CLIENTE SELECIONADO -->
+
+                <div class="card">
+
+                    <div class="cliente-info">
+
+                        <div class="info-box">
+                            <label>Cliente</label>
+                            <strong id="clienteSelecionado"></strong>
+                        </div>
+
+                        <div class="info-box">
+                            <label>Veículo</label>
+                            <strong id="veiculoSelecionado"></strong>
+                        </div>
+
+                        <div class="info-box">
+                            <label>Validade</label>
+                            <span id="validadeSelecionada"></span>
+                        </div>
+
+                        <div class="info-box">
+                            <label>Responsável</label>
+                            <span id="responsavelSelecionado"></span>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-sm"
+                            onclick="alterarCliente()"
+                        >
+                            Alterar
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- ITENS -->
+
+                <div class="itens-header">
+
+                    <h3>Itens do orçamento</h3>
+
+                    <div class="itens-buttons">
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            onclick="abrirModal('SERVICO')"
+                        >
+                            + Serviço
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            onclick="abrirModal('PECA')"
+                        >
+                            + Peça
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Qtd.</th>
+                            <th>Custo</th>
+                            <th>Venda</th>
+                            <th>Total</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="tabelaItens">
+
+                        <tr class="empty-row">
+                            <td colspan="7">
+                                Nenhum item adicionado ao orçamento.
+                            </td>
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="bottom-grid">
+
+                    <!-- OBS -->
+
+                    <div class="card">
+
+                        <div class="form-group">
+                            <label>Observações</label>
+
+                            <textarea
+                                id="observacoes"
+                                placeholder="Digite observações sobre o orçamento..."
+                            ></textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- RESUMO -->
+
+                    <div class="resumo">
+
+                        <h3>Resumo</h3>
+
+                        <div class="resumo-linha">
+                            <span>Custo estimado</span>
+                            <strong id="custoTotal">R$ 0,00</strong>
+                        </div>
+
+                        <div class="resumo-linha">
+                            <span>Peças</span>
+                            <strong id="totalPecas">R$ 0,00</strong>
+                        </div>
+
+                        <div class="resumo-linha">
+                            <span>Serviços</span>
+                            <strong id="totalServicos">R$ 0,00</strong>
+                        </div>
+
+                        <div class="resumo-total">
+                            <span>Total</span>
+                            <strong id="valorTotal">R$ 0,00</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div id="erroItens" class="erro"></div>
+
+                <div class="actions">
+
+                    <button
+                        class="btn btn-secondary"
+                        type="button"
+                        onclick="voltarCliente()"
+                    >
+                        ← Voltar
+                    </button>
+
+                    <button
+                        class="btn btn-secondary"
+                        type="button"
+                        onclick="salvarRascunho()"
+                    >
+                        Salvar rascunho
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        type="button"
+                        onclick="avancarRevisao()"
+                    >
+                        Avançar para revisão →
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- =========================
+                 ETAPA 3 - REVISÃO
+            ========================== -->
+
+            <section id="etapaRevisao" class="hidden">
+
+                <div class="card">
+
+                    <h3 class="card-title">Revisão do orçamento</h3>
+
+                    <p class="card-subtitle">
+                        Confira os dados antes de gerar o orçamento.
+                    </p>
+
+                    <div class="revisao-cliente">
+
+                        <div class="revisao-box">
+                            <small>Cliente</small>
+                            <strong id="reviewCliente"></strong>
+                        </div>
+
+                        <div class="revisao-box">
+                            <small>Veículo</small>
+                            <strong id="reviewVeiculo"></strong>
+                        </div>
+
+                        <div class="revisao-box">
+                            <small>Validade</small>
+                            <strong id="reviewValidade"></strong>
+                        </div>
+
+                        <div class="revisao-box">
+                            <small>Responsável</small>
+                            <strong id="reviewResponsavel"></strong>
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Qtd.</th>
+                                <th>Venda</th>
+                                <th>Total</th>
+                            </tr>
+                            </thead>
+
+                            <tbody id="reviewTabela"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+                <div class="bottom-grid">
+
+                    <div class="card">
+
+                        <div class="form-group">
+                            <label>Observações</label>
+
+                            <textarea
+                                id="reviewObservacoes"
+                                readonly
+                            ></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="resumo">
+
+                        <h3>Resumo</h3>
+
+                        <div class="resumo-linha">
+                            <span>Custo estimado</span>
+                            <strong id="reviewCusto">R$ 0,00</strong>
+                        </div>
+
+                        <div class="resumo-total">
+                            <span>Total do orçamento</span>
+                            <strong id="reviewTotal">R$ 0,00</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="actions">
+
+                    <button
+                        class="btn btn-secondary"
+                        onclick="voltarItens()"
+                    >
+                        ← Voltar aos itens
+                    </button>
+
+                    <button
+                        class="btn btn-secondary"
+                        onclick="salvarRascunho()"
+                    >
+                        Salvar rascunho
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="gerarOrcamento()"
+                    >
+                        Gerar orçamento
+                    </button>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- =========================
+     MODAL ITEM
+========================== -->
+
+<div id="modalItem" class="modal-overlay">
+
+    <div class="modal">
+
+        <h3 id="modalTitulo">Adicionar item</h3>
+
+        <div class="modal-grid">
+
+            <div class="form-group full">
+                <label>Descrição</label>
+
+                <input
+                    type="text"
+                    id="itemDescricao"
+                    placeholder="Descrição do item"
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Quantidade</label>
+
+                <input
+                    type="number"
+                    id="itemQuantidade"
+                    value="1"
+                    min="1"
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Custo unitário</label>
+
+                <input
+                    type="number"
+                    id="itemCusto"
+                    value="0"
+                    step="0.01"
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Valor de venda</label>
+
+                <input
+                    type="number"
+                    id="itemVenda"
+                    value="0"
+                    step="0.01"
+                >
+            </div>
+
+        </div>
+
+        <div id="erroModal" class="erro"></div>
+
+        <div class="actions">
+
+            <button
+                class="btn btn-secondary"
+                onclick="fecharModal()"
+            >
+                Cancelar
+            </button>
+
+            <button
+                class="btn btn-primary"
+                onclick="salvarItem()"
+            >
+                Adicionar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    /* =========================================
+       DADOS TEMPORÁRIOS
+    ========================================== */
+
+    let etapaAtual = 1;
+
+    let tipoItemAtual = null;
+
+    let itensOrcamento = [];
+
+    let itemEditando = null;
+
+    let orcamento = {
+        cliente_id: null,
+        cliente_nome: '',
+        veiculo_id: null,
+        veiculo_nome: '',
+        validade: 7,
+        responsavel: '',
+        observacoes: ''
+    };
+
+
+    /* =========================================
+       MOCK DE CLIENTES/VEÍCULOS
+
+       Depois isso virá do Flask/Banco
+    ========================================== */
+
+    const veiculosClientes = {
+
+        1: [
+            {
+                id: 10,
+                descricao: 'Jeep Compass 2.0 • ABC1D23'
+            },
+            {
+                id: 11,
+                descricao: 'Honda Civic • DEF4G56'
+            }
+        ],
+
+        2: [
+            {
+                id: 20,
+                descricao: 'Toyota Corolla • XYZ9H88'
+            }
+        ],
+
+        3: [
+            {
+                id: 30,
+                descricao: 'Chevrolet Onix • EFG4H56'
+            }
+        ]
+
+    };
+
+
+    /* =========================================
+       CLIENTE
+    ========================================== */
+
+    document
+        .getElementById('cliente')
+        .addEventListener('change', function () {
+
+            const clienteId = this.value;
+
+            const veiculoSelect =
+                document.getElementById('veiculo');
+
+            veiculoSelect.innerHTML = '';
+
+            if (!clienteId) {
+
+                veiculoSelect.disabled = true;
+
+                veiculoSelect.innerHTML =
+                    '<option value="">Selecione primeiro o cliente</option>';
+
+                return;
+
+            }
+
+            veiculoSelect.disabled = false;
+
+            veiculoSelect.innerHTML =
+                '<option value="">Selecione o veículo</option>';
+
+            const veiculos =
+                veiculosClientes[clienteId] || [];
+
+            veiculos.forEach(veiculo => {
+
+                const option =
+                    document.createElement('option');
+
+                option.value = veiculo.id;
+                option.textContent = veiculo.descricao;
+
+                veiculoSelect.appendChild(option);
+
+            });
+
+        });
+
+
+    function avancarParaItens() {
+
+        const cliente =
+            document.getElementById('cliente');
+
+        const veiculo =
+            document.getElementById('veiculo');
+
+        const validade =
+            document.getElementById('validade');
+
+        const responsavel =
+            document.getElementById('responsavel');
+
+        const erro =
+            document.getElementById('erroCliente');
+
+
+        if (!cliente.value) {
+
+            erro.textContent =
+                'Selecione um cliente.';
+
+            return;
+
+        }
+
+
+        if (!veiculo.value) {
+
+            erro.textContent =
+                'Selecione um veículo.';
+
+            return;
+
+        }
+
+
+        erro.textContent = '';
+
+
+        orcamento.cliente_id =
+            cliente.value;
+
+        orcamento.cliente_nome =
+            cliente.options[
+                cliente.selectedIndex
+            ].text;
+
+
+        orcamento.veiculo_id =
+            veiculo.value;
+
+        orcamento.veiculo_nome =
+            veiculo.options[
+                veiculo.selectedIndex
+            ].text;
+
+
+        orcamento.validade =
+            validade.value;
+
+
+        orcamento.responsavel =
+            responsavel.value;
+
+
+        atualizarCabecalhoItens();
+
+        mostrarEtapa(2);
+
+    }
+
+
+    function atualizarCabecalhoItens() {
+
+        document.getElementById(
+            'clienteSelecionado'
+        ).textContent =
+            orcamento.cliente_nome;
+
+
+        document.getElementById(
+            'veiculoSelecionado'
+        ).textContent =
+            orcamento.veiculo_nome;
+
+
+        document.getElementById(
+            'validadeSelecionada'
+        ).textContent =
+            orcamento.validade + ' dias';
+
+
+        document.getElementById(
+            'responsavelSelecionado'
+        ).textContent =
+            orcamento.responsavel;
+
+    }
+
+
+    function alterarCliente() {
+
+        if (itensOrcamento.length > 0) {
+
+            const confirmar = confirm(
+                'O orçamento já possui itens. Deseja voltar para alterar o cliente?'
+            );
+
+            if (!confirmar) {
+                return;
+            }
+
+        }
+
+        mostrarEtapa(1);
+
+    }
+
+
+    /* =========================================
+       MODAL ITEM
+    ========================================== */
+
+    function abrirModal(tipo) {
+
+        tipoItemAtual = tipo;
+
+        itemEditando = null;
+
+        document.getElementById(
+            'modalTitulo'
+        ).textContent =
+            tipo === 'PECA'
+                ? 'Adicionar peça'
+                : 'Adicionar serviço';
+
+
+        limparModal();
+
+
+        document.getElementById(
+            'modalItem'
+        ).style.display = 'flex';
+
+    }
+
+
+    function fecharModal() {
+
+        document.getElementById(
+            'modalItem'
+        ).style.display = 'none';
+
+        limparModal();
+
+    }
+
+
+    function limparModal() {
+
+        document.getElementById(
+            'itemDescricao'
+        ).value = '';
+
+        document.getElementById(
+            'itemQuantidade'
+        ).value = 1;
+
+        document.getElementById(
+            'itemCusto'
+        ).value = 0;
+
+        document.getElementById(
+            'itemVenda'
+        ).value = 0;
+
+        document.getElementById(
+            'erroModal'
+        ).textContent = '';
+
+    }
+
+
+    /* =========================================
+       ADICIONAR ITEM
+    ========================================== */
+
+    function salvarItem() {
+
+        const descricao =
+            document.getElementById(
+                'itemDescricao'
+            ).value.trim();
+
+
+        const quantidade =
+            Number(
+                document.getElementById(
+                    'itemQuantidade'
+                ).value
+            );
+
+
+        const custo =
+            Number(
+                document.getElementById(
+                    'itemCusto'
+                ).value
+            );
+
+
+        const venda =
+            Number(
+                document.getElementById(
+                    'itemVenda'
+                ).value
+            );
+
+
+        const erro =
+            document.getElementById(
+                'erroModal'
+            );
+
+
+        if (!descricao) {
+
+            erro.textContent =
+                'Informe a descrição do item.';
+
+            return;
+
+        }
+
+
+        if (
+            !quantidade ||
+            quantidade <= 0
+        ) {
+
+            erro.textContent =
+                'Informe uma quantidade válida.';
+
+            return;
+
+        }
+
+
+        if (venda < 0) {
+
+            erro.textContent =
+                'Informe um valor de venda válido.';
+
+            return;
+
+        }
+
+
+        const item = {
+
+            tipo: tipoItemAtual,
+
+            descricao: descricao,
+
+            quantidade: quantidade,
+
+            custo_unitario: custo,
+
+            valor_unitario: venda,
+
+            subtotal:
+                quantidade * venda,
+
+            custo_total:
+                quantidade * custo
+
+        };
+
+
+        if (itemEditando !== null) {
+
+            itensOrcamento[
+                itemEditando
+            ] = item;
+
+        } else {
+
+            itensOrcamento.push(item);
+
+        }
+
+
+        fecharModal();
+
+        atualizarTabela();
+
+    }
+
+
+    /* =========================================
+       TABELA
+    ========================================== */
+
+    function atualizarTabela() {
+
+        const tbody =
+            document.getElementById(
+                'tabelaItens'
+            );
+
+
+        tbody.innerHTML = '';
+
+
+        if (
+            itensOrcamento.length === 0
+        ) {
+
+            tbody.innerHTML = `
+                <tr class="empty-row">
+                    <td colspan="7">
+                        Nenhum item adicionado ao orçamento.
+                    </td>
+                </tr>
+            `;
+
+            atualizarResumo();
+
+            return;
+
+        }
+
+
+        itensOrcamento.forEach(
+            (item, index) => {
+
+                const tr =
+                    document.createElement('tr');
+
+
+                tr.innerHTML = `
+
+                    <td>
+                        ${item.tipo === 'PECA'
+                            ? 'Peça'
+                            : 'Serviço'}
+                    </td>
+
+                    <td>
+                        ${item.descricao}
+                    </td>
+
+                    <td>
+                        ${item.quantidade}
+                    </td>
+
+                    <td>
+                        ${formatarMoeda(
+                            item.custo_unitario
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatarMoeda(
+                            item.valor_unitario
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatarMoeda(
+                            item.subtotal
+                        )}
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="btn btn-secondary btn-sm"
+                            onclick="editarItem(${index})"
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn btn-danger btn-sm"
+                            onclick="removerItem(${index})"
+                        >
+                            Remover
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(tr);
+
+            });
+
+
+        atualizarResumo();
+
+    }
+
+
+    /* =========================================
+       EDITAR ITEM
+    ========================================== */
+
+    function editarItem(index) {
+
+        const item =
+            itensOrcamento[index];
+
+
+        itemEditando = index;
+
+        tipoItemAtual =
+            item.tipo;
+
+
+        document.getElementById(
+            'modalTitulo'
+        ).textContent =
+            'Editar item';
+
+
+        document.getElementById(
+            'itemDescricao'
+        ).value =
+            item.descricao;
+
+
+        document.getElementById(
+            'itemQuantidade'
+        ).value =
+            item.quantidade;
+
+
+        document.getElementById(
+            'itemCusto'
+        ).value =
+            item.custo_unitario;
+
+
+        document.getElementById(
+            'itemVenda'
+        ).value =
+            item.valor_unitario;
+
+
+        document.getElementById(
+            'modalItem'
+        ).style.display =
+            'flex';
+
+    }
+
+
+    /* =========================================
+       REMOVER ITEM
+    ========================================== */
+
+    function removerItem(index) {
+
+        const confirmar =
+            confirm(
+                'Deseja remover este item?'
+            );
+
+
+        if (!confirmar) {
+            return;
+        }
+
+
+        itensOrcamento.splice(
+            index,
+            1
+        );
+
+
+        atualizarTabela();
+
+    }
+
+
+    /* =========================================
+       RESUMO
+    ========================================== */
+
+    function atualizarResumo() {
+
+        let custoTotal = 0;
+
+        let totalPecas = 0;
+
+        let totalServicos = 0;
+
+
+        itensOrcamento.forEach(item => {
+
+            custoTotal +=
+                item.custo_total;
+
+
+            if (
+                item.tipo === 'PECA'
+            ) {
+
+                totalPecas +=
+                    item.subtotal;
+
+            } else {
+
+                totalServicos +=
+                    item.subtotal;
+
+            }
+
+        });
+
+
+        const total =
+            totalPecas +
+            totalServicos;
+
+
+        document.getElementById(
+            'custoTotal'
+        ).textContent =
+            formatarMoeda(
+                custoTotal
+            );
+
+
+        document.getElementById(
+            'totalPecas'
+        ).textContent =
+            formatarMoeda(
+                totalPecas
+            );
+
+
+        document.getElementById(
+            'totalServicos'
+        ).textContent =
+            formatarMoeda(
+                totalServicos
+            );
+
+
+        document.getElementById(
+            'valorTotal'
+        ).textContent =
+            formatarMoeda(
+                total
+            );
+
+    }
+
+
+    /* =========================================
+       REVISÃO
+    ========================================== */
+
+    function avancarRevisao() {
+
+        const erro =
+            document.getElementById(
+                'erroItens'
+            );
+
+
+        if (
+            itensOrcamento.length === 0
+        ) {
+
+            erro.textContent =
+                'Adicione pelo menos um item ao orçamento.';
+
+            return;
+
+        }
+
+
+        erro.textContent = '';
+
+
+        orcamento.observacoes =
+            document.getElementById(
+                'observacoes'
+            ).value;
+
+
+        montarRevisao();
+
+        mostrarEtapa(3);
+
+    }
+
+
+    function montarRevisao() {
+
+        document.getElementById(
+            'reviewCliente'
+        ).textContent =
+            orcamento.cliente_nome;
+
+
+        document.getElementById(
+            'reviewVeiculo'
+        ).textContent =
+            orcamento.veiculo_nome;
+
+
+        document.getElementById(
+            'reviewValidade'
+        ).textContent =
+            orcamento.validade +
+            ' dias';
+
+
+        document.getElementById(
+            'reviewResponsavel'
+        ).textContent =
+            orcamento.responsavel;
+
+
+        document.getElementById(
+            'reviewObservacoes'
+        ).value =
+            orcamento.observacoes;
+
+
+        const tbody =
+            document.getElementById(
+                'reviewTabela'
+            );
+
+
+        tbody.innerHTML = '';
+
+
+        let custo = 0;
+
+        let total = 0;
+
+
+        itensOrcamento.forEach(item => {
+
+            custo +=
+                item.custo_total;
+
+            total +=
+                item.subtotal;
+
+
+            const tr =
+                document.createElement('tr');
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${item.tipo === 'PECA'
+                        ? 'Peça'
+                        : 'Serviço'}
+                </td>
+
+                <td>
+                    ${item.descricao}
+                </td>
+
+                <td>
+                    ${item.quantidade}
+                </td>
+
+                <td>
+                    ${formatarMoeda(
+                        item.valor_unitario
+                    )}
+                </td>
+
+                <td>
+                    ${formatarMoeda(
+                        item.subtotal
+                    )}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(tr);
+
+        });
+
+
+        document.getElementById(
+            'reviewCusto'
+        ).textContent =
+            formatarMoeda(custo);
+
+
+        document.getElementById(
+            'reviewTotal'
+        ).textContent =
+            formatarMoeda(total);
+
+    }
+
+
+    /* =========================================
+       NAVEGAÇÃO
+    ========================================== */
+
+    function mostrarEtapa(etapa) {
+
+        etapaAtual = etapa;
+
+
+        document.getElementById(
+            'etapaCliente'
+        ).classList.add('hidden');
+
+
+        document.getElementById(
+            'etapaItens'
+        ).classList.add('hidden');
+
+
+        document.getElementById(
+            'etapaRevisao'
+        ).classList.add('hidden');
+
+
+        document.getElementById(
+            'step1'
+        ).className =
+            'step';
+
+
+        document.getElementById(
+            'step2'
+        ).className =
+            'step';
+
+
+        document.getElementById(
+            'step3'
+        ).className =
+            'step';
+
+
+        if (etapa === 1) {
+
+            document.getElementById(
+                'etapaCliente'
+            ).classList.remove('hidden');
+
+
+            document.getElementById(
+                'step1'
+            ).classList.add('active');
+
+        }
+
+
+        if (etapa === 2) {
+
+            document.getElementById(
+                'etapaItens'
+            ).classList.remove('hidden');
+
+
+            document.getElementById(
+                'step1'
+            ).classList.add('done');
+
+
+            document.getElementById(
+                'step2'
+            ).classList.add('active');
+
+        }
+
+
+        if (etapa === 3) {
+
+            document.getElementById(
+                'etapaRevisao'
+            ).classList.remove('hidden');
+
+
+            document.getElementById(
+                'step1'
+            ).classList.add('done');
+
+
+            document.getElementById(
+                'step2'
+            ).classList.add('done');
+
+
+            document.getElementById(
+                'step3'
+            ).classList.add('active');
+
+        }
+
+    }
+
+
+    function voltarCliente() {
+
+        mostrarEtapa(1);
+
+    }
+
+
+    function voltarItens() {
+
+        mostrarEtapa(2);
+
+    }
+
+
+    /* =========================================
+       SALVAR
+    ========================================== */
+
+    function salvarRascunho() {
+
+        const dados =
+            montarDadosOrcamento(
+                'PRE_ORCAMENTO'
+            );
+
+
+        console.log(
+            'RASCUNHO:',
+            dados
+        );
+
+
+        alert(
+            'Pré-orçamento preparado para salvar. Veja os dados no console.'
+        );
+
+    }
+
+
+    function gerarOrcamento() {
+
+        const dados =
+            montarDadosOrcamento(
+                'ABERTO'
+            );
+
+
+        console.log(
+            'ORÇAMENTO:',
+            dados
+        );
+
+
+        alert(
+            'Orçamento preparado para envio ao Flask. Veja os dados no console.'
+        );
+
+    }
+
+
+    function montarDadosOrcamento(status) {
+
+        let valorPecas = 0;
+
+        let valorServicos = 0;
+
+        let custoTotal = 0;
+
+
+        itensOrcamento.forEach(item => {
+
+            custoTotal +=
+                item.custo_total;
+
+
+            if (
+                item.tipo === 'PECA'
+            ) {
+
+                valorPecas +=
+                    item.subtotal;
+
+            } else {
+
+                valorServicos +=
+                    item.subtotal;
+
+            }
+
+        });
+
+
+        return {
+
+            cliente_id:
+                orcamento.cliente_id,
+
+            veiculo_id:
+                orcamento.veiculo_id,
+
+            validade:
+                orcamento.validade,
+
+            responsavel:
+                orcamento.responsavel,
+
+            observacao:
+                document.getElementById(
+                    'observacoes'
+                ).value,
+
+            status:
+                status,
+
+            valor_pecas:
+                valorPecas,
+
+            valor_servicos:
+                valorServicos,
+
+            valor_total:
+                valorPecas +
+                valorServicos,
+
+            custo_total:
+                custoTotal,
+
+            itens:
+                itensOrcamento
+
+        };
+
+    }
+
+
+    /* =========================================
+       UTIL
+    ========================================== */
+
+    function formatarMoeda(valor) {
+
+        return valor.toLocaleString(
+            'pt-BR',
+            {
+                style: 'currency',
+                currency: 'BRL'
+            }
+        );
+
+    }
+
+</script>
+
+</body>
+</html>

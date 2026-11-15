@@ -1,0 +1,66 @@
+[
+  {
+    "id": "1",
+    "categoria_id": "17",
+    "data_gasto": "2026-08-02",
+    "descricao": "Compra de componentes eletrônicos",
+    "fornecedor": "Eletrônica Components Ltda",
+    "valor": "1250.00",
+    "forma_pagamento": "PIX",
+    "status": "PAGO",
+    "data_vencimento": "2026-08-02",
+    "data_pagamento": "2026-08-02",
+    "data_cadastro": "2026-08-14T19:30:59.4230000"
+  },
+  {
+    "id": "2",
+    "categoria_id": "21",
+    "data_gasto": "2026-08-03",
+    "descricao": "Licença mensal de software de programação",
+    "fornecedor": "Diag Software",
+    "valor": "450.00",
+    "forma_pagamento": "CARTAO",
+    "status": "PAGO",
+    "data_vencimento": "2026-08-03",
+    "data_pagamento": "2026-08-03",
+    "data_cadastro": "2026-08-14T19:30:59.4230000"
+  },
+  {
+    "id": "3",
+    "categoria_id": "19",
+    "data_gasto": "2026-08-05",
+    "descricao": "Kit de ferramentas para bancada eletrônica",
+    "fornecedor": "Ferramentas Tech",
+    "valor": "680.00",
+    "forma_pagamento": "BOLETO",
+    "status": "PAGO",
+    "data_vencimento": "2026-08-10",
+    "data_pagamento": "2026-08-08",
+    "data_cadastro": "2026-08-14T19:30:59.4230000"
+  },
+  {
+    "id": "4",
+    "categoria_id": "22",
+    "data_gasto": "2026-08-07",
+    "descricao": "Frete para envio de módulo de cliente",
+    "fornecedor": "Transportadora Express",
+    "valor": "85.00",
+    "forma_pagamento": "PIX",
+    "status": "PAGO",
+    "data_vencimento": "2026-08-07",
+    "data_pagamento": "2026-08-07",
+    "data_cadastro": "2026-08-14T19:30:59.4230000"
+  },
+  {
+    "id": "5",
+    "categoria_id": "26",
+    "data_gasto": "2026-08-10",
+    "descricao": "Internet da unidade",
+    "fornecedor": "Operadora Internet",
+    "valor": "199.90",
+    "forma_pagamento": "BOLETO",
+    "status": "PENDENTE",
+    "data_vencimento": "2026-08-20",
+    "data_cadastro": "2026-08-14T19:30:59.4230000"
+  }
+]

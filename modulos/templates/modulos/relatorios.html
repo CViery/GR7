@@ -1,0 +1,106 @@
+{% extends 'modulos/base.html' %}
+{% block content %}
+<header>
+  <h1>Relatórios</h1>
+  <p>
+    {% if mes_selecionado %}
+      Indicadores consolidados referentes a <strong>{{ mes_selecionado[5:7] }}/{{ mes_selecionado[0:4] }}</strong>.
+    {% else %}
+      Indicadores consolidados da operação e comparativo mês a mês.
+    {% endif %}
+  </p>
+</header>
+
+<div class="toolbar">
+  <form class="search" method="get" style="display: flex; gap: 8px; align-items: center;">
+    <input type="month" name="mes" value="{{ mes_selecionado }}">
+    <button class="btn">Filtrar mês</button>
+    {% if mes_selecionado %}
+      <a class="btn secondary" href="{{ url_for('modulos.relatorios') }}">Todos os meses</a>
+    {% endif %}
+  </form>
+</div>
+
+<section class="cards">
+  <div class="metric blue"><span>VALOR DAS OS</span><strong>{{ total_vendas|brl }}</strong></div>
+  <div class="metric green"><span>FATURADO</span><strong>{{ total_faturado|brl }}</strong></div>
+  <div class="metric purple"><span>GASTOS</span><strong>{{ total_gastos|brl }}</strong></div>
+  <div class="metric orange"><span>RESULTADO</span><strong>{{ resultado_liquido|brl }}</strong></div>
+</section>
+
+<h2>Visão geral por mês</h2>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Mês</th>
+        <th>Valor das OS</th>
+        <th>Faturado</th>
+        <th>Gastos</th>
+        <th>Resultado</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in evolucao_mensal %}
+      <tr>
+        <td><strong>{{ m.label }}</strong></td>
+        <td>{{ m.vendas|brl }}</td>
+        <td>{{ m.faturado|brl }}</td>
+        <td>{{ m.gastos|brl }}</td>
+        <td><strong>{{ m.saldo|brl }}</strong></td>
+        <td><a class="btn secondary" href="{{ url_for('modulos.relatorios', mes=m.chave) }}">Ver mês</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">Nenhuma movimentação registrada.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<section class="detail-grid">
+  <div>
+    <h2>OS por status {{ '(' ~ mes_selecionado[5:7] ~ '/' ~ mes_selecionado[0:4] ~ ')' if mes_selecionado else '' }}</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Status</th><th>Qtd.</th><th>Valor</th></tr></thead>
+        <tbody>
+          {% for s,q,v in por_status %}
+          <tr><td>{{ s }}</td><td>{{ q }}</td><td>{{ v|brl }}</td></tr>
+          {% else %}
+          <tr><td colspan="3">Sem dados no período.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <h2>Clientes por movimentação {{ '(' ~ mes_selecionado[5:7] ~ '/' ~ mes_selecionado[0:4] ~ ')' if mes_selecionado else '' }}</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Cliente</th><th>OS</th><th>Valor</th></tr></thead>
+        <tbody>
+          {% for n,q,v in por_cliente %}
+          <tr><td>{{ n }}</td><td>{{ q }}</td><td>{{ v|brl }}</td></tr>
+          {% else %}
+          <tr><td colspan="3">Sem dados no período.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<h2>Faturamento por forma de pagamento {{ '(' ~ mes_selecionado[5:7] ~ '/' ~ mes_selecionado[0:4] ~ ')' if mes_selecionado else '' }}</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Forma de pagamento</th><th>Qtd. Faturas</th><th>Valor Total</th></tr></thead>
+    <tbody>
+      {% for fp, qtd, valor in por_pagamento %}
+      <tr><td><span class="tag">{{ fp.replace('_', ' ') }}</span></td><td>{{ qtd }}</td><td>{{ valor|brl }}</td></tr>
+      {% else %}
+      <tr><td colspan="3">Nenhum faturamento no período.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

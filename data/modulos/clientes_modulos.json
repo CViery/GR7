@@ -1,0 +1,76 @@
+[
+  {
+    "id": "1",
+    "nome": "GR7 Santo Amaro",
+    "filial_id": "1",
+    "telefone": "11999990001",
+    "email": "santoamaro@gr7.com.br",
+    "contato": "Cristian",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:41.7200000"
+  },
+  {
+    "id": "2",
+    "nome": "Portal do Morumbi",
+    "filial_id": "2",
+    "telefone": "11999990002",
+    "email": "portal@gr7.com.br",
+    "contato": "Giovanna",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:41.7200000"
+  },
+  {
+    "id": "3",
+    "nome": "GR7 Vila Andrade",
+    "filial_id": "3",
+    "telefone": "11999990003",
+    "email": "vilaandrade@gr7.com.br",
+    "contato": "Gil",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:41.7200000"
+  },
+  {
+    "id": "4",
+    "nome": "Auto Center Paulista",
+    "cpf_cnpj": "12.345.678/0001-90",
+    "telefone": "11988887777",
+    "email": "contato@autocenterpaulista.com.br",
+    "contato": "Carlos",
+    "endereco": "Av. Paulista",
+    "numero": "1500",
+    "bairro": "Bela Vista",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "cep": "01310-200",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:41.7270000"
+  },
+  {
+    "id": "5",
+    "nome": "Oficina Motor Tech",
+    "cpf_cnpj": "23.456.789/0001-10",
+    "telefone": "11977776666",
+    "email": "motor@motortech.com.br",
+    "contato": "Roberto",
+    "endereco": "Rua das Flores",
+    "numero": "320",
+    "bairro": "Campo Belo",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "cep": "04601-000",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:41.7270000"
+  },
+  {
+    "id": "6",
+    "nome": "João da Silva",
+    "cpf_cnpj": "123.456.789-00",
+    "telefone": "11966665555",
+    "email": "joao@email.com",
+    "contato": "João da Silva",
+    "cidade": "São Paulo",
+    "uf": "SP",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:41.7270000"
+  }
+]

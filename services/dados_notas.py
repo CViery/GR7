@@ -286,62 +286,36 @@ class DadosGastos:
         return result
     
     def dados_gastos(self, mes, ano):
-        #Dados das despesas e subcategorias
-        #print("Obtendo despesas...")
         despesas = self.db.get_despesas()
-        #print(f"Despesas obtidas: {despesas}")
-
-        #print("Obtendo subcategorias...")
         sub_categorias = self.db.get_all_subcategorias()
-        #print(f"Subcategorias obtidas: {sub_categorias}")
+        agregados = {
+            (str(row[0] or ''), str(row[1] or '')): float(row[2] or 0)
+            for row in self.db.resumo_gastos(mes, ano)
+        }
 
-        # Função para somar valores de um período específico
-        def somar_valores_por_subcategoria(subcategoria, mes=None, ano=None):
-            #print(f"Calculando valores para subcategoria: {subcategoria}, mês: {mes}, ano: {ano}")
-            notas = self.db.notas_por_subcategoria(subcategoria, mes, ano)
-            #print(f"Notas obtidas para subcategoria {subcategoria}: {notas}")
-            if notas is None:
-                print(f"Nenhuma nota encontrada para subcategoria {subcategoria}")
-                return
-            valores = [dado[13] for dado in notas]
-            soma = sum(valores)
-            #print(f"Soma dos valores para subcategoria {subcategoria}: {soma}")
-            return soma
-
-        def somar_valores_por_categoria(categoria, mes=None, ano=None):
-            notas = self.db.notas_por_categoria(categoria[1], mes, ano)
-            if notas is None:
-                return 0
-            valores = [dado[13] for dado in notas]
-            soma = sum(valores)
-            return soma
-
-        # Construir os dados finais com soma dos valores
         dados = []
         for despesa in despesas:
+            nome_despesa = str(despesa[1])
             subs = []
-            valor = somar_valores_por_categoria(despesa, mes, ano)
             for sub in sub_categorias:
-                if sub[2] == despesa[1]:  # Ajuste para verificar o nome da despesa
-                    # Calcular valores da subcategoria
-                    valor_mes = somar_valores_por_subcategoria(sub[3], mes=mes, ano=ano)
+                if str(sub[2]) == nome_despesa:
                     subs.append({
-                        "codigo": sub[1],  # Ajuste para corresponder ao índice correto
+                        "codigo": sub[1],
                         "descricao": sub[3],
-                        "valor_mes": self.formatar_moeda(valor_mes),
+                        "valor_mes": self.formatar_moeda(
+                            agregados.get((nome_despesa, str(sub[3])), 0)
+                        ),
                     })
+            total_categoria = sum(
+                valor for (categoria, _sub), valor in agregados.items()
+                if categoria == nome_despesa
+            )
             dados.append({
-                "despesa": despesa[1],
+                "despesa": nome_despesa,
                 "subs": subs,
-                "valor": self.formatar_moeda(valor)
+                "valor": self.formatar_moeda(total_categoria)
             })
-        
-        import pprint
-        pprint.pprint(dados)
-        
-            
         return dados
-        # Exibir os dados
         
     def buscar_notas(self, mes, ano):
         

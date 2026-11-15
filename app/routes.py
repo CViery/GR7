@@ -1,15 +1,11 @@
 from app import app
-from flask import request, redirect, render_template, flash, session, jsonify, make_response, Response
-from services import login, cadastrar_notas, cadastrar_duplicata, dados_notas, faturamento, utills, xlxs, rotas
+from flask import request, redirect, render_template, flash, session, jsonify, Response, url_for
+from services import login, dados_notas, faturamento, utills, xlxs, rotas
 from datetime import datetime
-from flask_paginate import Pagination, get_page_parameter
-from database import gastos_db, conection
-from xhtml2pdf import pisa
+from database import conection
 from io import BytesIO
-import json
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
-from openpyxl.drawing.image import Image
 
 
 
@@ -18,6 +14,12 @@ PERMISSAO_GR7_USER = 1
 PERMISSAO_PORTAL_ADMIN = 2
 SEM_PERMISSAO = 3
 PERMISSAO_GR7_MORUMBI_ADMIN = 4
+
+
+def criar_pdf(*args, **kwargs):
+    """Carrega o gerador de PDF apenas quando uma exportação é solicitada."""
+    from xhtml2pdf import pisa
+    return pisa.CreatePDF(*args, **kwargs)
 
 
 
@@ -96,10 +98,7 @@ class Routes:
 
     @app.route('/logout')
     def logout():
-        # Remover todas as variáveis de sessão relacionadas ao usuário
-        session.pop('usuario', None)
-        session.pop('empresa', None)
-        session.pop('permission_empresa', None)  # Caso esteja utilizando esta variável
+        session.clear()
         flash('Você saiu da sessão com sucesso.')
         return redirect('/')
 
@@ -141,7 +140,13 @@ class Routes:
                 else:
                     flash('Permissão de acesso inválida.')
                     return redirect('/')
-
+                
+            if empresa == 4:
+                if permission not in ('ADMIN', 'NORMAL'):
+                    flash('Permissão de acesso inválida.')
+                    return redirect('/')
+                return redirect(url_for('modulos.dashboard'))
+            
             else:
                 flash('Empresa não reconhecida.')
                 return redirect('/')
@@ -245,6 +250,7 @@ class Routes:
             empresa=session['empresa'],
             cias=db.companhias(),
             mecanicos=db.funcionarios(empresa),
+            orcamentistas=db.orcamentistas(empresa),
             response=''
         )
 
@@ -264,7 +270,12 @@ class Routes:
 
         ja_existe = db.cadastrar(data, usuario)
         empresa = session['empresa']
-        if ja_existe:
+        if ja_existe is None:
+            response = (
+                f"Não foi possível cadastrar a OS {data.get('num_os', '')}. "
+                "Verifique os dados e tente novamente."
+            )
+        elif ja_existe:
             response = f"A OS {data['num_os']} já está cadastrada"
         else:
             response = f"A OS {data['num_os']} cadastrada com sucesso"
@@ -274,8 +285,9 @@ class Routes:
             empresa=session['empresa'],
             cias=db.companhias(),
             mecanicos=db.funcionarios(empresa),
+            orcamentistas=db.orcamentistas(empresa),
             response=response
-        )       
+        )
 
     @app.route('/faturamentos/consultar', methods=['GET', 'POST'])
     def consultar_faturamentos():
@@ -292,16 +304,31 @@ class Routes:
                     
                 placa = request.form.get('placa')
                 mecanico_servico = request.form.get('mecanico_servico')
+                session['faturamento_filtros'] = {
+                    'data_inicio': data_inicio,
+                    'data_fim': data_fim,
+                    'placa': placa,
+                    'mecanico_servico': mecanico_servico,
+                    'numero_os': numero_os,
+                    'companhia': companhia
+                }
 
-                # Implementar a lógica para buscar os faturamentos no banco de dados com base nos filtros
                 faturamentos = db.filtrar_os(
-                        data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
-                    
-                valor = db.filtrar_os_valor(data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
-                valor_meta = db.filtrar_os_valor_meta(data_inicio, data_fim, placa, mecanico_servico, numero_os, companhia)
+                    data_inicio, data_fim, placa, mecanico_servico,
+                    numero_os, companhia
+                )
+                valor = db.filtrar_os_valor(
+                    data_inicio, data_fim, placa, mecanico_servico,
+                    numero_os, companhia
+                )
+                valor_meta = db.filtrar_os_valor_meta(
+                    data_inicio, data_fim, placa, mecanico_servico,
+                    numero_os, companhia
+                )
                         
             else:
                     # Se for uma requisição GET, buscar todos os faturamentos ou usar uma lógica padrão
+                session['faturamento_filtros'] = {}
                 faturamentos = db.faturamentos_gerais()
                 valor = db.faturamentos_gerais_valor()
                 valor_meta = db.faturamentos_gerais_valor_meta()
@@ -346,23 +373,22 @@ class Routes:
 
     @app.route('/baixar')
     def baixar_excel():
-        if 'usuario' in session:
-            if 'dados_exportar' in session:
-                dados = session['dados_exportar']
-                excel = xlxs.GerarExcel()
-                arquivo = excel.exportar_faturamentos_excel(dados)
-                
-                if arquivo:
-                    return arquivo
-                else:
-                    print('Erro ao gerar o arquivo Excel.')
-                    return redirect('/faturamentos/consultar')
-            else:
-                print('Dados para exportação não encontrados na sessão.')
-                return redirect('/faturamentos/consultar')
-        else:
-            print('Usuário não está logado.')
+        if 'usuario' not in session:
             return redirect('/')
+
+        db = faturamento.Faturamento()
+        filtros = session.get('faturamento_filtros') or {}
+        if filtros:
+            dados = db.filtrar_os(
+                filtros.get('data_inicio'), filtros.get('data_fim'),
+                filtros.get('placa'), filtros.get('mecanico_servico'),
+                filtros.get('numero_os'), filtros.get('companhia')
+            )
+        else:
+            dados = db.faturamentos_gerais()
+
+        arquivo = xlxs.GerarExcel().exportar_faturamentos_excel(dados or [])
+        return arquivo or redirect('/faturamentos/consultar')
 
     @app.route('/relatorios')
     def page_relatorios():
@@ -379,64 +405,33 @@ class Routes:
     @app.route('/fechamento_mensal', methods=['GET', 'POST'])
     def gerar_pdf():
         db = faturamento.Faturamento()
-        services = utills.Utills()
-        empresa = session['empresa']
-        mes = request.form.get('mes')
-        ano = request.form.get('ano')
-        # Dados para o template
-        
-        
-        valor_faturamento_total = db.faturamento_total_mes(mes, ano)
-        valor_faturamento_meta = db.faturamento_meta_mes(mes, ano)
-        faturamento_mecanicos = db.faturamento_mecanico(mes, ano)
-        faturamento_cias = db.faturamento_companhia(mes, ano)
-        faturamento_servico = db.faturamento_servico(mes, ano)
-        valor_dinheiro = db.faturamento_dinheiro(mes, ano)
-        ticket = services.ticket(mes, ano)
-        passagens = services.passagens(mes, ano)
-        valor_meta_int = db.faturamento_meta_mes_int(mes, ano)
-        mecanicos = db.faturamento_mecanico(mes, ano)
-        dados_filtros = db.filtros_mecanico(mes, ano)
-        dados_revitalizacao = db.revitalizacao_mecanico(mes,ano)
-        context = {
-            'valor_faturamento_total': valor_faturamento_total,
-            'valor_faturamento_meta': valor_faturamento_meta,
-            'faturamento_mecanicos': faturamento_mecanicos,
-            'faturamento_companhia': faturamento_cias,
-            'faturamento_servico': faturamento_servico,
-            'empresa': empresa,
-            'valor_dinheiro': valor_dinheiro,
-            'ticket': ticket,
-            'passagens': passagens,
-            'valor_meta_int': valor_meta_int,
-            'mes_escolhido': mes,
-            'ano_escolhido': ano,
-            'dados_filtros': dados_filtros,
-            'dados_revitalizacao': dados_revitalizacao
-        }
-        
-        # Renderiza o template HTML
-        html = render_template('relatorio_faturamento.html', **context)
-        
-        # Gera um buffer em memória para o PDF
+        empresa = session.get('empresa', 3)
+        mes = request.form.get('mes') or request.args.get('mes') or datetime.now().strftime('%m')
+        ano = request.form.get('ano') or request.args.get('ano') or datetime.now().strftime('%Y')
+
+        relatorio = db.relatorio_gerencial_mensal(mes, ano, empresa)
+
+        def fmt_num(valor):
+            v = float(valor or 0)
+            return f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+        html = render_template(
+            'relatorio_faturamento.html',
+            fmt=fmt_num,
+            **relatorio
+        )
+
         pdf_buffer = BytesIO()
-        
-        # Gera o PDF
-        pisa_status = pisa.CreatePDF(
+        pisa_status = criar_pdf(
             html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
         )
-        
-        # Verifica se ocorreu um erro
+
         if pisa_status.err:
             return "Erro ao gerar o PDF", 500
 
-        # Nome seguro para o arquivo
-        name_arquivo = f"Relatorio_{mes}_{ano}".replace(" ", "_").replace("/", "-")
-        
-        # Movendo o ponteiro do buffer para o início
+        name_arquivo = f"Relatorio_Gerencial_{relatorio['titulo_loja']}_{mes}_{ano}".replace(" ", "_").replace("/", "-")
         pdf_buffer.seek(0)
-        
-        # Retorna o PDF como uma resposta Flask
+
         response = Response(
             pdf_buffer,
             content_type='application/pdf'
@@ -482,7 +477,7 @@ class Routes:
         pdf_buffer = BytesIO()
 
         # Gerando o PDF a partir do HTML
-        pisa_status = pisa.CreatePDF(
+        pisa_status = criar_pdf(
             html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
         )
 
@@ -537,7 +532,7 @@ class Routes:
         pdf_buffer = BytesIO()
 
         # Gerando o PDF a partir do HTML
-        pisa_status = pisa.CreatePDF(
+        pisa_status = criar_pdf(
             html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
         )
 
@@ -592,7 +587,7 @@ class Routes:
         pdf_buffer = BytesIO()
 
         # Gerando o PDF a partir do HTML
-        pisa_status = pisa.CreatePDF(
+        pisa_status = criar_pdf(
             html.encode('utf-8'), dest=pdf_buffer, encoding='utf-8'
         )
 
@@ -901,54 +896,337 @@ class Routes:
     
     @app.route('/gerencial')
     def tela_gerencial():
-        funcionarios = [
-            {'id': 1, 'nome': 'Funcionário 1'},
-            {'id': 2, 'nome': 'Funcionário 2'},
-            # Adicione mais funcionários conforme necessário
-        ]
-        return render_template('gerencial.html', empresa="Oficina", funcionarios=funcionarios)
+        if 'usuario' not in session:
+            return redirect('/')
+        return render_template(
+            'gerencial.html',
+            empresa=session.get('empresa'),
+            user=session.get('usuario'),
+            permissao=session.get('permission', 'ADMIN'),
+            ano_atual=datetime.now().year
+        )
 
     @app.route('/dados-loja/<loja>')
     def dados_loja(loja):
-        ano = request.args.get('ano', default=2025, type=int)
-        db = conection.Database() 
-        faturamento = db.faturamento_loja_ano(loja, ano)
-        
-        
-
-        return jsonify(faturamento)
+        if 'usuario' not in session:
+            return jsonify({'erro': 'Usuário não autenticado.'}), 401
+        ano = request.args.get('ano', default=datetime.now().year, type=int)
+        try:
+            return jsonify(conection.Database().faturamento_loja_ano(loja, ano))
+        except ValueError as erro:
+            return jsonify({'erro': str(erro)}), 400
+        except Exception:
+            return jsonify({'erro': 'Não foi possível carregar o faturamento.'}), 500
 
     @app.route('/funcionarios-por-loja/<loja>')
     def funcionarios_por_loja(loja):
-       
-        if loja == 'GR7':
-            db = conection.Database() 
-        
-        
-        
-
-        funcionarios = db.funcionarios_por_loja(loja)
-        
-        
-
-        return jsonify(funcionarios)
+        if 'usuario' not in session:
+            return jsonify({'erro': 'Usuário não autenticado.'}), 401
+        try:
+            return jsonify(conection.Database().funcionarios_por_loja(loja))
+        except ValueError as erro:
+            return jsonify({'erro': str(erro)}), 400
+        except Exception:
+            return jsonify({'erro': 'Não foi possível carregar os profissionais.'}), 500
 
     @app.route('/dados-funcionario/<mecanico>')
     def dados_funcionario(mecanico):
+        if 'usuario' not in session:
+            return jsonify({'erro': 'Usuário não autenticado.'}), 401
         loja = request.args.get('loja', default="GR7", type=str)
-        ano = request.args.get('ano', default=2024, type=int)
+        ano = request.args.get('ano', default=datetime.now().year, type=int)
+        try:
+            return jsonify(conection.Database().desempenho_funcionario_ano(loja, mecanico, ano))
+        except ValueError as erro:
+            return jsonify({'erro': str(erro)}), 400
+        except Exception:
+            return jsonify({'erro': 'Não foi possível carregar o desempenho.'}), 500
 
-        if loja == 'GR7':
-            db = conection.Database() 
-        elif loja == "Portal":
-            db = conection.DatabasePortal()
-        elif loja == "Morumbi":
-            db = conection.DatabaseMorumbi()
-        
-        
+    @app.route('/orcamentos/novo', methods=['GET'])
+    def novo_orcamento():
+        if 'usuario' not in session:
+            return redirect('/')
+        if session.get('empresa') != 4:
+            flash('Selecione a filial GR7 Módulos para criar orçamentos.')
+            return redirect('/home')
+        return redirect(url_for('modulos.venda_nova'))
 
-        desempenho = db.desempenho_funcionario_ano(loja, mecanico, ano)
-        
-      
+    @app.route('/api/clientes', methods=['GET'])
+    def api_clientes():
 
-        return jsonify(desempenho)
+        if 'usuario' not in session:
+            return jsonify({
+                'success': False,
+                'message': 'Usuário não autenticado.'
+            }), 401
+
+        if session.get('empresa') == 4:
+            from modulos.models import Cliente
+            clientes = Cliente.query.filter_by(ativo=True).order_by(Cliente.nome).all()
+            return jsonify({
+                'success': True,
+                'clientes': [{'id': item.id, 'nome': item.nome} for item in clientes]
+            })
+        return jsonify({'success': False, 'message': 'Área disponível apenas para GR7 Módulos.'}), 403
+
+        try:
+
+            db = None
+
+            clientes = db.listar_clientes()
+
+            dados = []
+
+            for cliente in clientes:
+
+                dados.append({
+                    'id': cliente[0],
+                    'nome': cliente[1]
+                })
+
+            return jsonify({
+                'success': True,
+                'clientes': dados
+            })
+
+        except Exception as e:
+
+            print(f'Erro ao consultar clientes: {e}')
+
+            return jsonify({
+                'success': False,
+                'message': 'Erro ao consultar clientes.'
+            }), 500
+
+    @app.route('/api/clientes/<int:cliente_id>/veiculos', methods=['GET'])
+    def api_veiculos_cliente(cliente_id):
+
+        if 'usuario' not in session:
+            return jsonify({
+                'success': False,
+                'message': 'Usuário não autenticado.'
+            }), 401
+
+        if session.get('empresa') == 4:
+            from modulos.models import Veiculo
+            veiculos = Veiculo.query.filter_by(cliente_id=cliente_id).order_by(Veiculo.placa).all()
+            return jsonify({
+                'success': True,
+                'veiculos': [
+                    {'id': item.id, 'placa': item.placa, 'modelo': item.veiculo, 'ano': item.ano}
+                    for item in veiculos
+                ]
+            })
+        return jsonify({'success': False, 'message': 'Área disponível apenas para GR7 Módulos.'}), 403
+
+        try:
+
+            db = faturamento.Faturamento()
+
+            veiculos = db.listar_veiculos_cliente(cliente_id)
+
+            dados = []
+
+            for veiculo in veiculos:
+
+                dados.append({
+                    'id': veiculo[0],
+                    'placa': veiculo[1],
+                    'modelo': veiculo[2],
+                    'ano': veiculo[3]
+                })
+
+            return jsonify({
+                'success': True,
+                'veiculos': dados
+            })
+
+        except Exception as e:
+
+            print(
+                f'Erro ao consultar veículos '
+                f'do cliente {cliente_id}: {e}'
+            )
+
+            return jsonify({
+                'success': False,
+                'message': 'Erro ao consultar veículos.'
+            }), 500
+
+    @app.route('/api/orcamentos/salvar', methods=['POST'])
+    def salvar_orcamento():
+
+        if 'usuario' not in session:
+
+            return jsonify({
+                'success': False,
+                'message': 'Usuário não autenticado.'
+            }), 401
+
+        # Compatibilidade para clientes antigos: o formulário oficial agora
+        # pertence ao blueprint unificado e não usa mais modulos_db.
+        if session.get('empresa') == 4:
+            return jsonify({
+                'success': False,
+                'message': 'Use a tela unificada de Orçamentos.',
+                'redirect': url_for('modulos.venda_nova')
+            }), 409
+        return jsonify({'success': False, 'message': 'Área disponível apenas para GR7 Módulos.'}), 403
+
+
+        try:
+
+            dados = request.get_json()
+
+            if not dados:
+
+                return jsonify({
+                    'success': False,
+                    'message': 'Nenhum dado recebido.'
+                }), 400
+
+
+            venda_id = dados.get('venda_id')
+
+            cliente_id = dados.get('cliente_id')
+            veiculo_id = dados.get('veiculo_id')
+
+            validade = dados.get('validade')
+
+            status = dados.get(
+                'status',
+                'PRE_ORCAMENTO'
+            )
+
+            observacao = dados.get(
+                'observacao',
+                ''
+            )
+
+            itens = dados.get(
+                'itens',
+                []
+            )
+
+
+            # ==========================
+            # VALIDAÇÕES
+            # ==========================
+
+            if not cliente_id:
+
+                return jsonify({
+                    'success': False,
+                    'message': 'Selecione o cliente.'
+                }), 400
+
+
+            if not veiculo_id:
+
+                return jsonify({
+                    'success': False,
+                    'message': 'Selecione o veículo.'
+                }), 400
+
+
+            status_permitidos = [
+                'PRE_ORCAMENTO',
+                'ABERTO'
+            ]
+
+
+            if status not in status_permitidos:
+
+                return jsonify({
+                    'success': False,
+                    'message': 'Status inválido.'
+                }), 400
+
+
+            if (
+                status == 'ABERTO'
+                and not itens
+            ):
+
+                return jsonify({
+                    'success': False,
+                    'message':
+                        'Adicione pelo menos um item antes '
+                        'de gerar o orçamento.'
+                }), 400
+
+
+            # ==========================
+            # SESSION
+            # ==========================
+
+            usuario = session.get('usuario')
+
+            filial_id = session.get('empresa')
+
+
+            # ==========================
+            # BANCO
+            # ==========================
+
+            db = None
+
+
+            venda_id = db.salvar_orcamento(
+
+                venda_id=venda_id,
+
+                cliente_id=cliente_id,
+
+                veiculo_id=veiculo_id,
+
+                validade=validade,
+
+                status=status,
+
+                observacao=observacao,
+
+                usuario=usuario,
+
+                filial_id=filial_id,
+
+                itens=itens
+            )
+
+
+            # ==========================
+            # RESPOSTA
+            # ==========================
+
+            return jsonify({
+
+                'success': True,
+
+                'venda_id': venda_id,
+
+                'status': status,
+
+                'message':
+                    'Pré-orçamento salvo com sucesso.'
+                    if status == 'PRE_ORCAMENTO'
+                    else
+                    'Orçamento gerado com sucesso.'
+
+            })
+
+
+        except Exception as e:
+
+            print(
+                f'Erro ao salvar orçamento: {e}'
+            )
+
+
+            return jsonify({
+
+                'success': False,
+
+                'message':
+                    'Não foi possível salvar o orçamento.'
+
+            }), 500

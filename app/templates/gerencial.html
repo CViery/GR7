@@ -217,7 +217,7 @@ async function carregarFuncionarios(loja, ano) {
         data.forEach(funcionario => {
             const li = document.createElement('li');
             li.textContent = funcionario.nome;
-            li.onclick = () => mostrarDesempenhoFuncionario(funcionario.id, ano);
+            li.onclick = () => mostrarDesempenhoFuncionario(funcionario.id, loja, ano);
             listaFuncionarios.appendChild(li);
         });
     } catch (error) {
@@ -226,9 +226,9 @@ async function carregarFuncionarios(loja, ano) {
 }
 
 // Mostra o desempenho do funcionário
-async function mostrarDesempenhoFuncionario(funcionarioId, ano) {
+async function mostrarDesempenhoFuncionario(funcionarioId, loja, ano) {
     try {
-        const response = await fetch(`/dados-funcionario/${funcionarioId}?ano=${ano}`);
+        const response = await fetch(`/dados-funcionario/${encodeURIComponent(funcionarioId)}?loja=${encodeURIComponent(loja)}&ano=${ano}`);
         const data = await response.json();
 
         console.log("Dados de desempenho do funcionário:", data);

@@ -1,14 +1,28 @@
-import requests
+from functools import cached_property
+
 from database import conection, gastos_db
 from services import faturamento, dados_notas
 
 
 class Utills:
     def __init__(self):
-        self.db = conection.Database()
-        self.db_gastos = gastos_db.GastosDataBase()
-        self.db_dados_notas = dados_notas.DadosGastos()
-        self.faturamento_db = faturamento.Faturamento()
+        pass
+
+    @cached_property
+    def db(self):
+        return conection.Database()
+
+    @cached_property
+    def db_gastos(self):
+        return gastos_db.GastosDataBase()
+
+    @cached_property
+    def db_dados_notas(self):
+        return dados_notas.DadosGastos()
+
+    @cached_property
+    def faturamento_db(self):
+        return faturamento.Faturamento()
 
     def formatar_moeda(self, valor):
         return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
@@ -38,7 +52,6 @@ class Utills:
         try:
             # Obtém os dados de faturamento de serviços para o mês e ano fornecidos
             dados = self.db.faturamento_servicos(mes, ano)
-            print(dados)
             # Extrai os valores dos dados
             valores = [valor[0] for valor in dados]
 
@@ -344,9 +357,4 @@ class Utills:
         except Exception as e:
             # Trata outros erros
             print(f"Ocorreu um erro ao cadastrar o fornecedor: {e}")
-
-    def formatar_moeda(self, valor):
-
-        return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
 

@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}<title>Notificações</title>{% endblock %}
+{% block main %}
+<style>.notifications{max-width:900px;margin:28px auto;padding:0 20px}.notice{display:block;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;margin-bottom:12px;color:#1e293b;text-decoration:none;box-shadow:0 6px 18px rgba(15,23,42,.05)}.notice small{color:#64748b}.notice h3{margin:5px 0}.unread{border-left:5px solid #2563eb}</style>
+<main class="notifications"><h1>Notificações</h1>{% for item in notificacoes %}<a class="notice {{ 'unread' if not item.lida_em else '' }}" href="{{ item.url or '#' }}"><small>{{ item.criada_em.strftime('%d/%m/%Y %H:%M') if item.criada_em else '' }}</small><h3>{{ item.titulo }}</h3><p>{{ item.mensagem }}</p></a>{% else %}<p>Nenhuma notificação.</p>{% endfor %}</main>
+{% endblock %}

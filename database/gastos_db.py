@@ -1,7 +1,8 @@
 from database import conection
 import logging
+from flask import session
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class GastosDataBase:
     def __init__(self):
@@ -60,8 +61,8 @@ class GastosDataBase:
             
             # Preparar a query de inserção
             logging.info("Preparando a query de inserção...")
-            query = '''
-                INSERT INTO notas (pago_por, emitido_para, status, boleto, num_nota, duplicata, fornecedor, 
+            query = f'''
+                INSERT INTO {tabela} (pago_por, emitido_para, status, boleto, num_nota, duplicata, fornecedor, 
                                 data_emissao, dia_emissao, mes_emissao, ano_emissao, vencimentos, valor, 
                                 despesa, observacoes, usuario, sub_categorias) 
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
@@ -143,7 +144,7 @@ class GastosDataBase:
             logging.info("Iniciando a consulta para recuperar todos os registros de 'notas'.")
             tabela = self.get_tabela_notas()
             # Definindo a query
-            query = 'SELECT * FROM {nota} ORDER BY data_emissao ASC;'
+            query = f'SELECT * FROM {tabela} ORDER BY data_emissao ASC;'
             
             # Executando a consulta
             self.cursor.execute(query)
@@ -186,7 +187,8 @@ class GastosDataBase:
             logging.info(f"Iniciando consulta para recuperar valores de {tipo} no mês {mes} e ano {ano}.")
             
             # Query para buscar os valores
-            query = 'SELECT valor FROM notas WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ?'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT valor FROM {tabela} WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ?'
             self.cursor.execute(query, (tipo, mes, ano))
             
             # Recuperando os resultados
@@ -219,7 +221,8 @@ class GastosDataBase:
             logging.info("Iniciando consulta para recuperar todos os boletos.")
 
             # Consulta SQL para recuperar os boletos
-            query = 'SELECT * FROM boletos ORDER BY data_vencimento ASC'
+            tabela = self.get_tabela_boleto()
+            query = f'SELECT * FROM {tabela} ORDER BY data_vencimento ASC'
             self.cursor.execute(query)
 
             # Recuperando os resultados
@@ -247,7 +250,8 @@ class GastosDataBase:
             logging.info("Iniciando consulta para recuperar todos os boletos.")
 
             # Consulta SQL para recuperar os boletos
-            query = 'SELECT * FROM boletos WHERE mes_vencimento = ? AND ano_vencimento = ? ORDER BY data_vencimento ASC'
+            tabela = self.get_tabela_boleto()
+            query = f'SELECT * FROM {tabela} WHERE mes_vencimento = ? AND ano_vencimento = ? ORDER BY data_vencimento ASC'
             self.cursor.execute(query, (mes, ano))
 
             # Recuperando os resultados
@@ -278,7 +282,8 @@ class GastosDataBase:
             logging.info(f"Iniciando consulta para recuperar boletos com num_nota = {num_nota}.")
 
             # Consulta SQL para buscar boletos pela num_nota
-            query = 'SELECT * FROM boletos WHERE num_nota = ? ORDER BY data_vencimento ASC'
+            tabela = self.get_tabela_boleto()
+            query = f'SELECT * FROM {tabela} WHERE num_nota = ? ORDER BY data_vencimento ASC'
             self.cursor.execute(query, (num_nota,))
 
             # Recuperando os resultados
@@ -309,7 +314,8 @@ class GastosDataBase:
             logging.info(f"Iniciando consulta para recuperar os valores dos boletos com num_nota = {num_nota}.")
 
             # Consulta SQL para buscar os valores dos boletos pela num_nota
-            query = 'SELECT valor FROM boletos WHERE num_nota = ? ORDER BY data_vencimento ASC'
+            tabela = self.get_tabela_boleto()
+            query = f'SELECT valor FROM {tabela} WHERE num_nota = ? ORDER BY data_vencimento ASC'
             self.cursor.execute(query, (num_nota,))
 
             # Recuperando os resultados
@@ -342,7 +348,8 @@ class GastosDataBase:
             logging.info(f"Iniciando consulta para recuperar os boletos com vencimento em {dia}/{mes}/{ano}.")
 
             # Consulta SQL para buscar os boletos pelo dia, mês e ano de vencimento
-            query = 'SELECT * FROM boletos WHERE dia_vencimento = ? AND mes_vencimento = ? AND ano_vencimento = ?'
+            tabela = self.get_tabela_boleto()
+            query = f'SELECT * FROM {tabela} WHERE dia_vencimento = ? AND mes_vencimento = ? AND ano_vencimento = ?'
             self.cursor.execute(query, (dia, mes, ano))
 
             # Recuperando os resultados
@@ -432,7 +439,8 @@ class GastosDataBase:
             logging.info(f"Iniciando a busca do valor da despesa '{despesa}' para o mês {mes} e ano {ano}.")
 
             # Consulta SQL para buscar o valor da despesa
-            query = 'SELECT valor FROM notas WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT valor FROM {tabela} WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?'
             self.cursor.execute(query, (despesa, mes, ano))
 
             # Obtendo os resultados
@@ -463,7 +471,8 @@ class GastosDataBase:
             logging.info("Iniciando a busca de todas as notas.")
 
             # Consulta SQL para obter todas as notas
-            query = 'SELECT * FROM notas ORDER BY data_emissao ASC;'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT * FROM {tabela} ORDER BY data_emissao ASC;'
             self.cursor.execute(query)
 
             # Obtendo os resultados
@@ -495,7 +504,8 @@ class GastosDataBase:
             logging.info(f"Iniciando a busca de notas para o mês {mes} e ano {ano}.")
 
             # Consulta SQL para obter todas as notas para o mês e ano fornecidos
-            query = 'SELECT * FROM notas WHERE mes_emissao = ? AND ano_emissao = ? ORDER BY data_emissao ASC;'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT * FROM {tabela} WHERE mes_emissao = ? AND ano_emissao = ? ORDER BY data_emissao ASC;'
             self.cursor.execute(query, (mes, ano))
 
             # Obtendo os resultados
@@ -527,7 +537,8 @@ class GastosDataBase:
         """
         try:
             # Iniciando a construção da query
-            query = "SELECT * FROM notas"
+            tabela = self.get_tabela_notas()
+            query = f"SELECT * FROM {tabela}"
             params = []
             filters = []
 
@@ -595,7 +606,8 @@ class GastosDataBase:
         """
         try:
             # Preparando a consulta SQL
-            query = 'SELECT * FROM notas WHERE num_nota = ?'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT * FROM {tabela} WHERE num_nota = ?'
 
             # Log para mostrar a consulta que será executada
             logging.info(f"Executando a consulta: {query} com o parâmetro num_nota = {num_nota}")
@@ -635,7 +647,8 @@ class GastosDataBase:
         """
         try:
             # Preparando a consulta para atualizar a duplicata
-            query1 = 'UPDATE notas SET duplicata = ? WHERE num_nota = ?'
+            tabela = self.get_tabela_notas()
+            query1 = f'UPDATE {tabela} SET duplicata = ? WHERE num_nota = ?'
             
             # Log para mostrar o que está sendo atualizado
             logging.info(f"Atualizando duplicata da nota {num_nota} para {numero_duplicata}")
@@ -644,7 +657,7 @@ class GastosDataBase:
             self.cursor.execute(query1, (numero_duplicata, num_nota))
             
             # Preparando a consulta para atualizar a data de vencimento
-            query2 = 'UPDATE notas SET vencimentos = ? WHERE num_nota = ?'
+            query2 = f'UPDATE {tabela} SET vencimentos = ? WHERE num_nota = ?'
             
             # Log para mostrar o que está sendo atualizado
             logging.info(f"Atualizando data de vencimento da nota {num_nota} para {datas}")
@@ -679,7 +692,8 @@ class GastosDataBase:
         """
         try:
             # Construindo a query SQL
-            query = "SELECT * FROM boletos"
+            tabela = self.get_tabela_boleto()
+            query = f"SELECT * FROM {tabela}"
             params = []
             filters = []
 
@@ -729,7 +743,8 @@ class GastosDataBase:
         """
         try:
             # Construção da query SQL
-            query = 'SELECT valor FROM notas WHERE mes_emissao = ? AND ano_emissao = ?'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT valor FROM {tabela} WHERE mes_emissao = ? AND ano_emissao = ?'
             
             # Executando a consulta
             logging.info(f"Buscando valores das notas para o mês {mes} e ano {ano}.")
@@ -1011,7 +1026,8 @@ class GastosDataBase:
 
     def notas_por_subcategoria(self, subcategorias, mes, ano):
         try:
-            query  = 'SELECT * FROM notas WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ?'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT * FROM {tabela} WHERE sub_categorias = ? AND mes_emissao = ? AND ano_emissao = ?'
             parametros = (subcategorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
@@ -1021,7 +1037,8 @@ class GastosDataBase:
 
     def notas_por_categoria(self, categorias, mes, ano):
         try:
-            query  = 'SELECT * FROM notas WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?'
+            tabela = self.get_tabela_notas()
+            query = f'SELECT * FROM {tabela} WHERE despesa = ? AND mes_emissao = ? AND ano_emissao = ?'
             parametros = (categorias, mes, ano)
             self.cursor.execute(query, parametros)
             response = self.cursor.fetchall()
@@ -1034,3 +1051,25 @@ class GastosDataBase:
         self.cursor.execute(query)
         response = self.cursor.fetchall()
         return response
+
+    def resumo_gastos(self, mes, ano):
+        """Agrega categorias e subcategorias em uma única consulta."""
+        tabela = self.get_tabela_notas()
+        query = f'''
+            SELECT despesa, sub_categorias, COALESCE(SUM(valor), 0) AS total
+            FROM {tabela}
+            WHERE mes_emissao = ? AND ano_emissao = ?
+            GROUP BY despesa, sub_categorias
+        '''
+        self.cursor.execute(query, (mes, ano))
+        return self.cursor.fetchall()
+
+    def soma_custo_mes(self, mes, ano):
+        try:
+            query = f'SELECT SUM(valor) FROM gastos_modulos WHERE MONTH(data_finalizacao) = ? AND YEAR(data_finalizacao) = ?'
+            self.cursor.execute(query,( mes, ano))
+            result = self.cursor.fetchone()
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao consultar detalhes dos serviços: {e}")
+            return []

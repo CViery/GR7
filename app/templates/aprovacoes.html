@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}<title>Central de Aprovações</title>{% endblock %}
+{% block main %}
+<style>
+.approval-page{max-width:1200px;margin:28px auto;padding:0 20px}.head{display:flex;justify-content:space-between;align-items:center}.card{background:white;border:1px solid #e5e7eb;border-radius:16px;overflow:auto;box-shadow:0 10px 30px rgba(15,23,42,.07)}table{width:100%;border-collapse:collapse}th,td{padding:14px;border-bottom:1px solid #e5e7eb;text-align:left}th{background:#f8fafc}.status{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}.PENDENTE{background:#fef3c7;color:#92400e}.APROVADA{background:#dcfce7;color:#166534}.RECUSADA,.EXPIRADA{background:#fee2e2;color:#991b1b}.UTILIZADA{background:#dbeafe;color:#1e40af}.button{display:inline-block;padding:9px 13px;border-radius:9px;background:#2563eb;color:white;text-decoration:none;font-weight:700}
+</style>
+<main class="approval-page"><div class="head"><div><h1>Central de Aprovações</h1><p>Solicitações de alteração e respectivas decisões.</p></div><a class="button" href="{{ url_for('listar_notificacoes') }}">Notificações</a></div>
+<section class="card"><table><thead><tr><th>Status</th><th>OS</th><th>Placa</th><th>Solicitante</th><th>Motivo</th><th>Solicitada em</th><th></th></tr></thead><tbody>
+{% for item in solicitacoes %}<tr><td><span class="status {{ item.status }}">{{ item.status }}</span></td><td>{{ item.num_os }}</td><td>{{ item.placa }}</td><td>{{ item.solicitante }}</td><td>{{ item.motivo }}</td><td>{{ item.solicitado_em.strftime('%d/%m/%Y %H:%M') if item.solicitado_em else '-' }}</td><td><a class="button" href="{{ url_for('detalhe_aprovacao', solicitacao_id=item.id) }}">Abrir</a></td></tr>
+{% else %}<tr><td colspan="7">Nenhuma solicitação encontrada.</td></tr>{% endfor %}</tbody></table></section></main>
+{% endblock %}

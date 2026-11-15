@@ -1,0 +1,21 @@
+{% extends 'modulos/base.html' %}{% block title %}Visão geral · GR7{% endblock %}
+{% block content %}
+<header><h1>Visão geral</h1><p>Resumo operacional da GR7 Módulos e atalhos para os lançamentos mais usados.</p></header>
+<section class="cards">
+  <div class="metric orange"><span>ORÇAMENTOS EM ABERTO</span><strong>{{ abertas }}</strong><small>Aguardando evolução</small></div>
+  <div class="metric blue"><span>OS EM ANDAMENTO</span><strong>{{ andamento }}</strong><small>Em execução</small></div>
+  <div class="metric green"><span>FATURAMENTO NO MÊS</span><strong>{{ faturado_mes|brl }}</strong><small>Faturas registradas</small></div>
+  <div class="metric purple"><span>CUSTO NO MÊS</span><strong>{{ custo_mes|brl }}</strong><small>Gastos lançados</small></div>
+</section>
+<h2>Atalhos rápidos</h2>
+<section class="quick">
+ <a href="{{ url_for('modulos.venda_nova') }}"><b>+</b><div><strong>Novo orçamento</strong><small>Lançar novo atendimento</small></div></a>
+ <a href="{{ url_for('modulos.cliente_novo') }}"><b>C</b><div><strong>Cadastrar cliente</strong><small>Novo cliente</small></div></a>
+ <a href="{{ url_for('modulos.gastos') }}"><b>G</b><div><strong>Lançar gasto</strong><small>Registrar despesa</small></div></a>
+ <a href="{{ url_for('modulos.relatorios') }}"><b>R</b><div><strong>Relatórios</strong><small>Indicadores operacionais</small></div></a>
+</section>
+<div class="section-head"><h2>Últimas movimentações</h2><a class="btn secondary" href="{{ url_for('modulos.vendas') }}">Ver todas</a></div>
+<div class="table-wrap"><table><thead><tr><th>Nº</th><th>Cliente / veículo</th><th>Status</th><th>Valor</th></tr></thead><tbody>
+{% for v in ultimas %}<tr><td><a href="{{ url_for('modulos.venda_detalhe', venda_id=v.id) }}">{{ v.numero }}</a></td><td>{{ v.cliente.nome }} · {{ v.veiculo or '-' }} / {{ v.placa or '-' }}</td><td><span class="tag">{{ v.status }}</span></td><td>{{ v.valor_total|brl }}</td></tr>{% else %}<tr><td colspan="4">Sem movimentações.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

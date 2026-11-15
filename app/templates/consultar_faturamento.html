@@ -446,6 +446,7 @@
                         <th onclick="ordenarTabela(3)">Mecânico</th>
                         <th onclick="ordenarTabela(4)">Valor Total</th>
                         <th onclick="ordenarTabela(5)">Valor Líquido</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
 
@@ -457,6 +458,7 @@
                         data-aditivo="{{ faturamento['valor_aditivo'] }}"
                         data-fluido="{{ faturamento['valor_fluido_sangria'] }}"
                         data-palheta="{{ faturamento['valor_palheta'] }}"
+                        data-limpeza-freios="{{ faturamento['valor_limpeza_freios'] }}"
                         data-filtro="{{ faturamento['valor_filtro'] }}"
                         data-pneu="{{ faturamento['valor_pneu'] }}"
                         data-bateria="{{ faturamento['valor_bateria'] }}"
@@ -478,6 +480,7 @@
                         <td>{{ faturamento['mecanico_servico'] }}</td>
                         <td class="money">{{ faturamento['total_os'] }}</td>
                         <td class="money">{{ faturamento['valor_p_meta'] }}</td>
+                        <td>{% if faturamento['editavel'] %}<a class="btn btn-light" onclick="event.stopPropagation()" href="{{ url_for('solicitar_edicao_faturamento', faturamento_id=faturamento['id']) }}">Solicitar edição</a>{% else %}<span title="Será liberado após a migração desta OS">Registro antigo</span>{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -510,18 +513,23 @@
             </div>
 
             <div class="detail-item">
-                <span>Aditivo</span>
+                <span>{{ 'Ar-condicionado' if empresa == 2 else 'Aditivo' }}</span>
                 <strong id="modalAditivo"></strong>
             </div>
 
             <div class="detail-item">
-                <span>Fluido</span>
+                <span>{{ 'Lavagem' if empresa == 2 else 'Fluido/Sangria' }}</span>
                 <strong id="modalFluido"></strong>
             </div>
 
             <div class="detail-item">
-                <span>Palheta</span>
+                <span>{{ 'Alternador/Motor de arranque' if empresa == 2 else 'Palheta' }}</span>
                 <strong id="modalPalheta"></strong>
+            </div>
+
+            <div class="detail-item">
+                <span>{{ 'Funilaria' if empresa == 2 else 'Limpeza dos freios' }}</span>
+                <strong id="modalLimpezaFreios"></strong>
             </div>
 
             <div class="detail-item">
@@ -672,6 +680,7 @@
         document.getElementById("modalAditivo").innerText = linha.dataset.aditivo || "-";
         document.getElementById("modalFluido").innerText = linha.dataset.fluido || "-";
         document.getElementById("modalPalheta").innerText = linha.dataset.palheta || "-";
+        document.getElementById("modalLimpezaFreios").innerText = linha.dataset.limpezaFreios || "-";
         document.getElementById("modalFiltro").innerText = linha.dataset.filtro || "-";
         document.getElementById("modalPneu").innerText = linha.dataset.pneu || "-";
         document.getElementById("modalBateria").innerText = linha.dataset.bateria || "-";

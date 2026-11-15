@@ -1,15 +1,42 @@
-import sqlite3
+import os
 import pyodbc
-import traceback
 import logging
-from flask import session
+from flask import g, has_app_context, session
 
-logging.basicConfig(filename='app.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+pyodbc.pooling = True
+
+
+def _connection_string():
+    configured = os.getenv('DB_CONNECTION_STRING')
+    if configured:
+        return configured
+    raise RuntimeError(
+        'DB_CONNECTION_STRING não configurada. '
+        'Defina a variável de ambiente antes de iniciar o sistema.'
+    )
+
+
+def get_connection():
+    if not has_app_context():
+        return pyodbc.connect(_connection_string())
+
+    if 'database_connection' not in g:
+        g.database_connection = pyodbc.connect(_connection_string())
+    return g.database_connection
+
+
+def close_connection(_error=None):
+    connection = g.pop('database_connection', None)
+    if connection is not None:
+        connection.close()
+
+
 class Database:
     def __init__(self):
-        conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7-server.database.windows.net,1433;Database=gr7admin;Uid=CloudSA1dd1b5e5;Pwd=Viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
-        self.conn = pyodbc.connect(conn_str)
+        self.conn = get_connection()
         self.cursor = self.conn.cursor()
+        self._compat_view_available = None
 
     def get_empresa(self):
         try:
@@ -28,19 +55,66 @@ class Database:
             return {"status": "error", "message": str(e)}
 
     def get_tabela(self):
+        """Retorna a origem somente de leitura dos relatórios de faturamento."""
         try:
-            if session['empresa'] == 1:
-                return "faturamento"
-            elif session['empresa'] == 2:
-                return "faturamento_portal"
-            elif session['empresa'] == 3:
-                return "faturamento_morumbi"
+            filial = int(session['empresa'])
+            if filial not in (1, 2, 3):
+                raise ValueError('Filial sem faturamento gerencial.')
+            if self._compat_view_available is None:
+                self.cursor.execute(
+                    "SELECT CASE WHEN OBJECT_ID('dbo.vw_faturamento_compat', 'V') "
+                    "IS NULL THEN 0 ELSE 1 END"
+                )
+                self._compat_view_available = bool(self.cursor.fetchone()[0])
+
+            if not self._compat_view_available:
+                logging.warning(
+                    'Migração do faturamento ainda não aplicada; '
+                    'usando as tabelas legadas.'
+                )
+                return {
+                    1: 'dbo.faturamento',
+                    2: 'dbo.faturamento_portal',
+                    3: 'dbo.faturamento_morumbi',
+                }[filial]
+
+            colunas = (
+                'id,placa,modelo_veiculo,data_orcamento,data_faturamento,'
+                'mes_faturamento,ano_faturamento,dias,num_os,cia,'
+                'conversao_pneustore,pecas,servicos,valor_os,revitalizacao,'
+                'aditivo,quantidade_aditivo,fluido_sangria,palheta,'
+                'limpeza_freios,detergente_parabrisa,filtro,pneus,bateria,'
+                'modelo_bateria,quantidade_oleo,valor_oleo,tipo_marca_oleo,'
+                'valor_meta,mecanico,filtro_mecanico,valor_dinheiro,freios,'
+                'suspensao,injecao_ignicao,cabecote_motor_arrefecimento,'
+                'outros,oleos,transmissao,usuario,observacoes,terceiros,origem_novo,orcamentista'
+            )
+            return (
+                f'(SELECT {colunas} FROM dbo.vw_faturamento_compat '
+                f'WHERE filial_id = {filial}) AS faturamento_filial'
+            )
         except Exception as e:
             # Loga o erro detalhado
             logging.error("Erro ao cadastrar faturamento: %s", e)
 
             # Retorna uma mensagem de erro
             return {"status": "error", "message": str(e)}
+
+    @staticmethod
+    def _tabela_legada_escrita(filial):
+        """A view de compatibilidade possui UNION e nunca pode receber INSERT."""
+        try:
+            filial = int(filial)
+        except (TypeError, ValueError) as error:
+            raise ValueError('Filial inválida para cadastro de faturamento.') from error
+        tabelas = {
+            1: 'dbo.faturamento',
+            2: 'dbo.faturamento_portal',
+            3: 'dbo.faturamento_morumbi',
+        }
+        if filial not in tabelas:
+            raise ValueError('Filial sem faturamento gerencial.')
+        return tabelas[filial]
 
 
 
@@ -56,7 +130,10 @@ class Database:
         """
         try:
             # Query com os nomes das colunas explicitamente definidos
-            tabela = self.get_tabela()
+            # Este método é apenas o fallback legado. A origem retornada por
+            # get_tabela() pode ser a vw_faturamento_compat, que contém UNION
+            # e, portanto, é somente leitura no SQL Server.
+            tabela = self._tabela_legada_escrita(session['empresa'])
             query = f'''
                 INSERT INTO {tabela} (
                     placa, modelo_veiculo, data_orcamento, data_faturamento, mes_faturamento, ano_faturamento, 
@@ -66,9 +143,9 @@ class Database:
                     modelo_bateria, quantidade_oleo, valor_oleo, tipo_marca_oleo, valor_meta, mecanico, 
                     filtro_mecanico, valor_dinheiro, freios, suspensao, 
                     injecao_ignicao,cabecote_motor_arrefecimento, outros, 
-                    oleos, transmissao, usuario, observacoes, terceiros
+                    oleos, transmissao, usuario, observacoes, terceiros, orcamentista
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
             '''
 
@@ -271,6 +348,21 @@ class Database:
         except Exception as e:
             logging.error(f"Erro ao buscar mecânicos: {e}")
             raise
+
+    def get_orcamentistas(self, empresa):
+        """Retorna a lista de atendentes/orçamentistas da unidade."""
+        try:
+            query = '''
+                SELECT nome FROM colaboradores
+                WHERE filial_id = ?
+                  AND LOWER(LTRIM(RTRIM(funcao))) = 'atendente'
+                ORDER BY nome ASC;
+            '''
+            self.cursor.execute(query, empresa)
+            return self.cursor.fetchall()
+        except Exception as e:
+            logging.error(f"Erro ao buscar orçamentistas: {e}")
+            return []
 
     def get_revitalizacao_mecanico(self, mecanico, mes, ano):
         """
@@ -923,6 +1015,24 @@ class Database:
             logging.error(f"Erro ao consultar faturamento para o mês {mes}/{ano}: {e}")
             return []
 
+    @staticmethod
+    def tabela_por_loja(loja):
+        tabelas = {
+            'GR7': 'faturamento',
+            'Portal': 'faturamento_portal',
+            'Morumbi': 'faturamento_morumbi'
+        }
+        if loja not in tabelas:
+            raise ValueError('Unidade inválida.')
+        return tabelas[loja]
+
+    @staticmethod
+    def filial_por_loja(loja):
+        filiais = {'GR7': 1, 'Portal': 2, 'Morumbi': 3}
+        if loja not in filiais:
+            raise ValueError('Unidade inválida.')
+        return filiais[loja]
+
     def faturamento_loja_ano(self, loja, ano):
         """
         Retorna o faturamento mensal de uma loja para um determinado ano.
@@ -937,11 +1047,10 @@ class Database:
         try:
             logging.info(f"Consultando faturamento da loja {loja} para o ano {ano}.")
             
-            # Escolhe a tabela correta com base na loja
-            tabela = self.get_tabela()
+            tabela = self.tabela_por_loja(loja)
             
             query = f'''
-                SELECT mes_faturamento, SUM(valor_meta) as faturamento
+                SELECT mes_faturamento, COALESCE(SUM(valor_meta), 0) as faturamento
                 FROM {tabela}
                 WHERE ano_faturamento = ?
                 GROUP BY mes_faturamento
@@ -954,14 +1063,16 @@ class Database:
             faturamento = {mes: 0 for mes in range(1, 13)}  # Inicializa todos os meses com 0
             for row in result:
                 mes = int(row.mes_faturamento)
-                faturamento[mes] = float(row.faturamento)
+                faturamento[mes] = float(row.faturamento or 0)
             
             logging.info(f"Faturamento da loja {loja} para o ano {ano}: {faturamento}")
             
             return faturamento
+        except ValueError:
+            raise
         except Exception as e:
             logging.error(f"Erro ao consultar faturamento da loja {loja} para o ano {ano}: {e}")
-            return {}
+            raise
     
     def funcionarios_por_loja(self, loja):
         """
@@ -976,20 +1087,27 @@ class Database:
         try:
             logging.info(f"Consultando funcionários da loja {loja}.")
             
-            # Escolhe a tabela correta com base na loja
-           
-            
-            query = f'SELECT nome FROM colaboradores ORDER BY nome ASC;'
-            self.cursor.execute(query)
+            filial_id = self.filial_por_loja(loja)
+            query = '''
+                SELECT nome FROM colaboradores
+                WHERE filial_id = ? AND LOWER(funcao) = ?
+                ORDER BY nome ASC;
+            '''
+            self.cursor.execute(query, filial_id, 'mecanico')
             result = self.cursor.fetchall()
             
-            funcionarios = [row.nome for row in result]
+            funcionarios = [
+                {'id': row.nome, 'nome': row.nome}
+                for row in result if row.nome
+            ]
            
             logging.info(f"Funcionários da loja {loja}: {funcionarios}")
             return funcionarios
+        except ValueError:
+            raise
         except Exception as e:
             logging.error(f"Erro ao consultar funcionários da loja {loja}: {e}")
-            return []
+            raise
     
     def desempenho_funcionario_ano(self, loja, mecanico, ano):
         """
@@ -1006,35 +1124,44 @@ class Database:
         try:
             logging.info(f"Consultando desempenho do funcionário {mecanico} da loja {loja} para o ano {ano}.")
             
-            # Escolhe a tabela correta com base na loja
-            tabela = self.get_tabela()
+            tabela = self.tabela_por_loja(loja)
             
             query = f'''
-                SELECT 
-                    SUM(revitalizacao) as revitalizacao,
-                    SUM(filtro) as filtro,
-                    SUM(limpeza_freios) as limpeza_freios
+                SELECT
+                    mes_faturamento,
+                    COALESCE(SUM(revitalizacao), 0) AS revitalizacao,
+                    SUM(CASE WHEN COALESCE(revitalizacao, 0) > 0 THEN 1 ELSE 0 END) AS qtd_revitalizacao,
+                    COALESCE(SUM(filtro), 0) AS filtro,
+                    SUM(CASE WHEN COALESCE(filtro, 0) > 0 THEN 1 ELSE 0 END) AS qtd_filtro,
+                    COALESCE(SUM(limpeza_freios), 0) AS limpeza_freios,
+                    SUM(CASE WHEN COALESCE(limpeza_freios, 0) > 0 THEN 1 ELSE 0 END) AS qtd_limpeza_freios
                 FROM {tabela}
-                WHERE mecanico = ? AND ano_faturamento = ?;
+                WHERE mecanico = ? AND ano_faturamento = ?
+                GROUP BY mes_faturamento
+                ORDER BY mes_faturamento;
             '''
             self.cursor.execute(query, (mecanico, ano))
-            result = self.cursor.fetchone()
-            
-            if result:
-                desempenho = {
-                    "revitalizacao": float(result.revitalizacao or 0),
-                    "filtro": float(result.filtro or 0),
-                    "limpeza_freios": float(result.limpeza_freios or 0)
-                }
-                logging.info(f"Desempenho do funcionário {mecanico}: {desempenho}")
-                
-                return desempenho
-            else:
-                logging.warning(f"Nenhum desempenho encontrado para o funcionário {mecanico}.")
-                return {}
+            result = self.cursor.fetchall()
+            servicos = {
+                'revitalizacao': {'nome': 'Revitalização', 'valor': [0.0] * 12, 'quantidade': [0] * 12},
+                'filtro': {'nome': 'Filtros', 'valor': [0.0] * 12, 'quantidade': [0] * 12},
+                'limpeza': {'nome': 'Limpeza de freios', 'valor': [0.0] * 12, 'quantidade': [0] * 12}
+            }
+            for row in result:
+                indice = int(row.mes_faturamento) - 1
+                if 0 <= indice < 12:
+                    servicos['revitalizacao']['valor'][indice] = float(row.revitalizacao or 0)
+                    servicos['revitalizacao']['quantidade'][indice] = int(row.qtd_revitalizacao or 0)
+                    servicos['filtro']['valor'][indice] = float(row.filtro or 0)
+                    servicos['filtro']['quantidade'][indice] = int(row.qtd_filtro or 0)
+                    servicos['limpeza']['valor'][indice] = float(row.limpeza_freios or 0)
+                    servicos['limpeza']['quantidade'][indice] = int(row.qtd_limpeza_freios or 0)
+            return {'servicos': list(servicos.values())}
+        except ValueError:
+            raise
         except Exception as e:
             logging.error(f"Erro ao consultar desempenho do funcionário {mecanico}: {e}")
-            return {}
+            raise
         
     def detalhes_servicos_funcionario(self, loja, mecanico, ano):
         """
@@ -1083,3 +1210,66 @@ class Database:
         except Exception as e:
             logging.error(f"Erro ao consultar detalhes dos serviços do funcionário {mecanico}: {e}")
             return {}
+
+    def buscar_os(self, status):
+        try:
+            query = f'SELECT * FROM vendas_modulos WHERE status = ?'
+            self.cursor.execute(query,(status,) )
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao consultar detalhes dos serviços: {e}")
+            return []
+        
+    def buscar_quantidade(self, status):
+            try:
+                query = f'SELECT COUNT(*) AS quantidade_faturadas FROM vendas_modulos WHERE status = ?'
+                self.cursor.execute(query,(status,) )
+                result = self.cursor.fetchone()
+                return result
+            except Exception as e:
+                logging.error(f"Erro ao consultar detalhes dos serviços: {e}")
+                return []
+            
+    def soma_vendas_mes(self, status, mes, ano):
+        try:
+            query = '''
+                SELECT COALESCE(SUM(valor_total), 0)
+                FROM vendas_modulos
+                WHERE status = ?
+                AND MONTH(data_finalizacao) = ?
+                AND YEAR(data_finalizacao) = ?
+            '''
+
+            self.cursor.execute(query, (status, mes, ano))
+            result = self.cursor.fetchone()
+
+            return result[0] if result else 0
+
+        except Exception as e:
+            logging.error(f"Erro ao consultar soma das vendas do mês: {e}")
+            return 0
+
+
+    def ultimas_movimentacoes(self):
+        try:
+            query = 'SELECT TOP 6 * FROM vendas_modulos ORDER BY data_finalizacao DESC;'
+            self.cursor.execute(query,)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao consultar detalhes dos serviços: {e}")
+            return []
+
+    def listar_veiculos_client(self,client_id):
+        try:
+            query = 'SELECT * FROM veiculos_modulos WHERE cliente_id = ?;'
+            self.cursor.execute(query,(client_id,))
+            result = self.cursor.fetchall()
+            return result
+        except Exception as e:
+            logging.error(f"Erro ao consultar detalhes dos serviços: {e}")
+            return []
+        
+
+

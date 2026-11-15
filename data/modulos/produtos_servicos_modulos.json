@@ -1,0 +1,341 @@
+[
+  {
+    "id": "1",
+    "descricao": "Diagnóstico eletrônico",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "2",
+    "descricao": "Reprogramação de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "3",
+    "descricao": "Programação de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "4",
+    "descricao": "Codificação de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "5",
+    "descricao": "Clonagem de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "6",
+    "descricao": "Reset de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "7",
+    "descricao": "Teste em bancada",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "8",
+    "descricao": "Reparo de módulo de injeção",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "9",
+    "descricao": "Reparo de módulo ABS",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "10",
+    "descricao": "Reparo de módulo de câmbio",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "11",
+    "descricao": "Reparo de módulo de carroceria",
+    "tipo": "SERVICO",
+    "custo_padrao": "0.00",
+    "valor_padrao": "0.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T17:03:25.9230000"
+  },
+  {
+    "id": "12",
+    "codigo": "SRV001",
+    "descricao": "Diagnóstico eletrônico",
+    "tipo": "SERVICO",
+    "custo_padrao": "50.00",
+    "valor_padrao": "180.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "13",
+    "codigo": "SRV002",
+    "descricao": "Reprogramação de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "80.00",
+    "valor_padrao": "450.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "14",
+    "codigo": "SRV003",
+    "descricao": "Clonagem de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "100.00",
+    "valor_padrao": "650.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "15",
+    "codigo": "SRV004",
+    "descricao": "Reparo de módulo de injeção",
+    "tipo": "SERVICO",
+    "custo_padrao": "150.00",
+    "valor_padrao": "850.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "16",
+    "codigo": "SRV005",
+    "descricao": "Reparo de módulo ABS",
+    "tipo": "SERVICO",
+    "custo_padrao": "180.00",
+    "valor_padrao": "950.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "17",
+    "codigo": "SRV006",
+    "descricao": "Programação de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "70.00",
+    "valor_padrao": "400.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "18",
+    "codigo": "SRV007",
+    "descricao": "Teste em bancada",
+    "tipo": "SERVICO",
+    "custo_padrao": "30.00",
+    "valor_padrao": "150.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "19",
+    "codigo": "PEC001",
+    "descricao": "Processador módulo",
+    "tipo": "PECA",
+    "custo_padrao": "180.00",
+    "valor_padrao": "350.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "20",
+    "codigo": "PEC002",
+    "descricao": "Conector eletrônico",
+    "tipo": "PECA",
+    "custo_padrao": "35.00",
+    "valor_padrao": "90.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "21",
+    "codigo": "PEC003",
+    "descricao": "Memória EEPROM",
+    "tipo": "PECA",
+    "custo_padrao": "45.00",
+    "valor_padrao": "120.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "22",
+    "codigo": "PEC004",
+    "descricao": "Driver eletrônico",
+    "tipo": "PECA",
+    "custo_padrao": "90.00",
+    "valor_padrao": "190.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "23",
+    "codigo": "PEC005",
+    "descricao": "Módulo usado para reposição",
+    "tipo": "PECA",
+    "custo_padrao": "650.00",
+    "valor_padrao": "950.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:28:58.6200000"
+  },
+  {
+    "id": "24",
+    "codigo": "SRV001",
+    "descricao": "Diagnóstico eletrônico",
+    "tipo": "SERVICO",
+    "custo_padrao": "50.00",
+    "valor_padrao": "180.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "25",
+    "codigo": "SRV002",
+    "descricao": "Reprogramação de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "80.00",
+    "valor_padrao": "450.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "26",
+    "codigo": "SRV003",
+    "descricao": "Clonagem de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "100.00",
+    "valor_padrao": "650.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "27",
+    "codigo": "SRV004",
+    "descricao": "Reparo de módulo de injeção",
+    "tipo": "SERVICO",
+    "custo_padrao": "150.00",
+    "valor_padrao": "850.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "28",
+    "codigo": "SRV005",
+    "descricao": "Reparo de módulo ABS",
+    "tipo": "SERVICO",
+    "custo_padrao": "180.00",
+    "valor_padrao": "950.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "29",
+    "codigo": "SRV006",
+    "descricao": "Programação de módulo",
+    "tipo": "SERVICO",
+    "custo_padrao": "70.00",
+    "valor_padrao": "400.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "30",
+    "codigo": "SRV007",
+    "descricao": "Teste em bancada",
+    "tipo": "SERVICO",
+    "custo_padrao": "30.00",
+    "valor_padrao": "150.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "31",
+    "codigo": "PEC001",
+    "descricao": "Processador módulo",
+    "tipo": "PECA",
+    "custo_padrao": "180.00",
+    "valor_padrao": "350.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "32",
+    "codigo": "PEC002",
+    "descricao": "Conector eletrônico",
+    "tipo": "PECA",
+    "custo_padrao": "35.00",
+    "valor_padrao": "90.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "33",
+    "codigo": "PEC003",
+    "descricao": "Memória EEPROM",
+    "tipo": "PECA",
+    "custo_padrao": "45.00",
+    "valor_padrao": "120.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "34",
+    "codigo": "PEC004",
+    "descricao": "Driver eletrônico",
+    "tipo": "PECA",
+    "custo_padrao": "90.00",
+    "valor_padrao": "190.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  },
+  {
+    "id": "35",
+    "codigo": "PEC005",
+    "descricao": "Módulo usado para reposição",
+    "tipo": "PECA",
+    "custo_padrao": "650.00",
+    "valor_padrao": "950.00",
+    "ativo": "True",
+    "data_cadastro": "2026-08-14T19:29:43.4900000"
+  }
+]

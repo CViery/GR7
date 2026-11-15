@@ -9,7 +9,15 @@ class Login:
         self.db = login_db.Login()
 
     def empresas(self):
-        return self.db.get_empresa()
+        empresas = list(self.db.get_empresa() or [])
+        ids = {int(empresa[0]) for empresa in empresas if empresa}
+
+        # A filial de Módulos deve estar disponível no mesmo seletor de login,
+        # inclusive antes de o cadastro ser incluído na tabela legada.
+        if 4 not in ids:
+            empresas.append((4, 'GR7 Módulos'))
+
+        return empresas
 
     def login(self, usuario, senha):
         try:

@@ -2,6 +2,13 @@
 __pycache__/
 *.py[cod]
 *$py.class
+venv/
+.venv/
+.env
+app.log
+*.log
+release.zip
+packages-microsoft-prod.deb
 
 # C extensions
 *.so

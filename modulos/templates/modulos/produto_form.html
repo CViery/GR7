@@ -1,0 +1,47 @@
+{% extends 'modulos/base.html' %}
+{% block content %}
+<header>
+  <h1>{{ 'Editar peça / serviço' if produto else 'Nova peça / serviço' }}</h1>
+  <p>{{ 'Atualize os valores e informações do cadastro.' if produto else 'Cadastre uma nova peça ou serviço para uso nas OS e orçamentos.' }}</p>
+</header>
+
+<form class="panel form-grid" method="post">
+  <label>
+    Código
+    <input name="codigo" value="{{ produto.codigo or '' if produto else '' }}" placeholder="Ex.: MOD-001">
+  </label>
+
+  <label>
+    Tipo
+    <select required name="tipo">
+      <option value="SERVICO" {{ 'selected' if produto and produto.tipo == 'SERVICO' else '' }}>Serviço</option>
+      <option value="PECA" {{ 'selected' if produto and produto.tipo == 'PECA' else '' }}>Peça</option>
+    </select>
+  </label>
+
+  <label class="span-2">
+    Descrição
+    <input required name="descricao" value="{{ produto.descricao if produto else '' }}" placeholder="Ex.: Reparo de central de injeção">
+  </label>
+
+  <label>
+    Custo padrão (R$)
+    <input type="number" step="0.01" min="0" name="custo_padrao" value="{{ '%.2f'|format(produto.custo_padrao or 0) if produto else '0.00' }}">
+  </label>
+
+  <label>
+    Valor de venda padrão (R$)
+    <input type="number" step="0.01" min="0" required name="valor_padrao" value="{{ '%.2f'|format(produto.valor_padrao or 0) if produto else '0.00' }}">
+  </label>
+
+  <label class="span-2" style="display: flex; align-items: center; gap: 8px; margin-top: 24px;">
+    <input type="checkbox" name="ativo" style="width: auto;" {{ 'checked' if (not produto) or produto.ativo else '' }}>
+    Cadastro ativo (disponível para seleção nas OS)
+  </label>
+
+  <div class="actions span-4">
+    <a class="btn secondary" href="{{ url_for('modulos.produtos') }}">Cancelar</a>
+    <button class="btn">{{ 'Salvar alterações' if produto else 'Salvar cadastro' }}</button>
+  </div>
+</form>
+{% endblock %}
