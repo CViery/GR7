@@ -37,6 +37,7 @@ class Database:
         conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7-server.database.windows.net,1433;Database=gr7admin;Uid=CloudSA1dd1b5e5;Pwd=Viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
         self.conn = pyodbc.connect(conn_str)
         self.cursor = self.conn.cursor()
+        self._compat_view_available = None
 
     def get_empresa(self):
         try:
