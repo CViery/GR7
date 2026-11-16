@@ -6,15 +6,23 @@ from flask import g, has_app_context, session
 logger = logging.getLogger(__name__)
 pyodbc.pooling = True
 
+DEFAULT_CONN_STR = (
+    'Driver={ODBC Driver 18 for SQL Server};'
+    'Server=tcp:gr7-server.database.windows.net,1433;'
+    'Database=gr7admin;'
+    'Uid=CloudSA1dd1b5e5;'
+    'Pwd=Viery2312@;'
+    'Encrypt=yes;'
+    'TrustServerCertificate=no;'
+    'Connection Timeout=30;'
+)
+
 
 def _connection_string():
     configured = os.getenv('DB_CONNECTION_STRING')
     if configured:
         return configured
-    raise RuntimeError(
-        'DB_CONNECTION_STRING não configurada. '
-        'Defina a variável de ambiente antes de iniciar o sistema.'
-    )
+    return DEFAULT_CONN_STR
 
 
 def get_connection():
@@ -34,8 +42,7 @@ def close_connection(_error=None):
 
 class Database:
     def __init__(self):
-        conn_str = 'Driver={ODBC Driver 18 for SQL Server};Server=tcp:gr7-server.database.windows.net,1433;Database=gr7admin;Uid=CloudSA1dd1b5e5;Pwd=Viery2312@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
-        self.conn = pyodbc.connect(conn_str)
+        self.conn = pyodbc.connect(_connection_string())
         self.cursor = self.conn.cursor()
         self._compat_view_available = None
 
