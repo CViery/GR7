@@ -2,6 +2,7 @@ import ast
 import inspect
 import logging
 import os
+import textwrap
 from pathlib import Path
 from urllib.parse import quote_plus
 
@@ -19,7 +20,6 @@ def _resolver_connection_string():
     try:
         from database import conection as db_conn
 
-        # Caso _connection_string() funcione via variável de ambiente
         if hasattr(db_conn, "_connection_string"):
             try:
                 val = db_conn._connection_string()
@@ -28,9 +28,8 @@ def _resolver_connection_string():
             except RuntimeError:
                 pass
 
-        # Extrai a string conn_str definida dentro de Database.__init__ em database/conection.py
         if hasattr(db_conn, "Database"):
-            source = inspect.getsource(db_conn.Database.__init__)
+            source = textwrap.dedent(inspect.getsource(db_conn.Database.__init__))
             tree = ast.parse(source)
             for node in ast.walk(tree):
                 if isinstance(node, ast.Assign):
