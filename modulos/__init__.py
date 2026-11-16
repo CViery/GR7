@@ -1,5 +1,7 @@
-import os
+import ast
+import inspect
 import logging
+import os
 from pathlib import Path
 from urllib.parse import quote_plus
 
@@ -7,6 +9,39 @@ from .extensions import db
 
 
 logger = logging.getLogger(__name__)
+
+
+def _resolver_connection_string():
+    conn_str = (os.getenv("DB_CONNECTION_STRING") or "").strip()
+    if conn_str:
+        return conn_str
+
+    try:
+        from database import conection as db_conn
+
+        # Caso _connection_string() funcione via variável de ambiente
+        if hasattr(db_conn, "_connection_string"):
+            try:
+                val = db_conn._connection_string()
+                if isinstance(val, str) and val.strip():
+                    return val.strip()
+            except RuntimeError:
+                pass
+
+        # Extrai a string conn_str definida dentro de Database.__init__ em database/conection.py
+        if hasattr(db_conn, "Database"):
+            source = inspect.getsource(db_conn.Database.__init__)
+            tree = ast.parse(source)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Assign):
+                    for target in node.targets:
+                        if isinstance(target, ast.Name) and target.id == "conn_str":
+                            if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                                return node.value.value.strip()
+    except Exception as exc:
+        logger.warning("Não foi possível ler database.conection: %s", exc)
+
+    return ""
 
 
 def register_modulos(app):
@@ -17,15 +52,15 @@ def register_modulos(app):
     if database_uri.lower().startswith("sqlite:"):
         logger.warning(
             "MODULOS_DATABASE_URI ainda aponta para SQLite; usando o SQL "
-            "Server configurado em DB_CONNECTION_STRING."
+            "Server configurado em database.conection / DB_CONNECTION_STRING."
         )
         database_uri = ""
+
     if not database_uri:
-        connection_string = os.getenv("DB_CONNECTION_STRING")
+        connection_string = _resolver_connection_string()
         if not connection_string:
             raise RuntimeError(
-                "DB_CONNECTION_STRING não configurada. A área de Módulos "
-                "usa o mesmo SQL Server do sistema gerencial."
+                "DB_CONNECTION_STRING não configurada e não encontrada em database.conection."
             )
         database_uri = (
             "mssql+pyodbc:///?odbc_connect="
@@ -47,7 +82,13 @@ def register_modulos(app):
     app.register_blueprint(bp)
     register_cli(app)
 
+    if os.getenv("CI", "").lower() == "true" or app.config.get("TESTING"):
+        return
+
     with app.app_context():
-        db.create_all()
-        if os.getenv("MODULOS_AUTO_SEED", "0") == "1":
-            ensure_seeded()
+        try:
+            db.create_all()
+            if os.getenv("MODULOS_AUTO_SEED", "0") == "1":
+                ensure_seeded()
+        except Exception as exc:
+            logger.warning("Aviso ao executar db.create_all() nos módulos: %s", exc)
